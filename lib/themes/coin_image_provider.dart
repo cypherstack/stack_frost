@@ -20,37 +20,8 @@ final coinImageProvider = Provider.family<String, Coin>((ref, coin) {
     switch (coin) {
       case Coin.bitcoin:
         return assets.bitcoinImage;
-      case Coin.litecoin:
-      case Coin.litecoinTestNet:
-        return assets.litecoinImage;
-      case Coin.bitcoincash:
-        return assets.bitcoincashImage;
-      case Coin.dogecoin:
-        return assets.dogecoinImage;
-      case Coin.eCash:
-        return assets.bitcoinImage;
-      case Coin.epicCash:
-        return assets.epicCashImage;
-      case Coin.firo:
-        return assets.firoImage;
-      case Coin.monero:
-        return assets.moneroImage;
-      case Coin.wownero:
-        return assets.wowneroImage;
-      case Coin.namecoin:
-        return assets.namecoinImage;
-      case Coin.particl:
-        return assets.particlImage;
       case Coin.bitcoinTestNet:
         return assets.bitcoinImage;
-      case Coin.bitcoincashTestnet:
-        return assets.bitcoincashImage;
-      case Coin.firoTestNet:
-        return assets.firoImage;
-      case Coin.dogecoinTestNet:
-        return assets.dogecoinImage;
-      case Coin.ethereum:
-        return assets.ethereumImage;
       default:
         return assets.stackIcon;
     }
@@ -68,38 +39,8 @@ final coinImageSecondaryProvider = Provider.family<String, Coin>((ref, coin) {
     switch (coin) {
       case Coin.bitcoin:
         return assets.bitcoinImageSecondary;
-      case Coin.litecoin:
-      case Coin.litecoinTestNet:
-        return assets.litecoinImageSecondary;
-      case Coin.bitcoincash:
-        return assets.bitcoincashImageSecondary;
-      case Coin.dogecoin:
-        return assets.dogecoinImageSecondary;
-      case Coin.eCash:
-        return assets.bitcoinImageSecondary;
-      case Coin.epicCash:
-        return assets.epicCashImageSecondary;
-      case Coin.firo:
-        return assets.firoImageSecondary;
-      case Coin.monero:
-        return assets.moneroImageSecondary;
-      case Coin.wownero:
-        return assets.wowneroImageSecondary;
-      case Coin.namecoin:
-        return assets.namecoinImageSecondary;
-      case Coin.particl:
-        return assets.particlImageSecondary;
       case Coin.bitcoinTestNet:
         return assets.bitcoinImageSecondary;
-      case Coin.bitcoincashTestnet:
-        return assets.bitcoincashImageSecondary;
-      case Coin.firoTestNet:
-        return assets.firoImageSecondary;
-      case Coin.dogecoinTestNet:
-        return assets.dogecoinImageSecondary;
-      case Coin.ethereum:
-        return assets.ethereumImageSecondary;
-
       default:
         return assets.stackIcon;
     }

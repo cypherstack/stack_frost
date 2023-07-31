@@ -247,8 +247,6 @@ class Manager with ChangeNotifier {
 
   bool get hasOrdinalsSupport => _currentWallet is OrdinalsInterface;
 
-  bool get hasTokenSupport => _currentWallet.coin == Coin.ethereum;
-
   bool get hasWhirlpoolSupport => false;
 
   int get rescanOnOpenVersion =>

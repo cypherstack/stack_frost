@@ -14,21 +14,7 @@ import 'package:stackwallet/models/balance.dart';
 import 'package:stackwallet/models/isar/models/isar_models.dart' as isar_models;
 import 'package:stackwallet/models/node_model.dart';
 import 'package:stackwallet/models/paymint/fee_object_model.dart';
-import 'package:stackwallet/services/coins/banano/banano_wallet.dart';
 import 'package:stackwallet/services/coins/bitcoin/bitcoin_wallet.dart';
-import 'package:stackwallet/services/coins/bitcoincash/bitcoincash_wallet.dart';
-import 'package:stackwallet/services/coins/dogecoin/dogecoin_wallet.dart';
-import 'package:stackwallet/services/coins/ecash/ecash_wallet.dart';
-import 'package:stackwallet/services/coins/epiccash/epiccash_wallet.dart';
-import 'package:stackwallet/services/coins/ethereum/ethereum_wallet.dart';
-import 'package:stackwallet/services/coins/firo/firo_wallet.dart';
-import 'package:stackwallet/services/coins/litecoin/litecoin_wallet.dart';
-import 'package:stackwallet/services/coins/monero/monero_wallet.dart';
-import 'package:stackwallet/services/coins/namecoin/namecoin_wallet.dart';
-import 'package:stackwallet/services/coins/nano/nano_wallet.dart';
-import 'package:stackwallet/services/coins/particl/particl_wallet.dart';
-import 'package:stackwallet/services/coins/stellar/stellar_wallet.dart';
-import 'package:stackwallet/services/coins/wownero/wownero_wallet.dart';
 import 'package:stackwallet/services/transaction_notification_tracker.dart';
 import 'package:stackwallet/utilities/amount/amount.dart';
 import 'package:stackwallet/utilities/enums/coin_enum.dart';
@@ -84,51 +70,8 @@ abstract class CoinServiceAPI {
       electrumXClient: client,
     );
     switch (coin) {
-      case Coin.firo:
-        return FiroWallet(
-          walletId: walletId,
-          walletName: walletName,
-          coin: coin,
-          secureStore: secureStorageInterface,
-          client: client,
-          cachedClient: cachedClient,
-          tracker: tracker,
-        );
-      case Coin.firoTestNet:
-        return FiroWallet(
-          walletId: walletId,
-          walletName: walletName,
-          coin: coin,
-          secureStore: secureStorageInterface,
-          client: client,
-          cachedClient: cachedClient,
-          tracker: tracker,
-        );
-
       case Coin.bitcoin:
         return BitcoinWallet(
-          walletId: walletId,
-          walletName: walletName,
-          coin: coin,
-          secureStore: secureStorageInterface,
-          client: client,
-          cachedClient: cachedClient,
-          tracker: tracker,
-        );
-
-      case Coin.litecoin:
-        return LitecoinWallet(
-          walletId: walletId,
-          walletName: walletName,
-          coin: coin,
-          secureStore: secureStorageInterface,
-          client: client,
-          cachedClient: cachedClient,
-          tracker: tracker,
-        );
-
-      case Coin.litecoinTestNet:
-        return LitecoinWallet(
           walletId: walletId,
           walletName: walletName,
           coin: coin,
@@ -146,152 +89,6 @@ abstract class CoinServiceAPI {
           secureStore: secureStorageInterface,
           client: client,
           cachedClient: cachedClient,
-          tracker: tracker,
-        );
-
-      case Coin.bitcoincash:
-        return BitcoinCashWallet(
-          walletId: walletId,
-          walletName: walletName,
-          coin: coin,
-          secureStore: secureStorageInterface,
-          client: client,
-          cachedClient: cachedClient,
-          tracker: tracker,
-        );
-
-      case Coin.bitcoincashTestnet:
-        return BitcoinCashWallet(
-          walletId: walletId,
-          walletName: walletName,
-          coin: coin,
-          secureStore: secureStorageInterface,
-          client: client,
-          cachedClient: cachedClient,
-          tracker: tracker,
-        );
-
-      case Coin.dogecoin:
-        return DogecoinWallet(
-          walletId: walletId,
-          walletName: walletName,
-          coin: coin,
-          secureStore: secureStorageInterface,
-          client: client,
-          cachedClient: cachedClient,
-          tracker: tracker,
-        );
-
-      case Coin.epicCash:
-        return EpicCashWallet(
-          walletId: walletId,
-          walletName: walletName,
-          coin: coin,
-          secureStore: secureStorageInterface,
-          // tracker: tracker,
-        );
-
-      case Coin.ethereum:
-        return EthereumWallet(
-          walletId: walletId,
-          walletName: walletName,
-          coin: coin,
-          secureStore: secureStorageInterface,
-          tracker: tracker,
-        );
-
-      case Coin.monero:
-        return MoneroWallet(
-          walletId: walletId,
-          walletName: walletName,
-          coin: coin,
-          secureStorage: secureStorageInterface,
-          // tracker: tracker,
-        );
-
-      case Coin.particl:
-        return ParticlWallet(
-            walletId: walletId,
-            walletName: walletName,
-            coin: coin,
-            secureStore: secureStorageInterface,
-            client: client,
-            cachedClient: cachedClient,
-            tracker: tracker);
-
-      case Coin.stellar:
-        return StellarWallet(
-          walletId: walletId,
-          walletName: walletName,
-          coin: coin,
-          secureStore: secureStorageInterface,
-          tracker: tracker,
-        );
-
-      case Coin.wownero:
-        return WowneroWallet(
-          walletId: walletId,
-          walletName: walletName,
-          coin: coin,
-          secureStorage: secureStorageInterface,
-          // tracker: tracker,
-        );
-
-      case Coin.namecoin:
-        return NamecoinWallet(
-          walletId: walletId,
-          walletName: walletName,
-          coin: coin,
-          secureStore: secureStorageInterface,
-          tracker: tracker,
-          cachedClient: cachedClient,
-          client: client,
-        );
-
-      case Coin.nano:
-        return NanoWallet(
-            walletId: walletId,
-            walletName: walletName,
-            coin: coin,
-            tracker: tracker,
-            secureStore: secureStorageInterface);
-
-      case Coin.banano:
-        return BananoWallet(
-            walletId: walletId,
-            walletName: walletName,
-            coin: coin,
-            tracker: tracker,
-            secureStore: secureStorageInterface);
-
-      case Coin.dogecoinTestNet:
-        return DogecoinWallet(
-          walletId: walletId,
-          walletName: walletName,
-          coin: coin,
-          secureStore: secureStorageInterface,
-          client: client,
-          cachedClient: cachedClient,
-          tracker: tracker,
-        );
-
-      case Coin.eCash:
-        return ECashWallet(
-          walletId: walletId,
-          walletName: walletName,
-          coin: coin,
-          secureStore: secureStorageInterface,
-          client: client,
-          cachedClient: cachedClient,
-          tracker: tracker,
-        );
-
-      case Coin.stellarTestnet:
-        return StellarWallet(
-          walletId: walletId,
-          walletName: walletName,
-          coin: coin,
-          secureStore: secureStorageInterface,
           tracker: tracker,
         );
     }

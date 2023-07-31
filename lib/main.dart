@@ -12,15 +12,9 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:cw_core/node.dart';
-import 'package:cw_core/unspent_coins_info.dart';
-import 'package:cw_core/wallet_info.dart';
-import 'package:cw_core/wallet_type.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_libmonero/monero/monero.dart';
-import 'package:flutter_libmonero/wownero/wownero.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -48,11 +42,9 @@ import 'package:stackwallet/pages_desktop_specific/password/desktop_login_view.d
 import 'package:stackwallet/providers/desktop/storage_crypto_handler_provider.dart';
 import 'package:stackwallet/providers/global/auto_swb_service_provider.dart';
 import 'package:stackwallet/providers/global/base_currencies_provider.dart';
-// import 'package:stackwallet/providers/global/has_authenticated_start_state_provider.dart';
 import 'package:stackwallet/providers/global/trades_service_provider.dart';
 import 'package:stackwallet/providers/providers.dart';
 import 'package:stackwallet/route_generator.dart';
-// import 'package:stackwallet/services/buy/buy_data_loading_service.dart';
 import 'package:stackwallet/services/debug_service.dart';
 import 'package:stackwallet/services/exchange/exchange_data_loading_service.dart';
 import 'package:stackwallet/services/locale_service.dart';
@@ -151,15 +143,15 @@ void main() async {
   // node model adapter
   Hive.registerAdapter(NodeModelAdapter());
 
-  Hive.registerAdapter(NodeAdapter());
-
-  if (!Hive.isAdapterRegistered(WalletInfoAdapter().typeId)) {
-    Hive.registerAdapter(WalletInfoAdapter());
-  }
-
-  Hive.registerAdapter(WalletTypeAdapter());
-
-  Hive.registerAdapter(UnspentCoinsInfoAdapter());
+  // Hive.registerAdapter(NodeAdapter());
+  //
+  // if (!Hive.isAdapterRegistered(WalletInfoAdapter().typeId)) {
+  //   Hive.registerAdapter(WalletInfoAdapter());
+  // }
+  //
+  // Hive.registerAdapter(WalletTypeAdapter());
+  //
+  // Hive.registerAdapter(UnspentCoinsInfoAdapter());
   await Hive.initFlutter(
       (await StackFileSystem.applicationHiveDirectory()).path);
 
@@ -188,13 +180,6 @@ void main() async {
             level: LogLevel.Error, printFullLength: true);
       }
     }
-  }
-
-  if (!Platform.isWindows) {
-    monero.onStartup();
-  }
-  if (!Platform.isLinux && !Platform.isWindows) {
-    wownero.onStartup();
   }
 
   // SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,

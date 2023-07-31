@@ -256,15 +256,11 @@ class Wallets extends ChangeNotifier {
             final shouldSetAutoSync = shouldAutoSyncAll ||
                 walletIdsToEnableAutoSync.contains(manager.walletId);
 
-            if (manager.coin == Coin.monero || manager.coin == Coin.wownero) {
-              // walletsToInitLinearly.add(Tuple2(manager, shouldSetAutoSync));
-            } else {
-              walletInitFutures.add(manager.initializeExisting().then((value) {
-                if (shouldSetAutoSync) {
-                  manager.shouldAutoSync = true;
-                }
-              }));
-            }
+            walletInitFutures.add(manager.initializeExisting().then((value) {
+              if (shouldSetAutoSync) {
+                manager.shouldAutoSync = true;
+              }
+            }));
 
             _managerMap.add(walletId, manager, false);
 
@@ -346,15 +342,11 @@ class Wallets extends ChangeNotifier {
           final shouldSetAutoSync = shouldAutoSyncAll ||
               walletIdsToEnableAutoSync.contains(manager.walletId);
 
-          if (manager.coin == Coin.monero || manager.coin == Coin.wownero) {
-            // walletsToInitLinearly.add(Tuple2(manager, shouldSetAutoSync));
-          } else {
-            walletInitFutures.add(manager.initializeExisting().then((value) {
-              if (shouldSetAutoSync) {
-                manager.shouldAutoSync = true;
-              }
-            }));
-          }
+          walletInitFutures.add(manager.initializeExisting().then((value) {
+            if (shouldSetAutoSync) {
+              manager.shouldAutoSync = true;
+            }
+          }));
 
           _managerMap.add(walletId, manager, false);
 
