@@ -11,7 +11,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stackwallet/models/isar/models/ethereum/eth_contract.dart';
-import 'package:stackwallet/pages/token_view/sub_widgets/token_summary.dart';
 import 'package:stackwallet/providers/db/main_db_provider.dart';
 import 'package:stackwallet/providers/providers.dart';
 import 'package:stackwallet/themes/stack_colors.dart';
@@ -81,9 +80,6 @@ class WalletInfoRow extends ConsumerWidget {
                               const SizedBox(
                                 width: 4,
                               ),
-                              CoinTickerTag(
-                                walletId: walletId,
-                              ),
                             ],
                           )
                         : Text(
@@ -145,9 +141,6 @@ class WalletInfoRow extends ConsumerWidget {
                           ),
                           const SizedBox(
                             width: 4,
-                          ),
-                          CoinTickerTag(
-                            walletId: walletId,
                           ),
                         ],
                       )

@@ -49,13 +49,7 @@ class _FeeSliderState extends State<FeeSlider> {
             setState(() {
               sliderValue = value;
               final number = pow(sliderValue * (max - min) + min, 4).toDouble();
-              switch (widget.coin) {
-                case Coin.dogecoin:
-                case Coin.dogecoinTestNet:
-                  rate = (number * 1000).toInt();
-                default:
-                  rate = number.toInt();
-              }
+              rate = number.toInt();
             });
             widget.onSatVByteChanged(rate);
           },

@@ -13,7 +13,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stackwallet/models/isar/models/isar_models.dart';
-import 'package:stackwallet/notifications/show_flush_bar.dart';
 import 'package:stackwallet/pages/wallet_view/sub_widgets/tx_icon.dart';
 import 'package:stackwallet/pages/wallet_view/transaction_views/transaction_details_view.dart';
 import 'package:stackwallet/providers/db/main_db_provider.dart';
@@ -57,10 +56,6 @@ class _TransactionCardState extends ConsumerState<TransactionCard> {
     Coin coin,
     int currentHeight,
   ) {
-    if (coin == Coin.epicCash && _transaction.slateId == null) {
-      return "Restored Funds";
-    }
-
     final confirmedStatus = _transaction.isConfirmed(
       currentHeight,
       coin.requiredConfirmations,
@@ -169,16 +164,6 @@ class _TransactionCardState extends ConsumerState<TransactionCard> {
             ),
           ),
           onPressed: () async {
-            if (coin == Coin.epicCash && _transaction.slateId == null) {
-              unawaited(showFloatingFlushBar(
-                context: context,
-                message:
-                    "Restored Epic funds from your Seed have no Data.\nUse Stack Backup to keep your transaction history.",
-                type: FlushBarType.warning,
-                duration: const Duration(seconds: 5),
-              ));
-              return;
-            }
             if (Util.isDesktop) {
               await showDialog<void>(
                 context: context,
@@ -230,9 +215,7 @@ class _TransactionCardState extends ConsumerState<TransactionCard> {
                               fit: BoxFit.scaleDown,
                               child: Text(
                                 _transaction.isCancelled
-                                    ? coin == Coin.ethereum
-                                        ? "Failed"
-                                        : "Cancelled"
+                                    ? "Cancelled"
                                     : whatIsIt(
                                         _transaction.type,
                                         coin,

@@ -11,8 +11,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:stackwallet/providers/providers.dart';
-import 'package:stackwallet/services/coins/ethereum/ethereum_wallet.dart';
 import 'package:stackwallet/themes/stack_colors.dart';
 import 'package:stackwallet/utilities/assets.dart';
 import 'package:stackwallet/utilities/constants.dart';
@@ -43,13 +41,6 @@ class _MasterWalletCardState extends ConsumerState<MasterWalletCard> {
 
   @override
   void initState() {
-    final ethWallet = ref
-        .read(walletsChangeNotifierProvider)
-        .getManager(widget.walletId)
-        .wallet as EthereumWallet;
-
-    tokenContractAddresses = ethWallet.getWalletTokenContractAddresses();
-
     super.initState();
   }
 

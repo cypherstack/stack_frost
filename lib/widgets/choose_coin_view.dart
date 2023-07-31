@@ -55,7 +55,6 @@ class _ChooseCoinViewState extends ConsumerState<ChooseCoinView> {
   @override
   void initState() {
     _coins = _coins.toList();
-    _coins.remove(Coin.firoTestNet);
     super.initState();
   }
 

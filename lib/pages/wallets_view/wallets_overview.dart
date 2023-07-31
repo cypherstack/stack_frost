@@ -15,9 +15,7 @@ import 'package:stackwallet/models/add_wallet_list_entity/sub_classes/coin_entit
 import 'package:stackwallet/models/isar/models/ethereum/eth_contract.dart';
 import 'package:stackwallet/pages/add_wallet_views/create_or_restore_wallet_view/create_or_restore_wallet_view.dart';
 import 'package:stackwallet/pages_desktop_specific/my_stack_view/dialogs/desktop_expanding_wallet_card.dart';
-import 'package:stackwallet/providers/db/main_db_provider.dart';
 import 'package:stackwallet/providers/providers.dart';
-import 'package:stackwallet/services/coins/ethereum/ethereum_wallet.dart';
 import 'package:stackwallet/services/coins/manager.dart';
 import 'package:stackwallet/themes/stack_colors.dart';
 import 'package:stackwallet/utilities/assets.dart';
@@ -114,52 +112,16 @@ class _EthWalletsOverviewState extends ConsumerState<WalletsOverview> {
         ref.read(walletsServiceChangeNotifierProvider).fetchWalletsData();
     walletsData.removeWhere((key, value) => value.coin != widget.coin);
 
-    if (widget.coin == Coin.ethereum) {
-      for (final data in walletsData.values) {
-        final List<EthContract> contracts = [];
-        final manager =
-            ref.read(walletsChangeNotifierProvider).getManager(data.walletId);
-        final contractAddresses = (manager.wallet as EthereumWallet)
-            .getWalletTokenContractAddresses();
-
-        // fetch each contract
-        for (final contractAddress in contractAddresses) {
-          final contract = ref
-              .read(
-                mainDBProvider,
-              )
-              .getEthContractSync(
-                contractAddress,
-              );
-
-          // add it to list if it exists in DB
-          if (contract != null) {
-            contracts.add(contract);
-          }
-        }
-
-        // add tuple to list
-        wallets.add(
-          Tuple2(
-            ref.read(walletsChangeNotifierProvider).getManager(
-                  data.walletId,
-                ),
-            contracts,
-          ),
-        );
-      }
-    } else {
-      // add non token wallet tuple to list
-      for (final data in walletsData.values) {
-        wallets.add(
-          Tuple2(
-            ref.read(walletsChangeNotifierProvider).getManager(
-                  data.walletId,
-                ),
-            [],
-          ),
-        );
-      }
+    // add non token wallet tuple to list
+    for (final data in walletsData.values) {
+      wallets.add(
+        Tuple2(
+          ref.read(walletsChangeNotifierProvider).getManager(
+                data.walletId,
+              ),
+          [],
+        ),
+      );
     }
 
     super.initState();
