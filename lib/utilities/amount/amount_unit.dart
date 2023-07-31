@@ -36,34 +36,9 @@ enum AmountUnit {
 
   static List<AmountUnit> valuesForCoin(Coin coin) {
     switch (coin) {
-      case Coin.firo:
-      case Coin.litecoin:
-      case Coin.particl:
-      case Coin.namecoin:
       case Coin.bitcoinTestNet:
-      case Coin.litecoinTestNet:
-      case Coin.bitcoincashTestnet:
-      case Coin.dogecoinTestNet:
-      case Coin.firoTestNet:
       case Coin.bitcoin:
-      case Coin.bitcoincash:
-      case Coin.dogecoin:
-      case Coin.eCash:
-      case Coin.epicCash:
-      case Coin.stellar: // TODO: check if this is correct
-      case Coin.stellarTestnet:
         return AmountUnit.values.sublist(0, 4);
-
-      case Coin.monero:
-      case Coin.wownero:
-        return AmountUnit.values.sublist(0, 5);
-
-      case Coin.ethereum:
-        return AmountUnit.values.sublist(0, 7);
-
-      case Coin.nano:
-      case Coin.banano:
-        return AmountUnit.values;
     }
   }
 }
@@ -78,67 +53,23 @@ extension AmountUnitExt on AmountUnit {
       case AmountUnit.micro:
         return "µ${coin.ticker}";
       case AmountUnit.nano:
-        if (coin == Coin.ethereum) {
-          return "gwei";
-        } else if (coin == Coin.wownero ||
-            coin == Coin.monero ||
-            coin == Coin.nano ||
-            coin == Coin.banano) {
-          return "n${coin.ticker}";
-        } else {
-          return "sats";
-        }
+        return "sats";
       case AmountUnit.pico:
-        if (coin == Coin.ethereum) {
-          return "mwei";
-        } else if (coin == Coin.wownero ||
-            coin == Coin.monero ||
-            coin == Coin.nano ||
-            coin == Coin.banano) {
-          return "p${coin.ticker}";
-        } else {
-          return "invalid";
-        }
+        return "invalid";
       case AmountUnit.femto:
-        if (coin == Coin.ethereum) {
-          return "kwei";
-        } else if (coin == Coin.nano || coin == Coin.banano) {
-          return "f${coin.ticker}";
-        } else {
-          return "invalid";
-        }
+        return "invalid";
       case AmountUnit.atto:
-        if (coin == Coin.ethereum) {
-          return "wei";
-        } else if (coin == Coin.nano || coin == Coin.banano) {
-          return "a${coin.ticker}";
-        } else {
-          return "invalid";
-        }
+        return "invalid";
       case AmountUnit.zepto:
-        if (coin == Coin.nano || coin == Coin.banano) {
-          return "z${coin.ticker}";
-        } else {
-          return "invalid";
-        }
+        return "invalid";
       case AmountUnit.yocto:
-        if (coin == Coin.nano || coin == Coin.banano) {
-          return "y${coin.ticker}";
-        } else {
-          return "invalid";
-        }
+        return "invalid";
+
       case AmountUnit.ronto:
-        if (coin == Coin.nano || coin == Coin.banano) {
-          return "r${coin.ticker}";
-        } else {
-          return "invalid";
-        }
+        return "invalid";
+
       case AmountUnit.quecto:
-        if (coin == Coin.nano || coin == Coin.banano) {
-          return "q${coin.ticker}";
-        } else {
-          return "invalid";
-        }
+        return "invalid";
     }
   }
 

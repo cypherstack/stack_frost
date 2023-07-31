@@ -8,7 +8,6 @@
  *
  */
 
-import 'package:dart_numerics/dart_numerics.dart';
 import 'package:decimal/decimal.dart';
 import 'package:hive/hive.dart';
 import 'package:stackwallet/utilities/constants.dart';
@@ -229,38 +228,6 @@ class Transaction {
     );
   }
 
-  factory Transaction.fromLelantusJson(Map<String, dynamic> json) {
-    return Transaction(
-      txid: json['txid'] as String,
-      confirmedStatus: json['confirmed_status'] as bool? ?? false,
-      timestamp: json['timestamp'] as int? ??
-          (DateTime.now().millisecondsSinceEpoch ~/ 1000),
-      txType: json['txType'] as String,
-      amount: (Decimal.parse(json["amount"].toString()) *
-              Decimal.fromInt(Constants.satsPerCoin(Coin
-                  .firo).toInt())) // dirty hack but we need 8 decimal places here to keep consistent data structure
-          .toBigInt()
-          .toInt(),
-      aliens: [],
-      worthNow: json['worthNow'] as String,
-      worthAtBlockTimestamp: json['worthAtBlockTimestamp'] as String? ?? "0",
-      fees: (Decimal.parse(json["fees"].toString()) *
-              Decimal.fromInt(Constants.satsPerCoin(Coin
-                  .firo).toInt())) // dirty hack but we need 8 decimal places here to keep consistent data structure
-          .toBigInt()
-          .toInt(),
-      inputSize: json['inputSize'] as int? ?? 0,
-      outputSize: json['outputSize'] as int? ?? 0,
-      inputs: [],
-      outputs: [],
-      address: json["address"] as String,
-      height: json["height"] as int? ?? int64MaxValue,
-      subType: json["subType"] as String? ?? "",
-      confirmations: json["confirmations"] as int? ?? 0,
-      otherData: json["otherData"] as String?,
-    );
-  }
-
   bool get isMinting => subType.toLowerCase() == "mint" && !confirmedStatus;
 
   Transaction copyWith({
@@ -411,10 +378,9 @@ class Output {
         scriptpubkeyAsm: json['scriptPubKey']['asm'] as String?,
         scriptpubkeyType: json['scriptPubKey']['type'] as String?,
         scriptpubkeyAddress: address,
-        value: (Decimal.parse(
-                    (json["value"] ?? 0).toString()) *
-                Decimal.fromInt(Constants.satsPerCoin(Coin
-                    .firo).toInt())) // dirty hack but we need 8 decimal places here to keep consistent data structure
+        value: (Decimal.parse((json["value"] ?? 0).toString()) *
+                Decimal.fromInt(Constants.satsPerCoin(Coin.firo)
+                    .toInt())) // dirty hack but we need 8 decimal places here to keep consistent data structure
             .toBigInt()
             .toInt(),
       );
@@ -426,8 +392,8 @@ class Output {
           scriptpubkeyType: "",
           scriptpubkeyAddress: "",
           value: (Decimal.parse(0.toString()) *
-                  Decimal.fromInt(Constants.satsPerCoin(Coin
-                      .firo).toInt())) // dirty hack but we need 8 decimal places here to keep consistent data structure
+                  Decimal.fromInt(Constants.satsPerCoin(Coin.firo)
+                      .toInt())) // dirty hack but we need 8 decimal places here to keep consistent data structure
               .toBigInt()
               .toInt());
     }
