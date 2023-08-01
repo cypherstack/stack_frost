@@ -10,8 +10,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackfrost/models/isar/models/ethereum/eth_contract.dart';
-import 'package:stackfrost/providers/db/main_db_provider.dart';
 import 'package:stackfrost/providers/providers.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
@@ -40,12 +38,6 @@ class WalletInfoRow extends ConsumerWidget {
         .watch(walletsChangeNotifierProvider.notifier)
         .getManagerProvider(walletId));
 
-    EthContract? contract;
-    if (contractAddress != null) {
-      contract = ref.watch(mainDBProvider
-          .select((value) => value.getEthContractSync(contractAddress!)));
-    }
-
     if (Util.isDesktop) {
       return Padding(
         padding: padding,
@@ -64,33 +56,15 @@ class WalletInfoRow extends ConsumerWidget {
                     const SizedBox(
                       width: 12,
                     ),
-                    contract != null
-                        ? Row(
-                            children: [
-                              Text(
-                                contract.name,
-                                style:
-                                    STextStyles.desktopTextExtraSmall(context)
-                                        .copyWith(
-                                  color: Theme.of(context)
-                                      .extension<StackColors>()!
-                                      .textDark,
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 4,
-                              ),
-                            ],
-                          )
-                        : Text(
-                            manager.walletName,
-                            style: STextStyles.desktopTextExtraSmall(context)
-                                .copyWith(
-                              color: Theme.of(context)
-                                  .extension<StackColors>()!
-                                  .textDark,
-                            ),
-                          ),
+                    Text(
+                      manager.walletName,
+                      style:
+                          STextStyles.desktopTextExtraSmall(context).copyWith(
+                        color: Theme.of(context)
+                            .extension<StackColors>()!
+                            .textDark,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -132,22 +106,10 @@ class WalletInfoRow extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                contract != null
-                    ? Row(
-                        children: [
-                          Text(
-                            contract.name,
-                            style: STextStyles.titleBold12(context),
-                          ),
-                          const SizedBox(
-                            width: 4,
-                          ),
-                        ],
-                      )
-                    : Text(
-                        manager.walletName,
-                        style: STextStyles.titleBold12(context),
-                      ),
+                Text(
+                  manager.walletName,
+                  style: STextStyles.titleBold12(context),
+                ),
                 const SizedBox(
                   height: 2,
                 ),

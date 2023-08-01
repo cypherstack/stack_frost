@@ -15,11 +15,8 @@ import 'package:isar/isar.dart';
 import 'package:stackfrost/models/add_wallet_list_entity/add_wallet_list_entity.dart';
 import 'package:stackfrost/models/isar/models/contact_entry.dart';
 import 'package:stackfrost/models/isar/models/isar_models.dart';
-import 'package:stackfrost/models/isar/ordinal.dart';
 import 'package:stackfrost/models/paynym/paynym_account_lite.dart';
 import 'package:stackfrost/models/send_view_auto_fill_data.dart';
-import 'package:stackfrost/pages/add_wallet_views/add_token_view/add_custom_token_view.dart';
-import 'package:stackfrost/pages/add_wallet_views/add_token_view/edit_wallet_tokens_view.dart';
 import 'package:stackfrost/pages/add_wallet_views/add_wallet_view/add_wallet_view.dart';
 import 'package:stackfrost/pages/add_wallet_views/create_or_restore_wallet_view/create_or_restore_wallet_view.dart';
 import 'package:stackfrost/pages/add_wallet_views/name_your_wallet_view/name_your_wallet_view.dart';
@@ -42,9 +39,6 @@ import 'package:stackfrost/pages/home_view/home_view.dart';
 import 'package:stackfrost/pages/intro_view.dart';
 import 'package:stackfrost/pages/manage_favorites_view/manage_favorites_view.dart';
 import 'package:stackfrost/pages/notification_views/notifications_view.dart';
-import 'package:stackfrost/pages/ordinals/ordinal_details_view.dart';
-import 'package:stackfrost/pages/ordinals/ordinals_filter_view.dart';
-import 'package:stackfrost/pages/ordinals/ordinals_view.dart';
 import 'package:stackfrost/pages/paynym/add_new_paynym_follow_view.dart';
 import 'package:stackfrost/pages/paynym/paynym_claim_view.dart';
 import 'package:stackfrost/pages/paynym/paynym_home_view.dart';
@@ -56,7 +50,6 @@ import 'package:stackfrost/pages/receive_view/generate_receiving_uri_qr_code_vie
 import 'package:stackfrost/pages/receive_view/receive_view.dart';
 import 'package:stackfrost/pages/send_view/confirm_transaction_view.dart';
 import 'package:stackfrost/pages/send_view/send_view.dart';
-import 'package:stackfrost/pages/send_view/token_send_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/about_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/advanced_views/advanced_settings_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/advanced_views/debug_view.dart';
@@ -100,7 +93,6 @@ import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_sett
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_settings_wallet_settings/rename_wallet_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_settings_wallet_settings/wallet_settings_wallet_settings_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_settings_wallet_settings/xpub_view.dart';
-import 'package:stackfrost/pages/special/firo_rescan_recovery_error_dialog.dart';
 import 'package:stackfrost/pages/stack_privacy_calls.dart';
 import 'package:stackfrost/pages/wallet_view/transaction_views/all_transactions_view.dart';
 import 'package:stackfrost/pages/wallet_view/transaction_views/edit_note_view.dart';
@@ -112,9 +104,6 @@ import 'package:stackfrost/pages/wallets_view/wallets_view.dart';
 import 'package:stackfrost/pages_desktop_specific/address_book_view/desktop_address_book.dart';
 import 'package:stackfrost/pages_desktop_specific/addresses/desktop_wallet_addresses_view.dart';
 import 'package:stackfrost/pages_desktop_specific/coin_control/desktop_coin_control_view.dart';
-import 'package:stackfrost/pages_desktop_specific/desktop_buy/desktop_buy_view.dart';
-import 'package:stackfrost/pages_desktop_specific/desktop_exchange/desktop_all_trades_view.dart';
-import 'package:stackfrost/pages_desktop_specific/desktop_exchange/desktop_exchange_view.dart';
 import 'package:stackfrost/pages_desktop_specific/desktop_home_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/my_stack_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/desktop_token_view.dart';
@@ -126,8 +115,6 @@ import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/sub_
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/unlock_wallet_keys_desktop.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/wallet_keys_desktop_popup.dart';
 import 'package:stackfrost/pages_desktop_specific/notifications/desktop_notifications_view.dart';
-import 'package:stackfrost/pages_desktop_specific/ordinals/desktop_ordinal_details_view.dart';
-import 'package:stackfrost/pages_desktop_specific/ordinals/desktop_ordinals_view.dart';
 import 'package:stackfrost/pages_desktop_specific/password/create_password_view.dart';
 import 'package:stackfrost/pages_desktop_specific/password/delete_password_warning_view.dart';
 import 'package:stackfrost/pages_desktop_specific/password/forgot_password_desktop_view.dart';
@@ -243,20 +230,6 @@ class RouteGenerator {
         }
         return _routeError("${settings.name} invalid args: ${args.toString()}");
 
-      case FiroRescanRecoveryErrorView.routeName:
-        if (args is String) {
-          return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => FiroRescanRecoveryErrorView(
-              walletId: args,
-            ),
-            settings: RouteSettings(
-              name: settings.name,
-            ),
-          );
-        }
-        return _routeError("${settings.name} invalid args: ${args.toString()}");
-
       case WalletsView.routeName:
         return getRoute(
             shouldUseMaterialRoute: useMaterialPageRoute,
@@ -268,31 +241,6 @@ class RouteGenerator {
             shouldUseMaterialRoute: useMaterialPageRoute,
             builder: (_) => const AddWalletView(),
             settings: RouteSettings(name: settings.name));
-
-      case EditWalletTokensView.routeName:
-        if (args is String) {
-          return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => EditWalletTokensView(
-              walletId: args,
-            ),
-            settings: RouteSettings(
-              name: settings.name,
-            ),
-          );
-        } else if (args is Tuple2<String, List<String>>) {
-          return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => EditWalletTokensView(
-              walletId: args.item1,
-              contractsToMarkSelected: args.item2,
-            ),
-            settings: RouteSettings(
-              name: settings.name,
-            ),
-          );
-        }
-        return _routeError("${settings.name} invalid args: ${args.toString()}");
 
       case DesktopTokenView.routeName:
         if (args is String) {
@@ -307,15 +255,6 @@ class RouteGenerator {
           );
         }
         return _routeError("${settings.name} invalid args: ${args.toString()}");
-
-      case AddCustomTokenView.routeName:
-        return getRoute(
-          shouldUseMaterialRoute: useMaterialPageRoute,
-          builder: (_) => const AddCustomTokenView(),
-          settings: RouteSettings(
-            name: settings.name,
-          ),
-        );
 
       case WalletsOverview.routeName:
         if (args is Coin) {
@@ -374,70 +313,6 @@ class RouteGenerator {
           );
         }
         return _routeError("${settings.name} invalid args: ${args.toString()}");
-
-      case OrdinalsView.routeName:
-        if (args is String) {
-          return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => OrdinalsView(
-              walletId: args,
-            ),
-            settings: RouteSettings(
-              name: settings.name,
-            ),
-          );
-        }
-        return _routeError("${settings.name} invalid args: ${args.toString()}");
-
-      case DesktopOrdinalsView.routeName:
-        if (args is String) {
-          return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => DesktopOrdinalsView(
-              walletId: args,
-            ),
-            settings: RouteSettings(
-              name: settings.name,
-            ),
-          );
-        }
-        return _routeError("${settings.name} invalid args: ${args.toString()}");
-
-      case OrdinalDetailsView.routeName:
-        if (args is ({Ordinal ordinal, String walletId})) {
-          return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => OrdinalDetailsView(
-              walletId: args.walletId,
-              ordinal: args.ordinal,
-            ),
-            settings: RouteSettings(
-              name: settings.name,
-            ),
-          );
-        }
-        return _routeError("${settings.name} invalid args: ${args.toString()}");
-
-      case DesktopOrdinalDetailsView.routeName:
-        if (args is ({Ordinal ordinal, String walletId})) {
-          return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => DesktopOrdinalDetailsView(
-              walletId: args.walletId,
-              ordinal: args.ordinal,
-            ),
-            settings: RouteSettings(
-              name: settings.name,
-            ),
-          );
-        }
-        return _routeError("${settings.name} invalid args: ${args.toString()}");
-
-      case OrdinalsFilterView.routeName:
-        return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => const OrdinalsFilterView(),
-            settings: RouteSettings(name: settings.name));
 
       case UtxoDetailsView.routeName:
         if (args is Tuple2<Id, String>) {
@@ -1128,17 +1003,6 @@ class RouteGenerator {
               name: settings.name,
             ),
           );
-        } else if (args is Tuple2<String, EthContract?>) {
-          return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => ReceiveView(
-              walletId: args.item1,
-              tokenContract: args.item2,
-            ),
-            settings: RouteSettings(
-              name: settings.name,
-            ),
-          );
         }
         return _routeError("${settings.name} invalid args: ${args.toString()}");
 
@@ -1210,21 +1074,21 @@ class RouteGenerator {
         }
         return _routeError("${settings.name} invalid args: ${args.toString()}");
 
-      case TokenSendView.routeName:
-        if (args is Tuple3<String, Coin, EthContract>) {
-          return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => TokenSendView(
-              walletId: args.item1,
-              coin: args.item2,
-              tokenContract: args.item3,
-            ),
-            settings: RouteSettings(
-              name: settings.name,
-            ),
-          );
-        }
-        return _routeError("${settings.name} invalid args: ${args.toString()}");
+      // case TokenSendView.routeName:
+      //   if (args is Tuple3<String, Coin, EthContract>) {
+      //     return getRoute(
+      //       shouldUseMaterialRoute: useMaterialPageRoute,
+      //       builder: (_) => TokenSendView(
+      //         walletId: args.item1,
+      //         coin: args.item2,
+      //         tokenContract: args.item3,
+      //       ),
+      //       settings: RouteSettings(
+      //         name: settings.name,
+      //       ),
+      //     );
+      //   }
+      //   return _routeError("${settings.name} invalid args: ${args.toString()}");
 
       case ConfirmTransactionView.routeName:
         if (args is Tuple2<Map<String, dynamic>, String>) {
@@ -1359,24 +1223,6 @@ class RouteGenerator {
         return getRoute(
             shouldUseMaterialRoute: useMaterialPageRoute,
             builder: (_) => const DesktopNotificationsView(),
-            settings: RouteSettings(name: settings.name));
-
-      case DesktopExchangeView.routeName:
-        return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => const DesktopExchangeView(),
-            settings: RouteSettings(name: settings.name));
-
-      case DesktopBuyView.routeName:
-        return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => const DesktopBuyView(),
-            settings: RouteSettings(name: settings.name));
-
-      case DesktopAllTradesView.routeName:
-        return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => const DesktopAllTradesView(),
             settings: RouteSettings(name: settings.name));
 
       case DesktopSettingsView.routeName:

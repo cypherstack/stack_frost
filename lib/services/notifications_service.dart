@@ -14,17 +14,13 @@ import 'package:flutter/foundation.dart';
 import 'package:stackfrost/db/hive/db.dart';
 import 'package:stackfrost/electrumx_rpc/electrumx.dart';
 import 'package:stackfrost/exceptions/electrumx/no_such_transaction.dart';
-import 'package:stackfrost/models/exchange/response_objects/trade.dart';
 import 'package:stackfrost/models/notification_model.dart';
-import 'package:stackfrost/services/exchange/exchange_response.dart';
 import 'package:stackfrost/services/node_service.dart';
 import 'package:stackfrost/services/notifications_api.dart';
 import 'package:stackfrost/services/trade_service.dart';
 import 'package:stackfrost/utilities/enums/coin_enum.dart';
 import 'package:stackfrost/utilities/logger.dart';
 import 'package:stackfrost/utilities/prefs.dart';
-
-import 'exchange/exchange.dart';
 
 class NotificationsService extends ChangeNotifier {
   late NodeService nodeService;
@@ -95,9 +91,9 @@ class NotificationsService extends ChangeNotifier {
     _timer = Timer.periodic(notificationRefreshInterval, (_) {
       Logging.instance
           .log("Periodic notifications update check", level: LogLevel.Info);
-      if (prefs.externalCalls) {
-        _checkTrades();
-      }
+      // if (prefs.externalCalls) {
+      //   _checkTrades();
+      // }
       _checkTransactions();
     });
   }
@@ -194,73 +190,73 @@ class NotificationsService extends ChangeNotifier {
     }
   }
 
-  void _checkTrades() async {
-    for (final notification in _watchedChangeNowTradeNotifications) {
-      final id = notification.changeNowId!;
-
-      final trades =
-          tradesService.trades.where((element) => element.tradeId == id);
-
-      if (trades.isEmpty) {
-        return;
-      }
-      final oldTrade = trades.first;
-      late final ExchangeResponse<Trade> response;
-
-      try {
-        final exchange = Exchange.fromName(oldTrade.exchangeName);
-        response = await exchange.updateTrade(oldTrade);
-      } catch (_) {
-        return;
-      }
-
-      if (response.value == null) {
-        return;
-      }
-
-      final trade = response.value!;
-
-      // only update if status has changed
-      if (trade.status != notification.title) {
-        bool shouldWatchForUpdates = true;
-        // TODO: make sure we set shouldWatchForUpdates to correct value here
-        switch (trade.status) {
-          case "Refunded":
-          case "refunded":
-          case "Failed":
-          case "failed":
-          case "closed":
-          case "expired":
-          case "Finished":
-          case "finished":
-          case "Completed":
-          case "completed":
-          case "Not found":
-            shouldWatchForUpdates = false;
-            break;
-          default:
-            shouldWatchForUpdates = true;
-        }
-
-        final updatedNotification = notification.copyWith(
-          title: trade.status,
-          shouldWatchForUpdates: shouldWatchForUpdates,
-        );
-
-        // remove from watch list if shouldWatchForUpdates was changed
-        if (!shouldWatchForUpdates) {
-          await _deleteWatchedTradeNotification(notification);
-        }
-
-        // replaces the current notification with the updated one
-        unawaited(add(updatedNotification, true));
-
-        // update the trade in db
-        // over write trade stored in db with updated version
-        await tradesService.edit(trade: trade, shouldNotifyListeners: true);
-      }
-    }
-  }
+  // void _checkTrades() async {
+  //   for (final notification in _watchedChangeNowTradeNotifications) {
+  //     final id = notification.changeNowId!;
+  //
+  //     final trades =
+  //         tradesService.trades.where((element) => element.tradeId == id);
+  //
+  //     if (trades.isEmpty) {
+  //       return;
+  //     }
+  //     final oldTrade = trades.first;
+  //     late final ExchangeResponse<Trade> response;
+  //
+  //     try {
+  //       final exchange = Exchange.fromName(oldTrade.exchangeName);
+  //       response = await exchange.updateTrade(oldTrade);
+  //     } catch (_) {
+  //       return;
+  //     }
+  //
+  //     if (response.value == null) {
+  //       return;
+  //     }
+  //
+  //     final trade = response.value!;
+  //
+  //     // only update if status has changed
+  //     if (trade.status != notification.title) {
+  //       bool shouldWatchForUpdates = true;
+  //       // TODO: make sure we set shouldWatchForUpdates to correct value here
+  //       switch (trade.status) {
+  //         case "Refunded":
+  //         case "refunded":
+  //         case "Failed":
+  //         case "failed":
+  //         case "closed":
+  //         case "expired":
+  //         case "Finished":
+  //         case "finished":
+  //         case "Completed":
+  //         case "completed":
+  //         case "Not found":
+  //           shouldWatchForUpdates = false;
+  //           break;
+  //         default:
+  //           shouldWatchForUpdates = true;
+  //       }
+  //
+  //       final updatedNotification = notification.copyWith(
+  //         title: trade.status,
+  //         shouldWatchForUpdates: shouldWatchForUpdates,
+  //       );
+  //
+  //       // remove from watch list if shouldWatchForUpdates was changed
+  //       if (!shouldWatchForUpdates) {
+  //         await _deleteWatchedTradeNotification(notification);
+  //       }
+  //
+  //       // replaces the current notification with the updated one
+  //       unawaited(add(updatedNotification, true));
+  //
+  //       // update the trade in db
+  //       // over write trade stored in db with updated version
+  //       await tradesService.edit(trade: trade, shouldNotifyListeners: true);
+  //     }
+  //   }
+  // }
 
   bool get hasUnreadNotifications {
     // final count = (_unreadCountBox.get("count") ?? 0) > 0;

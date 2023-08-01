@@ -15,7 +15,6 @@ import 'package:stackfrost/exceptions/main_db/main_db_exception.dart';
 import 'package:stackfrost/models/isar/models/block_explorer.dart';
 import 'package:stackfrost/models/isar/models/contact_entry.dart';
 import 'package:stackfrost/models/isar/models/isar_models.dart';
-import 'package:stackfrost/models/isar/ordinal.dart';
 import 'package:stackfrost/models/isar/stack_theme.dart';
 import 'package:stackfrost/utilities/amount/amount.dart';
 import 'package:stackfrost/utilities/enums/coin_enum.dart';
@@ -54,7 +53,6 @@ class MainDB {
         TransactionBlockExplorerSchema,
         StackThemeSchema,
         ContactEntrySchema,
-        OrdinalSchema,
       ],
       directory: (await StackFileSystem.applicationIsarDirectory()).path,
       // inspector: kDebugMode,

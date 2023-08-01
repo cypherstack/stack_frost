@@ -12,7 +12,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:stackfrost/models/exchange/aggregate_currency.dart';
-import 'package:stackfrost/pages/buy_view/sub_widgets/crypto_selection_view.dart';
 import 'package:stackfrost/providers/global/locale_provider.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/utilities/amount/amount_input_formatter.dart';
@@ -173,18 +172,7 @@ class _ExchangeTextFieldState extends ConsumerState<ExchangeTextField> {
                           ),
                           child: Builder(
                             builder: (context) {
-                              if (isStackCoin(widget.currency?.ticker)) {
-                                return Center(
-                                  child: CoinIconForTicker(
-                                    size: 18,
-                                    ticker: widget.currency!.ticker,
-                                  ),
-                                  // child: getIconForTicker(
-                                  //   widget.currency!.ticker,
-                                  //   size: 18,
-                                  // ),
-                                );
-                              } else if (widget.currency != null &&
+                              if (widget.currency != null &&
                                   widget.currency!.image.isNotEmpty) {
                                 return Center(
                                   child: SvgPicture.network(

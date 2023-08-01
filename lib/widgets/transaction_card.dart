@@ -15,7 +15,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stackfrost/models/isar/models/isar_models.dart';
 import 'package:stackfrost/pages/wallet_view/sub_widgets/tx_icon.dart';
 import 'package:stackfrost/pages/wallet_view/transaction_views/transaction_details_view.dart';
-import 'package:stackfrost/providers/db/main_db_provider.dart';
 import 'package:stackfrost/providers/providers.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/utilities/amount/amount.dart';
@@ -49,7 +48,6 @@ class _TransactionCardState extends ConsumerState<TransactionCard> {
   late final String prefix;
   late final String unit;
   late final Coin coin;
-  late final EthContract? tokenContract;
 
   String whatIsIt(
     TransactionType type,
@@ -123,11 +121,7 @@ class _TransactionCardState extends ConsumerState<TransactionCard> {
         .getManager(widget.walletId)
         .coin;
 
-    tokenContract = ref
-        .read(mainDBProvider)
-        .getEthContractSync(_transaction.otherData ?? "");
-
-    unit = isTokenTx ? tokenContract!.symbol : coin.ticker;
+    unit = coin.ticker;
     super.initState();
   }
 
@@ -236,7 +230,7 @@ class _TransactionCardState extends ConsumerState<TransactionCard> {
                                   final amount = _transaction.realAmount;
 
                                   return Text(
-                                    "$prefix${ref.watch(pAmountFormatter(coin)).format(amount, ethContract: tokenContract)}",
+                                    "$prefix${ref.watch(pAmountFormatter(coin)).format(amount)}",
                                     style: STextStyles.itemSubtitle12(context),
                                   );
                                 },

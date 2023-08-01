@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stackfrost/models/models.dart';
 import 'package:stackfrost/pages/send_view/sub_widgets/transaction_fee_selection_sheet.dart';
-import 'package:stackfrost/pages/token_view/token_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/desktop_fee_dropdown.dart';
 import 'package:stackfrost/providers/global/wallets_provider.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
@@ -51,17 +50,11 @@ class _DesktopFeeDialogState extends ConsumerState<DesktopFeeDialog> {
                     : feeSheetSessionCacheProvider)
                 .fast[amount] ==
             null) {
-          if (widget.isToken == false) {
-            final manager =
-                ref.read(walletsChangeNotifierProvider).getManager(walletId);
+          final manager =
+              ref.read(walletsChangeNotifierProvider).getManager(walletId);
 
-            ref.read(feeSheetSessionCacheProvider).fast[amount] =
-                await manager.estimateFeeFor(amount, feeRate);
-          } else {
-            final tokenWallet = ref.read(tokenServiceProvider)!;
-            final fee = tokenWallet.estimateFeeFor(feeRate);
-            ref.read(tokenFeeSessionCacheProvider).fast[amount] = fee;
-          }
+          ref.read(feeSheetSessionCacheProvider).fast[amount] =
+              await manager.estimateFeeFor(amount, feeRate);
         }
         return ref
             .read(widget.isToken
@@ -76,17 +69,11 @@ class _DesktopFeeDialogState extends ConsumerState<DesktopFeeDialog> {
                     : feeSheetSessionCacheProvider)
                 .average[amount] ==
             null) {
-          if (widget.isToken == false) {
-            final manager =
-                ref.read(walletsChangeNotifierProvider).getManager(walletId);
+          final manager =
+              ref.read(walletsChangeNotifierProvider).getManager(walletId);
 
-            ref.read(feeSheetSessionCacheProvider).average[amount] =
-                await manager.estimateFeeFor(amount, feeRate);
-          } else {
-            final tokenWallet = ref.read(tokenServiceProvider)!;
-            final fee = tokenWallet.estimateFeeFor(feeRate);
-            ref.read(tokenFeeSessionCacheProvider).average[amount] = fee;
-          }
+          ref.read(feeSheetSessionCacheProvider).average[amount] =
+              await manager.estimateFeeFor(amount, feeRate);
         }
         return ref
             .read(widget.isToken
@@ -101,17 +88,11 @@ class _DesktopFeeDialogState extends ConsumerState<DesktopFeeDialog> {
                     : feeSheetSessionCacheProvider)
                 .slow[amount] ==
             null) {
-          if (widget.isToken == false) {
-            final manager =
-                ref.read(walletsChangeNotifierProvider).getManager(walletId);
+          final manager =
+              ref.read(walletsChangeNotifierProvider).getManager(walletId);
 
-            ref.read(feeSheetSessionCacheProvider).slow[amount] =
-                await manager.estimateFeeFor(amount, feeRate);
-          } else {
-            final tokenWallet = ref.read(tokenServiceProvider)!;
-            final fee = tokenWallet.estimateFeeFor(feeRate);
-            ref.read(tokenFeeSessionCacheProvider).slow[amount] = fee;
-          }
+          ref.read(feeSheetSessionCacheProvider).slow[amount] =
+              await manager.estimateFeeFor(amount, feeRate);
         }
         return ref
             .read(widget.isToken
@@ -331,16 +312,14 @@ class _DesktopFeeItemState extends ConsumerState<DesktopFeeItem> {
                             indicatePrecisionLoss: false,
                           )})";
 
-                  timeString = manager.coin == Coin.ethereum
-                      ? ""
-                      : estimatedTimeToBeIncludedInNextBlock(
-                          Constants.targetBlockTimeInSeconds(manager.coin),
-                          widget.feeRateType == FeeRateType.fast
-                              ? widget.feeObject!.numberOfBlocksFast
-                              : widget.feeRateType == FeeRateType.slow
-                                  ? widget.feeObject!.numberOfBlocksSlow
-                                  : widget.feeObject!.numberOfBlocksAverage,
-                        );
+                  estimatedTimeToBeIncludedInNextBlock(
+                    Constants.targetBlockTimeInSeconds(manager.coin),
+                    widget.feeRateType == FeeRateType.fast
+                        ? widget.feeObject!.numberOfBlocksFast
+                        : widget.feeRateType == FeeRateType.slow
+                            ? widget.feeObject!.numberOfBlocksSlow
+                            : widget.feeObject!.numberOfBlocksAverage,
+                  );
 
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
