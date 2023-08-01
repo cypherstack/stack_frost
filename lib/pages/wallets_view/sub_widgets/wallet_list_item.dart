@@ -56,7 +56,7 @@ class WalletListItem extends ConsumerWidget {
               BorderRadius.circular(Constants.size.circularBorderRadius),
         ),
         onPressed: () async {
-          if (walletCount == 1 && coin != Coin.ethereum) {
+          if (walletCount == 1) {
             final providersByCoin = ref
                 .watch(walletsChangeNotifierProvider
                     .select((value) => value.getManagerProvidersByCoin()))
@@ -65,9 +65,6 @@ class WalletListItem extends ConsumerWidget {
                 .expand((e) => e)
                 .toList();
             final manager = ref.read(providersByCoin.first);
-            if (coin == Coin.monero || coin == Coin.wownero) {
-              await manager.initializeExisting();
-            }
             if (context.mounted) {
               unawaited(
                 Navigator.of(context).pushNamed(

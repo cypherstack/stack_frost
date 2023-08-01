@@ -15,24 +15,15 @@ import 'package:event_bus/event_bus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:isar/isar.dart';
-import 'package:stackfrost/models/isar/exchange_cache/currency.dart';
-import 'package:stackfrost/notifications/show_flush_bar.dart';
-import 'package:stackfrost/pages/buy_view/buy_in_wallet_view.dart';
 import 'package:stackfrost/pages/coin_control/coin_control_view.dart';
-import 'package:stackfrost/pages/exchange_view/wallet_initiated_exchange_view.dart';
 import 'package:stackfrost/pages/home_view/home_view.dart';
-import 'package:stackfrost/pages/monkey/monkey_view.dart';
 import 'package:stackfrost/pages/notification_views/notifications_view.dart';
-import 'package:stackfrost/pages/ordinals/ordinals_view.dart';
 import 'package:stackfrost/pages/paynym/paynym_claim_view.dart';
 import 'package:stackfrost/pages/paynym/paynym_home_view.dart';
 import 'package:stackfrost/pages/receive_view/receive_view.dart';
 import 'package:stackfrost/pages/send_view/send_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_network_settings_view/wallet_network_settings_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_settings_view.dart';
-import 'package:stackfrost/pages/special/firo_rescan_recovery_error_dialog.dart';
-import 'package:stackfrost/pages/token_view/my_tokens_view.dart';
 import 'package:stackfrost/pages/wallet_view/sub_widgets/transactions_list.dart';
 import 'package:stackfrost/pages/wallet_view/sub_widgets/wallet_summary.dart';
 import 'package:stackfrost/pages/wallet_view/transaction_views/all_transactions_view.dart';
@@ -44,17 +35,14 @@ import 'package:stackfrost/providers/ui/unread_notifications_provider.dart';
 import 'package:stackfrost/providers/wallet/my_paynym_account_state_provider.dart';
 import 'package:stackfrost/providers/wallet/public_private_balance_state_provider.dart';
 import 'package:stackfrost/providers/wallet/wallet_balance_toggle_state_provider.dart';
-import 'package:stackfrost/services/coins/firo/firo_wallet.dart';
 import 'package:stackfrost/services/coins/manager.dart';
 import 'package:stackfrost/services/event_bus/events/global/node_connection_status_changed_event.dart';
 import 'package:stackfrost/services/event_bus/events/global/wallet_sync_status_changed_event.dart';
 import 'package:stackfrost/services/event_bus/global_event_bus.dart';
-import 'package:stackfrost/services/exchange/exchange_data_loading_service.dart';
 import 'package:stackfrost/services/mixins/paynym_wallet_interface.dart';
 import 'package:stackfrost/themes/coin_icon_provider.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/themes/theme_providers.dart';
-import 'package:stackfrost/utilities/amount/amount.dart';
 import 'package:stackfrost/utilities/assets.dart';
 import 'package:stackfrost/utilities/clipboard_interface.dart';
 import 'package:stackfrost/utilities/constants.dart';
@@ -62,7 +50,6 @@ import 'package:stackfrost/utilities/enums/backup_frequency_type.dart';
 import 'package:stackfrost/utilities/enums/coin_enum.dart';
 import 'package:stackfrost/utilities/enums/wallet_balance_toggle_state.dart';
 import 'package:stackfrost/utilities/logger.dart';
-import 'package:stackfrost/utilities/show_loading.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
 import 'package:stackfrost/widgets/background.dart';
 import 'package:stackfrost/widgets/conditional_parent.dart';
@@ -72,10 +59,7 @@ import 'package:stackfrost/widgets/custom_loading_overlay.dart';
 import 'package:stackfrost/widgets/desktop/secondary_button.dart';
 import 'package:stackfrost/widgets/loading_indicator.dart';
 import 'package:stackfrost/widgets/stack_dialog.dart';
-import 'package:stackfrost/widgets/wallet_navigation_bar/components/icons/buy_nav_icon.dart';
 import 'package:stackfrost/widgets/wallet_navigation_bar/components/icons/coin_control_nav_icon.dart';
-import 'package:stackfrost/widgets/wallet_navigation_bar/components/icons/exchange_nav_icon.dart';
-import 'package:stackfrost/widgets/wallet_navigation_bar/components/icons/ordinals_nav_icon.dart';
 import 'package:stackfrost/widgets/wallet_navigation_bar/components/icons/paynym_nav_icon.dart';
 import 'package:stackfrost/widgets/wallet_navigation_bar/components/icons/receive_nav_icon.dart';
 import 'package:stackfrost/widgets/wallet_navigation_bar/components/icons/send_nav_icon.dart';
@@ -122,35 +106,6 @@ class _WalletViewState extends ConsumerState<WalletView> {
   bool _rescanningOnOpen = false;
   bool _lelantusRescanRecovery = false;
 
-  Future<void> _firoRescanRecovery() async {
-    final success = await (ref.read(managerProvider).wallet as FiroWallet)
-        .firoRescanRecovery();
-
-    if (success) {
-      // go into wallet
-      WidgetsBinding.instance.addPostFrameCallback(
-        (_) => setState(() {
-          _rescanningOnOpen = false;
-          _lelantusRescanRecovery = false;
-        }),
-      );
-    } else {
-      // show error message dialog w/ options
-      if (mounted) {
-        final shouldRetry = await Navigator.of(context).pushNamed(
-          FiroRescanRecoveryErrorView.routeName,
-          arguments: walletId,
-        );
-
-        if (shouldRetry is bool && shouldRetry) {
-          await _firoRescanRecovery();
-        }
-      } else {
-        return await _firoRescanRecovery();
-      }
-    }
-  }
-
   @override
   void initState() {
     walletId = widget.walletId;
@@ -165,14 +120,7 @@ class _WalletViewState extends ConsumerState<WalletView> {
       _shouldDisableAutoSyncOnLogOut = false;
     }
 
-    if (ref.read(managerProvider).coin == Coin.firo &&
-        (ref.read(managerProvider).wallet as FiroWallet)
-            .lelantusCoinIsarRescanRequired) {
-      _rescanningOnOpen = true;
-      _lelantusRescanRecovery = true;
-      _firoRescanRecovery();
-    } else if (ref.read(managerProvider).rescanOnOpenVersion ==
-        Constants.rescanV1) {
+    if (ref.read(managerProvider).rescanOnOpenVersion == Constants.rescanV1) {
       _rescanningOnOpen = true;
       ref.read(managerProvider).fullRescan(20, 1000).then(
             (_) => ref.read(managerProvider).resetRescanOnOpen().then(
@@ -321,138 +269,50 @@ class _WalletViewState extends ConsumerState<WalletView> {
     }
   }
 
-  void _onExchangePressed(BuildContext context) async {
-    final Coin coin = ref.read(managerProvider).coin;
-
-    if (coin.isTestNet) {
-      await showDialog<void>(
-        context: context,
-        builder: (_) => const StackOkDialog(
-          title: "Exchange not available for test net coins",
-        ),
-      );
-    } else {
-      Future<Currency?> _future;
-      try {
-        _future = ExchangeDataLoadingService.instance.isar.currencies
-            .where()
-            .tickerEqualToAnyExchangeNameName(coin.ticker)
-            .findFirst();
-      } catch (_) {
-        _future = ExchangeDataLoadingService.instance.loadAll().then((_) =>
-            ExchangeDataLoadingService.instance.isar.currencies
-                .where()
-                .tickerEqualToAnyExchangeNameName(coin.ticker)
-                .findFirst());
-      }
-
-      final currency = await showLoading(
-        whileFuture: _future,
-        context: context,
-        message: "Loading...",
-      );
-
-      if (mounted) {
-        unawaited(
-          Navigator.of(context).pushNamed(
-            WalletInitiatedExchangeView.routeName,
-            arguments: Tuple2(
-              walletId,
-              currency == null ? Coin.bitcoin : coin,
-            ),
-          ),
-        );
-      }
-    }
-  }
-
-  void _onBuyPressed(BuildContext context) async {
-    final coin = ref.read(managerProvider).coin;
-
-    if (coin.isTestNet) {
-      await showDialog<void>(
-        context: context,
-        builder: (_) => const StackOkDialog(
-          title: "Buy not available for test net coins",
-        ),
-      );
-    } else {
-      if (mounted) {
-        unawaited(
-          Navigator.of(context).pushNamed(
-            BuyInWalletView.routeName,
-            arguments: coin.hasBuySupport ? coin : Coin.bitcoin,
-          ),
-        );
-      }
-    }
-  }
-
-  Future<void> attemptAnonymize() async {
-    bool shouldPop = false;
-    unawaited(
-      showDialog(
-        context: context,
-        builder: (context) => WillPopScope(
-          child: const CustomLoadingOverlay(
-            message: "Anonymizing balance",
-            eventBus: null,
-          ),
-          onWillPop: () async => shouldPop,
-        ),
-      ),
-    );
-    final firoWallet = ref.read(managerProvider).wallet as FiroWallet;
-
-    final Amount publicBalance = firoWallet.availablePublicBalance();
-    if (publicBalance <= Amount.zero) {
-      shouldPop = true;
-      if (mounted) {
-        Navigator.of(context).popUntil(
-          ModalRoute.withName(WalletView.routeName),
-        );
-        unawaited(
-          showFloatingFlushBar(
-            type: FlushBarType.info,
-            message: "No funds available to anonymize!",
-            context: context,
-          ),
-        );
-      }
-      return;
-    }
-
-    try {
-      await firoWallet.anonymizeAllPublicFunds();
-      shouldPop = true;
-      if (mounted) {
-        Navigator.of(context).popUntil(
-          ModalRoute.withName(WalletView.routeName),
-        );
-        unawaited(
-          showFloatingFlushBar(
-            type: FlushBarType.success,
-            message: "Anonymize transaction submitted",
-            context: context,
-          ),
-        );
-      }
-    } catch (e) {
-      shouldPop = true;
-      if (mounted) {
-        Navigator.of(context).popUntil(
-          ModalRoute.withName(WalletView.routeName),
-        );
-        await showDialog<dynamic>(
-          context: context,
-          builder: (_) => StackOkDialog(
-            title: "Anonymize all failed",
-            message: "Reason: $e",
-          ),
-        );
-      }
-    }
-  }
+  // void _onExchangePressed(BuildContext context) async {
+  //   final Coin coin = ref.read(managerProvider).coin;
+  //
+  //   if (coin.isTestNet) {
+  //     await showDialog<void>(
+  //       context: context,
+  //       builder: (_) => const StackOkDialog(
+  //         title: "Exchange not available for test net coins",
+  //       ),
+  //     );
+  //   } else {
+  //     Future<Currency?> _future;
+  //     try {
+  //       _future = ExchangeDataLoadingService.instance.isar.currencies
+  //           .where()
+  //           .tickerEqualToAnyExchangeNameName(coin.ticker)
+  //           .findFirst();
+  //     } catch (_) {
+  //       _future = ExchangeDataLoadingService.instance.loadAll().then((_) =>
+  //           ExchangeDataLoadingService.instance.isar.currencies
+  //               .where()
+  //               .tickerEqualToAnyExchangeNameName(coin.ticker)
+  //               .findFirst());
+  //     }
+  //
+  //     final currency = await showLoading(
+  //       whileFuture: _future,
+  //       context: context,
+  //       message: "Loading...",
+  //     );
+  //
+  //     if (mounted) {
+  //       unawaited(
+  //         Navigator.of(context).pushNamed(
+  //           WalletInitiatedExchangeView.routeName,
+  //           arguments: Tuple2(
+  //             walletId,
+  //             currency == null ? Coin.bitcoin : coin,
+  //           ),
+  //         ),
+  //       );
+  //     }
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -737,75 +597,6 @@ class _WalletViewState extends ConsumerState<WalletView> {
                             ),
                           ),
                         ),
-                        if (coin == Coin.firo)
-                          const SizedBox(
-                            height: 10,
-                          ),
-                        if (coin == Coin.firo)
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: TextButton(
-                                    style: Theme.of(context)
-                                        .extension<StackColors>()!
-                                        .getSecondaryEnabledButtonStyle(
-                                            context),
-                                    onPressed: () async {
-                                      await showDialog<void>(
-                                        context: context,
-                                        builder: (context) => StackDialog(
-                                          title: "Attention!",
-                                          message:
-                                              "You're about to anonymize all of your public funds.",
-                                          leftButton: TextButton(
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                            child: Text(
-                                              "Cancel",
-                                              style: STextStyles.button(context)
-                                                  .copyWith(
-                                                color: Theme.of(context)
-                                                    .extension<StackColors>()!
-                                                    .accentColorDark,
-                                              ),
-                                            ),
-                                          ),
-                                          rightButton: TextButton(
-                                            onPressed: () async {
-                                              Navigator.of(context).pop();
-
-                                              unawaited(attemptAnonymize());
-                                            },
-                                            style: Theme.of(context)
-                                                .extension<StackColors>()!
-                                                .getPrimaryEnabledButtonStyle(
-                                                    context),
-                                            child: Text(
-                                              "Continue",
-                                              style:
-                                                  STextStyles.button(context),
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    child: Text(
-                                      "Anonymize funds",
-                                      style:
-                                          STextStyles.button(context).copyWith(
-                                        color: Theme.of(context)
-                                            .extension<StackColors>()!
-                                            .buttonTextSecondary,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
                         const SizedBox(
                           height: 20,
                         ),
@@ -943,53 +734,8 @@ class _WalletViewState extends ConsumerState<WalletView> {
                       );
                     },
                   ),
-                  if (Constants.enableExchange)
-                    WalletNavigationBarItemData(
-                      label: "Swap",
-                      icon: const ExchangeNavIcon(),
-                      onTap: () => _onExchangePressed(context),
-                    ),
-                  if (Constants.enableExchange)
-                    WalletNavigationBarItemData(
-                      label: "Buy",
-                      icon: const BuyNavIcon(),
-                      onTap: () => _onBuyPressed(context),
-                    ),
                 ],
                 moreItems: [
-                  if (ref.watch(
-                    walletsChangeNotifierProvider.select(
-                      (value) =>
-                          value.getManager(widget.walletId).hasTokenSupport,
-                    ),
-                  ))
-                    WalletNavigationBarItemData(
-                      label: "Tokens",
-                      icon: const CoinControlNavIcon(),
-                      onTap: () {
-                        Navigator.of(context).pushNamed(
-                          MyTokensView.routeName,
-                          arguments: walletId,
-                        );
-                      },
-                    ),
-                  if (coin == Coin.banano)
-                    WalletNavigationBarItemData(
-                        icon: SvgPicture.asset(
-                          Assets.svg.monkey,
-                          height: 20,
-                          width: 20,
-                          color: Theme.of(context)
-                              .extension<StackColors>()!
-                              .bottomNavIconIcon,
-                        ),
-                        label: "MonKey",
-                        onTap: () {
-                          Navigator.of(context).pushNamed(
-                            MonkeyView.routeName,
-                            arguments: widget.walletId,
-                          );
-                        }),
                   if (ref.watch(
                         walletsChangeNotifierProvider.select(
                           (value) => value
@@ -1071,22 +817,6 @@ class _WalletViewState extends ConsumerState<WalletView> {
                             );
                           }
                         }
-                      },
-                    ),
-                  if (ref.watch(
-                    walletsChangeNotifierProvider.select(
-                      (value) =>
-                          value.getManager(widget.walletId).hasOrdinalsSupport,
-                    ),
-                  ))
-                    WalletNavigationBarItemData(
-                      label: "Ordinals",
-                      icon: const OrdinalsNavIcon(),
-                      onTap: () {
-                        Navigator.of(context).pushNamed(
-                          OrdinalsView.routeName,
-                          arguments: widget.walletId,
-                        );
                       },
                     ),
                 ],

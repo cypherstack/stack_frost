@@ -16,13 +16,11 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:stackfrost/pages/wallet_view/wallet_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/desktop_wallet_view.dart';
 import 'package:stackfrost/providers/providers.dart';
-import 'package:stackfrost/services/coins/firo/firo_wallet.dart';
 import 'package:stackfrost/themes/coin_icon_provider.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/utilities/amount/amount.dart';
 import 'package:stackfrost/utilities/amount/amount_formatter.dart';
 import 'package:stackfrost/utilities/constants.dart';
-import 'package:stackfrost/utilities/enums/coin_enum.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
 import 'package:stackfrost/utilities/util.dart';
 import 'package:stackfrost/widgets/coin_card.dart';
@@ -116,12 +114,6 @@ class _FavoriteCardState extends ConsumerState<FavoriteCard> {
       ),
       child: GestureDetector(
         onTap: () async {
-          if (coin == Coin.monero || coin == Coin.wownero) {
-            await ref
-                .read(walletsChangeNotifierProvider)
-                .getManager(walletId)
-                .initializeExisting();
-          }
           if (mounted) {
             if (Util.isDesktop) {
               await Navigator.of(context).pushNamed(
@@ -196,18 +188,6 @@ class _FavoriteCardState extends ConsumerState<FavoriteCard> {
                       );
 
                       Amount total = balance.total;
-                      if (coin == Coin.firo || coin == Coin.firoTestNet) {
-                        final balancePrivate = ref.watch(
-                          walletsChangeNotifierProvider.select(
-                            (value) => (value.getManager(walletId).wallet
-                                    as FiroWallet)
-                                .balancePrivate,
-                          ),
-                        );
-
-                        total += balancePrivate.total;
-                      }
-
                       Amount fiatTotal = Amount.zero;
 
                       if (externalCalls && total > Amount.zero) {

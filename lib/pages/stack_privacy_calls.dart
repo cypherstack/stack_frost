@@ -8,7 +8,6 @@
  *
  */
 
-import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -19,7 +18,6 @@ import 'package:stackfrost/pages/pinpad_views/create_pin_view.dart';
 import 'package:stackfrost/pages_desktop_specific/password/create_password_view.dart';
 import 'package:stackfrost/providers/global/prefs_provider.dart';
 import 'package:stackfrost/providers/global/price_provider.dart';
-import 'package:stackfrost/services/exchange/exchange_data_loading_service.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/themes/theme_providers.dart';
 import 'package:stackfrost/utilities/assets.dart';
@@ -244,10 +242,6 @@ class _StackPrivacyCalls extends ConsumerState<StackPrivacyCalls> {
                                       value: isEasy)
                                   .then((_) {
                                 if (isEasy) {
-                                  unawaited(
-                                    ExchangeDataLoadingService.instance
-                                        .loadAll(),
-                                  );
                                   // unawaited(
                                   //     BuyDataLoadingService().loadAll(ref));
                                   ref
