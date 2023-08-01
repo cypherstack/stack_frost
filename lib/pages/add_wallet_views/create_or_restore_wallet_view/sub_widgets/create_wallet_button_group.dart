@@ -11,11 +11,11 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:stackwallet/pages/add_wallet_views/name_your_wallet_view/name_your_wallet_view.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/enums/add_wallet_type_enum.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
+import 'package:stackfrost/pages/add_wallet_views/name_your_wallet_view/name_your_wallet_view.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/enums/add_wallet_type_enum.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
 import 'package:tuple/tuple.dart';
 
 class CreateWalletButtonGroup extends StatelessWidget {
@@ -34,7 +34,7 @@ class CreateWalletButtonGroup extends StatelessWidget {
       crossAxisAlignment:
           isDesktop ? CrossAxisAlignment.center : CrossAxisAlignment.stretch,
       children: [
-        if (Platform.isAndroid || coin != Coin.wownero)
+        if (Platform.isAndroid)
           ConstrainedBox(
             constraints: BoxConstraints(
               minHeight: isDesktop ? 70 : 0,
@@ -61,7 +61,7 @@ class CreateWalletButtonGroup extends StatelessWidget {
               ),
             ),
           ),
-        if (Platform.isAndroid || coin != Coin.wownero)
+        if (Platform.isAndroid)
           SizedBox(
             height: isDesktop ? 16 : 12,
           ),

@@ -10,17 +10,17 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackwallet/db/isar/main_db.dart';
-import 'package:stackwallet/models/isar/models/ethereum/eth_contract.dart';
-import 'package:stackwallet/providers/providers.dart';
-import 'package:stackwallet/services/coins/ethereum/ethereum_wallet.dart';
-import 'package:stackwallet/services/coins/firo/firo_wallet.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/amount/amount.dart';
-import 'package:stackwallet/utilities/amount/amount_formatter.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/utilities/util.dart';
+import 'package:stackfrost/db/isar/main_db.dart';
+import 'package:stackfrost/models/isar/models/ethereum/eth_contract.dart';
+import 'package:stackfrost/providers/providers.dart';
+import 'package:stackfrost/services/coins/ethereum/ethereum_wallet.dart';
+import 'package:stackfrost/services/coins/firo/firo_wallet.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/amount/amount.dart';
+import 'package:stackfrost/utilities/amount/amount_formatter.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/utilities/util.dart';
 
 class WalletInfoRowBalance extends ConsumerWidget {
   const WalletInfoRowBalance({

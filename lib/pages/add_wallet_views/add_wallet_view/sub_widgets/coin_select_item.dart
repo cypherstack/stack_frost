@@ -13,19 +13,14 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:isar/isar.dart';
-import 'package:stackwallet/models/add_wallet_list_entity/add_wallet_list_entity.dart';
-import 'package:stackwallet/models/add_wallet_list_entity/sub_classes/eth_token_entity.dart';
-import 'package:stackwallet/models/isar/exchange_cache/currency.dart';
-import 'package:stackwallet/providers/providers.dart';
-import 'package:stackwallet/services/exchange/change_now/change_now_exchange.dart';
-import 'package:stackwallet/services/exchange/exchange_data_loading_service.dart';
-import 'package:stackwallet/themes/coin_icon_provider.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/assets.dart';
-import 'package:stackwallet/utilities/constants.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/utilities/util.dart';
+import 'package:stackfrost/models/add_wallet_list_entity/add_wallet_list_entity.dart';
+import 'package:stackfrost/providers/providers.dart';
+import 'package:stackfrost/themes/coin_icon_provider.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/assets.dart';
+import 'package:stackfrost/utilities/constants.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/utilities/util.dart';
 
 class CoinSelectItem extends ConsumerWidget {
   const CoinSelectItem({
@@ -43,20 +38,6 @@ class CoinSelectItem extends ConsumerWidget {
     final isDesktop = Util.isDesktop;
 
     String? tokenImageUri;
-    if (entity is EthTokenEntity) {
-      final currency = ExchangeDataLoadingService.instance.isar.currencies
-          .where()
-          .exchangeNameEqualTo(ChangeNowExchange.exchangeName)
-          .filter()
-          .tokenContractEqualTo(
-            (entity as EthTokenEntity).token.address,
-            caseSensitive: false,
-          )
-          .and()
-          .imageIsNotEmpty()
-          .findFirstSync();
-      tokenImageUri = currency?.image;
-    }
 
     return Container(
       decoration: BoxDecoration(

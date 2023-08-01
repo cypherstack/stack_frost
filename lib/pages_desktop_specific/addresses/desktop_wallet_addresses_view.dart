@@ -12,16 +12,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:isar/isar.dart';
-import 'package:stackwallet/models/isar/models/isar_models.dart';
-import 'package:stackwallet/pages/receive_view/addresses/address_details_view.dart';
-import 'package:stackwallet/pages_desktop_specific/addresses/sub_widgets/desktop_address_list.dart';
-import 'package:stackwallet/providers/db/main_db_provider.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/assets.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/widgets/custom_buttons/app_bar_icon_button.dart';
-import 'package:stackwallet/widgets/desktop/desktop_app_bar.dart';
-import 'package:stackwallet/widgets/desktop/desktop_scaffold.dart';
+import 'package:stackfrost/models/isar/models/isar_models.dart';
+import 'package:stackfrost/pages/receive_view/addresses/address_details_view.dart';
+import 'package:stackfrost/pages_desktop_specific/addresses/sub_widgets/desktop_address_list.dart';
+import 'package:stackfrost/providers/db/main_db_provider.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/assets.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
+import 'package:stackfrost/widgets/desktop/desktop_app_bar.dart';
+import 'package:stackfrost/widgets/desktop/desktop_scaffold.dart';
 
 final desktopSelectedAddressId = StateProvider.autoDispose<Id?>((ref) => null);
 

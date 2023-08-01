@@ -11,18 +11,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:stackwallet/models/isar/models/ethereum/eth_contract.dart';
-import 'package:stackwallet/services/coins/manager.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/assets.dart';
-import 'package:stackwallet/utilities/constants.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/widgets/animated_widgets/rotate_icon.dart';
-import 'package:stackwallet/widgets/expandable.dart';
-import 'package:stackwallet/widgets/rounded_white_container.dart';
-import 'package:stackwallet/widgets/wallet_card.dart';
-import 'package:stackwallet/widgets/wallet_info_row/sub_widgets/wallet_info_row_balance.dart';
-import 'package:stackwallet/widgets/wallet_info_row/sub_widgets/wallet_info_row_coin_icon.dart';
+import 'package:stackfrost/models/isar/models/ethereum/eth_contract.dart';
+import 'package:stackfrost/services/coins/manager.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/assets.dart';
+import 'package:stackfrost/utilities/constants.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/widgets/animated_widgets/rotate_icon.dart';
+import 'package:stackfrost/widgets/expandable.dart';
+import 'package:stackfrost/widgets/rounded_white_container.dart';
+import 'package:stackfrost/widgets/wallet_card.dart';
+import 'package:stackfrost/widgets/wallet_info_row/sub_widgets/wallet_info_row_balance.dart';
+import 'package:stackfrost/widgets/wallet_info_row/sub_widgets/wallet_info_row_coin_icon.dart';
 import 'package:tuple/tuple.dart';
 
 class DesktopExpandingWalletCard extends StatefulWidget {

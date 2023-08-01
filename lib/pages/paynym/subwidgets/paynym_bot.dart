@@ -9,7 +9,7 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:stackwallet/widgets/loading_indicator.dart';
+import 'package:stackfrost/widgets/loading_indicator.dart';
 
 class PayNymBot extends StatelessWidget {
   const PayNymBot({

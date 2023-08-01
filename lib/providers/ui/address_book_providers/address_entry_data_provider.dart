@@ -9,7 +9,7 @@
  */
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackwallet/models/contact_address_entry_data.dart';
+import 'package:stackfrost/models/contact_address_entry_data.dart';
 
 // workaround to refresh entire family
 final addressEntryDataProviderFamilyRefresher = Provider((_) => DateTime.now());

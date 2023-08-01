@@ -9,7 +9,7 @@
  */
 
 import 'package:equatable/equatable.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
 
 abstract class AddWalletListEntity extends Equatable {
   Coin get coin;

@@ -10,24 +10,24 @@
 
 import 'package:hive/hive.dart';
 import 'package:isar/isar.dart';
-import 'package:stackwallet/db/hive/db.dart';
-import 'package:stackwallet/db/isar/main_db.dart';
-import 'package:stackwallet/electrumx_rpc/electrumx.dart';
-import 'package:stackwallet/models/contact.dart';
-import 'package:stackwallet/models/exchange/change_now/exchange_transaction.dart';
-import 'package:stackwallet/models/exchange/response_objects/trade.dart';
-import 'package:stackwallet/models/isar/models/blockchain_data/address.dart';
-import 'package:stackwallet/models/isar/models/contact_entry.dart'
+import 'package:stackfrost/db/hive/db.dart';
+import 'package:stackfrost/db/isar/main_db.dart';
+import 'package:stackfrost/electrumx_rpc/electrumx.dart';
+import 'package:stackfrost/models/contact.dart';
+import 'package:stackfrost/models/exchange/change_now/exchange_transaction.dart';
+import 'package:stackfrost/models/exchange/response_objects/trade.dart';
+import 'package:stackfrost/models/isar/models/blockchain_data/address.dart';
+import 'package:stackfrost/models/isar/models/contact_entry.dart'
     as isar_contact;
-import 'package:stackwallet/models/isar/models/isar_models.dart' as isar_models;
-import 'package:stackwallet/services/mixins/wallet_db.dart';
-import 'package:stackwallet/services/node_service.dart';
-import 'package:stackwallet/services/wallets_service.dart';
-import 'package:stackwallet/utilities/amount/amount.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/flutter_secure_storage_interface.dart';
-import 'package:stackwallet/utilities/logger.dart';
-import 'package:stackwallet/utilities/prefs.dart';
+import 'package:stackfrost/models/isar/models/isar_models.dart' as isar_models;
+import 'package:stackfrost/services/mixins/wallet_db.dart';
+import 'package:stackfrost/services/node_service.dart';
+import 'package:stackfrost/services/wallets_service.dart';
+import 'package:stackfrost/utilities/amount/amount.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/flutter_secure_storage_interface.dart';
+import 'package:stackfrost/utilities/logger.dart';
+import 'package:stackfrost/utilities/prefs.dart';
 import 'package:tuple/tuple.dart';
 
 class DbVersionMigrator with WalletDB {

@@ -13,14 +13,14 @@ import 'dart:async';
 import 'package:event_bus/event_bus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackwallet/pages/token_view/token_view.dart';
-import 'package:stackwallet/providers/global/wallets_provider.dart';
-import 'package:stackwallet/services/event_bus/events/global/wallet_sync_status_changed_event.dart';
-import 'package:stackwallet/services/event_bus/global_event_bus.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/constants.dart';
-import 'package:stackwallet/utilities/util.dart';
-import 'package:stackwallet/widgets/animated_widgets/rotating_arrows.dart';
+import 'package:stackfrost/pages/token_view/token_view.dart';
+import 'package:stackfrost/providers/global/wallets_provider.dart';
+import 'package:stackfrost/services/event_bus/events/global/wallet_sync_status_changed_event.dart';
+import 'package:stackfrost/services/event_bus/global_event_bus.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/constants.dart';
+import 'package:stackfrost/utilities/util.dart';
+import 'package:stackfrost/widgets/animated_widgets/rotating_arrows.dart';
 
 /// [eventBus] should only be set during testing
 class WalletRefreshButton extends ConsumerStatefulWidget {

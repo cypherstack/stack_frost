@@ -8,8 +8,8 @@
  *
  */
 
-import 'package:stackwallet/models/node_model.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/models/node_model.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
 
 abstract class DefaultNodes {
   static const String defaultNodeIdPrefix = "default_";

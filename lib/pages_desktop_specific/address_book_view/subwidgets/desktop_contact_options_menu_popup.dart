@@ -11,16 +11,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:stackwallet/notifications/show_flush_bar.dart';
-import 'package:stackwallet/pages/address_book_views/subviews/edit_contact_name_emoji_view.dart';
-import 'package:stackwallet/providers/global/address_book_service_provider.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/assets.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/widgets/desktop/desktop_dialog.dart';
-import 'package:stackwallet/widgets/desktop/desktop_dialog_close_button.dart';
-import 'package:stackwallet/widgets/desktop/primary_button.dart';
-import 'package:stackwallet/widgets/desktop/secondary_button.dart';
+import 'package:stackfrost/notifications/show_flush_bar.dart';
+import 'package:stackfrost/pages/address_book_views/subviews/edit_contact_name_emoji_view.dart';
+import 'package:stackfrost/providers/global/address_book_service_provider.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/assets.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/widgets/desktop/desktop_dialog.dart';
+import 'package:stackfrost/widgets/desktop/desktop_dialog_close_button.dart';
+import 'package:stackfrost/widgets/desktop/primary_button.dart';
+import 'package:stackfrost/widgets/desktop/secondary_button.dart';
 
 class DesktopContactOptionsMenuPopup extends ConsumerStatefulWidget {
   const DesktopContactOptionsMenuPopup({Key? key, required this.contactId})

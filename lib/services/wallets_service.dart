@@ -11,13 +11,13 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:stackwallet/db/hive/db.dart';
-import 'package:stackwallet/db/isar/main_db.dart';
-import 'package:stackwallet/services/notifications_service.dart';
-import 'package:stackwallet/services/trade_sent_from_stack_service.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/flutter_secure_storage_interface.dart';
-import 'package:stackwallet/utilities/logger.dart';
+import 'package:stackfrost/db/hive/db.dart';
+import 'package:stackfrost/db/isar/main_db.dart';
+import 'package:stackfrost/services/notifications_service.dart';
+import 'package:stackfrost/services/trade_sent_from_stack_service.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/flutter_secure_storage_interface.dart';
+import 'package:stackfrost/utilities/logger.dart';
 import 'package:uuid/uuid.dart';
 
 class WalletInfo {

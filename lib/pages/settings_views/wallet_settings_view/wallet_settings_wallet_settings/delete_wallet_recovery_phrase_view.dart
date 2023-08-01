@@ -12,19 +12,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:stackwallet/notifications/show_flush_bar.dart';
-import 'package:stackwallet/pages/add_wallet_views/new_wallet_recovery_phrase_view/sub_widgets/mnemonic_table.dart';
-import 'package:stackwallet/pages/home_view/home_view.dart';
-import 'package:stackwallet/providers/providers.dart';
-import 'package:stackwallet/services/coins/manager.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/assets.dart';
-import 'package:stackwallet/utilities/clipboard_interface.dart';
-import 'package:stackwallet/utilities/constants.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/widgets/background.dart';
-import 'package:stackwallet/widgets/custom_buttons/app_bar_icon_button.dart';
-import 'package:stackwallet/widgets/stack_dialog.dart';
+import 'package:stackfrost/notifications/show_flush_bar.dart';
+import 'package:stackfrost/pages/add_wallet_views/new_wallet_recovery_phrase_view/sub_widgets/mnemonic_table.dart';
+import 'package:stackfrost/pages/home_view/home_view.dart';
+import 'package:stackfrost/providers/providers.dart';
+import 'package:stackfrost/services/coins/manager.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/assets.dart';
+import 'package:stackfrost/utilities/clipboard_interface.dart';
+import 'package:stackfrost/utilities/constants.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/widgets/background.dart';
+import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
+import 'package:stackfrost/widgets/stack_dialog.dart';
 
 class DeleteWalletRecoveryPhraseView extends ConsumerStatefulWidget {
   const DeleteWalletRecoveryPhraseView({

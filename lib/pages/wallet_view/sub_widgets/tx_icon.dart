@@ -13,11 +13,11 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:stackwallet/models/isar/models/isar_models.dart';
-import 'package:stackwallet/models/isar/stack_theme.dart';
-import 'package:stackwallet/themes/theme_providers.dart';
-import 'package:stackwallet/utilities/assets.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/models/isar/models/isar_models.dart';
+import 'package:stackfrost/models/isar/stack_theme.dart';
+import 'package:stackfrost/themes/theme_providers.dart';
+import 'package:stackfrost/utilities/assets.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
 
 class TxIcon extends ConsumerWidget {
   const TxIcon({

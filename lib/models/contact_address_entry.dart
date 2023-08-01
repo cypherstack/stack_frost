@@ -10,7 +10,7 @@
 
 import 'dart:convert';
 
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
 
 @Deprecated("Use lib/models/isar/models/contact_entry.dart instead")
 class ContactAddressEntry {

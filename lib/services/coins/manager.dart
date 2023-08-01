@@ -12,21 +12,21 @@ import 'dart:async';
 
 import 'package:event_bus/event_bus.dart';
 import 'package:flutter/material.dart';
-import 'package:stackwallet/db/hive/db.dart';
-import 'package:stackwallet/models/balance.dart';
-import 'package:stackwallet/models/isar/models/isar_models.dart' as isar_models;
-import 'package:stackwallet/models/models.dart';
-import 'package:stackwallet/services/coins/coin_service.dart';
-import 'package:stackwallet/services/event_bus/events/global/node_connection_status_changed_event.dart';
-import 'package:stackwallet/services/event_bus/events/global/updated_in_background_event.dart';
-import 'package:stackwallet/services/event_bus/global_event_bus.dart';
-import 'package:stackwallet/services/mixins/coin_control_interface.dart';
-import 'package:stackwallet/services/mixins/ordinals_interface.dart';
-import 'package:stackwallet/services/mixins/paynym_wallet_interface.dart';
-import 'package:stackwallet/services/mixins/xpubable.dart';
-import 'package:stackwallet/utilities/amount/amount.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/logger.dart';
+import 'package:stackfrost/db/hive/db.dart';
+import 'package:stackfrost/models/balance.dart';
+import 'package:stackfrost/models/isar/models/isar_models.dart' as isar_models;
+import 'package:stackfrost/models/models.dart';
+import 'package:stackfrost/services/coins/coin_service.dart';
+import 'package:stackfrost/services/event_bus/events/global/node_connection_status_changed_event.dart';
+import 'package:stackfrost/services/event_bus/events/global/updated_in_background_event.dart';
+import 'package:stackfrost/services/event_bus/global_event_bus.dart';
+import 'package:stackfrost/services/mixins/coin_control_interface.dart';
+import 'package:stackfrost/services/mixins/ordinals_interface.dart';
+import 'package:stackfrost/services/mixins/paynym_wallet_interface.dart';
+import 'package:stackfrost/services/mixins/xpubable.dart';
+import 'package:stackfrost/utilities/amount/amount.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/logger.dart';
 
 class Manager with ChangeNotifier {
   final CoinServiceAPI _currentWallet;

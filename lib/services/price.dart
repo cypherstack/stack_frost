@@ -14,10 +14,10 @@ import 'dart:convert';
 import 'package:decimal/decimal.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
-import 'package:stackwallet/db/hive/db.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/logger.dart';
-import 'package:stackwallet/utilities/prefs.dart';
+import 'package:stackfrost/db/hive/db.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/logger.dart';
+import 'package:stackfrost/utilities/prefs.dart';
 import 'package:tuple/tuple.dart';
 
 class PriceAPI {
@@ -96,12 +96,12 @@ class PriceAPI {
     }
     Map<Coin, Tuple2<Decimal, double>> result = {};
     try {
-      final uri =
-          Uri.parse("https://api.coingecko.com/api/v3/coins/markets?vs_currency"
-              "=${baseCurrency.toLowerCase()}"
-              "&ids=monero,bitcoin,litecoin,ecash,epic-cash,zcoin,dogecoin,"
-              "bitcoin-cash,namecoin,wownero,ethereum,particl,nano,banano,stellar"
-              "&order=market_cap_desc&per_page=50&page=1&sparkline=false");
+      final uri = Uri.parse(
+          "https://api.coingecko.com/api/v3/coins/markets?vs_currency"
+          "=${baseCurrency.toLowerCase()}"
+          "&ids=monero,bitcoin,litecoin,ecash,epic-cash,zcoin,dogecoin,"
+          "bitcoin-cash,namecoin,wownero,ethereum,particl,nano,banano,stellar"
+          "&order=market_cap_desc&per_page=50&page=1&sparkline=false");
 
       final coinGeckoResponse = await client.get(
         uri,

@@ -8,9 +8,9 @@
  *
  */
 
-import 'package:stackwallet/db/isar/main_db.dart';
-import 'package:stackwallet/models/isar/models/block_explorer.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/db/isar/main_db.dart';
+import 'package:stackfrost/models/isar/models/block_explorer.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
 
 // Returns the default block explorer URL for the given coin and txid
 Uri getDefaultBlockExplorerUrlFor({

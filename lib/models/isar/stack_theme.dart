@@ -13,12 +13,12 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
-import 'package:stackwallet/themes/color_theme.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/extensions/impl/box_shadow.dart';
-import 'package:stackwallet/utilities/extensions/impl/gradient.dart';
-import 'package:stackwallet/utilities/extensions/impl/string.dart';
-import 'package:stackwallet/utilities/stack_file_system.dart';
+import 'package:stackfrost/themes/color_theme.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/extensions/impl/box_shadow.dart';
+import 'package:stackfrost/utilities/extensions/impl/gradient.dart';
+import 'package:stackfrost/utilities/extensions/impl/string.dart';
+import 'package:stackfrost/utilities/stack_file_system.dart';
 
 part 'stack_theme.g.dart';
 

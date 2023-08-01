@@ -14,12 +14,12 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/themes/theme_providers.dart';
-import 'package:stackwallet/utilities/assets.dart';
-import 'package:stackwallet/widgets/background.dart';
-import 'package:stackwallet/widgets/conditional_parent.dart';
-import 'package:stackwallet/widgets/rounded_container.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/themes/theme_providers.dart';
+import 'package:stackfrost/utilities/assets.dart';
+import 'package:stackfrost/widgets/background.dart';
+import 'package:stackfrost/widgets/conditional_parent.dart';
+import 'package:stackfrost/widgets/rounded_container.dart';
 
 class LoadingView extends ConsumerWidget {
   const LoadingView({Key? key}) : super(key: key);

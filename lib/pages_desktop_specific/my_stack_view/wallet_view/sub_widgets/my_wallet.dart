@@ -10,14 +10,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackwallet/pages/wallet_view/sub_widgets/transactions_list.dart';
-import 'package:stackwallet/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/desktop_receive.dart';
-import 'package:stackwallet/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/desktop_send.dart';
-import 'package:stackwallet/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/desktop_token_send.dart';
-import 'package:stackwallet/providers/global/wallets_provider.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/widgets/custom_tab_view.dart';
-import 'package:stackwallet/widgets/rounded_white_container.dart';
+import 'package:stackfrost/pages/wallet_view/sub_widgets/transactions_list.dart';
+import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/desktop_receive.dart';
+import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/desktop_send.dart';
+import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/desktop_token_send.dart';
+import 'package:stackfrost/providers/global/wallets_provider.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/widgets/custom_tab_view.dart';
+import 'package:stackfrost/widgets/rounded_white_container.dart';
 
 class MyWallet extends ConsumerStatefulWidget {
   const MyWallet({

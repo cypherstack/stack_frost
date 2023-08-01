@@ -9,7 +9,7 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
 
 const kCoinThemeColorDefaults = CoinThemeColorDefault();
 

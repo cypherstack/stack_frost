@@ -20,19 +20,19 @@ import 'package:bitcoindart/src/utils/constants/op.dart' as op;
 import 'package:bitcoindart/src/utils/script.dart' as bscript;
 import 'package:isar/isar.dart';
 import 'package:pointycastle/digests/sha256.dart';
-import 'package:stackwallet/db/isar/main_db.dart';
-import 'package:stackwallet/electrumx_rpc/electrumx.dart';
-import 'package:stackwallet/exceptions/wallet/insufficient_balance_exception.dart';
-import 'package:stackwallet/exceptions/wallet/paynym_send_exception.dart';
-import 'package:stackwallet/models/isar/models/isar_models.dart';
-import 'package:stackwallet/models/signing_data.dart';
-import 'package:stackwallet/utilities/amount/amount.dart';
-import 'package:stackwallet/utilities/bip32_utils.dart';
-import 'package:stackwallet/utilities/bip47_utils.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/flutter_secure_storage_interface.dart';
-import 'package:stackwallet/utilities/format.dart';
-import 'package:stackwallet/utilities/logger.dart';
+import 'package:stackfrost/db/isar/main_db.dart';
+import 'package:stackfrost/electrumx_rpc/electrumx.dart';
+import 'package:stackfrost/exceptions/wallet/insufficient_balance_exception.dart';
+import 'package:stackfrost/exceptions/wallet/paynym_send_exception.dart';
+import 'package:stackfrost/models/isar/models/isar_models.dart';
+import 'package:stackfrost/models/signing_data.dart';
+import 'package:stackfrost/utilities/amount/amount.dart';
+import 'package:stackfrost/utilities/bip32_utils.dart';
+import 'package:stackfrost/utilities/bip47_utils.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/flutter_secure_storage_interface.dart';
+import 'package:stackfrost/utilities/format.dart';
+import 'package:stackfrost/utilities/logger.dart';
 import 'package:tuple/tuple.dart';
 
 const String kPCodeKeyPrefix = "pCode_key_";
@@ -108,22 +108,18 @@ mixin PaynymWalletInterface {
     required int Function({
       required int vSize,
       required int feeRatePerKB,
-    })
-        estimateTxFee,
+    }) estimateTxFee,
     required Future<Map<String, dynamic>> Function({
       required String address,
       required Amount amount,
       Map<String, dynamic>? args,
-    })
-        prepareSend,
+    }) prepareSend,
     required Future<int> Function({
       required String address,
-    })
-        getTxCount,
+    }) getTxCount,
     required Future<List<SigningData>> Function(
       List<UTXO> utxosToUse,
-    )
-        fetchBuildTxData,
+    ) fetchBuildTxData,
     required Future<void> Function() refresh,
     required Future<void> Function() checkChangeAddressForTransactions,
   }) {

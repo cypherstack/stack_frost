@@ -12,13 +12,13 @@ import 'dart:isolate';
 
 import 'package:hive/hive.dart';
 import 'package:mutex/mutex.dart';
-import 'package:stackwallet/models/exchange/response_objects/trade.dart';
-import 'package:stackwallet/models/node_model.dart';
-import 'package:stackwallet/models/notification_model.dart';
-import 'package:stackwallet/models/trade_wallet_lookup.dart';
-import 'package:stackwallet/services/wallets_service.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/logger.dart';
+import 'package:stackfrost/models/exchange/response_objects/trade.dart';
+import 'package:stackfrost/models/node_model.dart';
+import 'package:stackfrost/models/notification_model.dart';
+import 'package:stackfrost/models/trade_wallet_lookup.dart';
+import 'package:stackfrost/services/wallets_service.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/logger.dart';
 
 class DB {
   // legacy (required for migrations)

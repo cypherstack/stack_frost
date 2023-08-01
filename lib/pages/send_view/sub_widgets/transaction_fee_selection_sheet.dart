@@ -11,21 +11,21 @@
 import 'package:cw_core/monero_transaction_priority.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackwallet/models/paymint/fee_object_model.dart';
-import 'package:stackwallet/pages/token_view/token_view.dart';
-import 'package:stackwallet/providers/providers.dart';
-import 'package:stackwallet/providers/ui/fee_rate_type_state_provider.dart';
-import 'package:stackwallet/providers/wallet/public_private_balance_state_provider.dart';
-import 'package:stackwallet/services/coins/firo/firo_wallet.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/amount/amount.dart';
-import 'package:stackwallet/utilities/amount/amount_formatter.dart';
-import 'package:stackwallet/utilities/constants.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/enums/fee_rate_type_enum.dart';
-import 'package:stackwallet/utilities/logger.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/widgets/animated_text.dart';
+import 'package:stackfrost/models/paymint/fee_object_model.dart';
+import 'package:stackfrost/pages/token_view/token_view.dart';
+import 'package:stackfrost/providers/providers.dart';
+import 'package:stackfrost/providers/ui/fee_rate_type_state_provider.dart';
+import 'package:stackfrost/providers/wallet/public_private_balance_state_provider.dart';
+import 'package:stackfrost/services/coins/firo/firo_wallet.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/amount/amount.dart';
+import 'package:stackfrost/utilities/amount/amount_formatter.dart';
+import 'package:stackfrost/utilities/constants.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/enums/fee_rate_type_enum.dart';
+import 'package:stackfrost/utilities/logger.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/widgets/animated_text.dart';
 
 final feeSheetSessionCacheProvider =
     ChangeNotifierProvider<FeeSheetSessionCache>((ref) {

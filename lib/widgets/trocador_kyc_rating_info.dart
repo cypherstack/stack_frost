@@ -9,15 +9,15 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/widgets/conditional_parent.dart';
-import 'package:stackwallet/widgets/desktop/desktop_dialog.dart';
-import 'package:stackwallet/widgets/desktop/desktop_dialog_close_button.dart';
-import 'package:stackwallet/widgets/desktop/primary_button.dart';
-import 'package:stackwallet/widgets/desktop/secondary_button.dart';
-import 'package:stackwallet/widgets/exchange/trocador/trocador_kyc_icon.dart';
-import 'package:stackwallet/widgets/exchange/trocador/trocador_rating_type_enum.dart';
-import 'package:stackwallet/widgets/stack_dialog.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/widgets/conditional_parent.dart';
+import 'package:stackfrost/widgets/desktop/desktop_dialog.dart';
+import 'package:stackfrost/widgets/desktop/desktop_dialog_close_button.dart';
+import 'package:stackfrost/widgets/desktop/primary_button.dart';
+import 'package:stackfrost/widgets/desktop/secondary_button.dart';
+import 'package:stackfrost/widgets/exchange/trocador/trocador_kyc_icon.dart';
+import 'package:stackfrost/widgets/exchange/trocador/trocador_rating_type_enum.dart';
+import 'package:stackfrost/widgets/stack_dialog.dart';
 
 class TrocadorKYCRatingInfo extends StatelessWidget {
   const TrocadorKYCRatingInfo({Key? key}) : super(key: key);

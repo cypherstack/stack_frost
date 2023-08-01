@@ -9,9 +9,9 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/widgets/desktop/secondary_button.dart';
-import 'package:stackwallet/widgets/stack_dialog.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/widgets/desktop/secondary_button.dart';
+import 'package:stackfrost/widgets/stack_dialog.dart';
 
 class RecoveryPhraseExplanationDialog extends StatelessWidget {
   const RecoveryPhraseExplanationDialog({Key? key}) : super(key: key);

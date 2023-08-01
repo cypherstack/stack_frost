@@ -9,7 +9,7 @@
  */
 
 import 'package:hive/hive.dart';
-import 'package:stackwallet/utilities/logger.dart';
+import 'package:stackfrost/utilities/logger.dart';
 
 part '../../type_adaptors/exchange_transaction_status.g.dart';
 

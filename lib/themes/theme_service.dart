@@ -17,10 +17,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart';
 import 'package:isar/isar.dart';
-import 'package:stackwallet/db/isar/main_db.dart';
-import 'package:stackwallet/models/isar/stack_theme.dart';
-import 'package:stackwallet/utilities/logger.dart';
-import 'package:stackwallet/utilities/stack_file_system.dart';
+import 'package:stackfrost/db/isar/main_db.dart';
+import 'package:stackfrost/models/isar/stack_theme.dart';
+import 'package:stackfrost/utilities/logger.dart';
+import 'package:stackfrost/utilities/stack_file_system.dart';
 
 final pThemeService = Provider<ThemeService>((ref) {
   return ThemeService.instance;

@@ -9,8 +9,8 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
 
 class RestoreOptionsNextButton extends StatelessWidget {
   const RestoreOptionsNextButton({

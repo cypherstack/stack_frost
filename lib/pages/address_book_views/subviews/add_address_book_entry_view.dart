@@ -12,31 +12,31 @@ import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:stackwallet/models/isar/models/contact_entry.dart';
-import 'package:stackwallet/pages/address_book_views/subviews/new_contact_address_entry_form.dart';
-import 'package:stackwallet/providers/global/address_book_service_provider.dart';
-import 'package:stackwallet/providers/ui/address_book_providers/address_entry_data_provider.dart';
-import 'package:stackwallet/providers/ui/address_book_providers/contact_name_is_not_empty_state_provider.dart';
-import 'package:stackwallet/providers/ui/address_book_providers/valid_contact_state_provider.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/assets.dart';
-import 'package:stackwallet/utilities/barcode_scanner_interface.dart';
-import 'package:stackwallet/utilities/clipboard_interface.dart';
-import 'package:stackwallet/utilities/constants.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/utilities/util.dart';
-import 'package:stackwallet/widgets/background.dart';
-import 'package:stackwallet/widgets/conditional_parent.dart';
-import 'package:stackwallet/widgets/custom_buttons/app_bar_icon_button.dart';
-import 'package:stackwallet/widgets/custom_buttons/blue_text_button.dart';
-import 'package:stackwallet/widgets/desktop/desktop_dialog.dart';
-import 'package:stackwallet/widgets/desktop/desktop_dialog_close_button.dart';
-import 'package:stackwallet/widgets/desktop/primary_button.dart';
-import 'package:stackwallet/widgets/desktop/secondary_button.dart';
-import 'package:stackwallet/widgets/emoji_select_sheet.dart';
-import 'package:stackwallet/widgets/icon_widgets/x_icon.dart';
-import 'package:stackwallet/widgets/stack_text_field.dart';
-import 'package:stackwallet/widgets/textfield_icon_button.dart';
+import 'package:stackfrost/models/isar/models/contact_entry.dart';
+import 'package:stackfrost/pages/address_book_views/subviews/new_contact_address_entry_form.dart';
+import 'package:stackfrost/providers/global/address_book_service_provider.dart';
+import 'package:stackfrost/providers/ui/address_book_providers/address_entry_data_provider.dart';
+import 'package:stackfrost/providers/ui/address_book_providers/contact_name_is_not_empty_state_provider.dart';
+import 'package:stackfrost/providers/ui/address_book_providers/valid_contact_state_provider.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/assets.dart';
+import 'package:stackfrost/utilities/barcode_scanner_interface.dart';
+import 'package:stackfrost/utilities/clipboard_interface.dart';
+import 'package:stackfrost/utilities/constants.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/utilities/util.dart';
+import 'package:stackfrost/widgets/background.dart';
+import 'package:stackfrost/widgets/conditional_parent.dart';
+import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
+import 'package:stackfrost/widgets/custom_buttons/blue_text_button.dart';
+import 'package:stackfrost/widgets/desktop/desktop_dialog.dart';
+import 'package:stackfrost/widgets/desktop/desktop_dialog_close_button.dart';
+import 'package:stackfrost/widgets/desktop/primary_button.dart';
+import 'package:stackfrost/widgets/desktop/secondary_button.dart';
+import 'package:stackfrost/widgets/emoji_select_sheet.dart';
+import 'package:stackfrost/widgets/icon_widgets/x_icon.dart';
+import 'package:stackfrost/widgets/stack_text_field.dart';
+import 'package:stackfrost/widgets/textfield_icon_button.dart';
 import 'package:uuid/uuid.dart';
 
 class AddAddressBookEntryView extends ConsumerStatefulWidget {
@@ -703,7 +703,7 @@ class _AddAddressBookEntryViewState
                                               name: nameController.text,
                                               addresses: entries,
                                               isFavorite: _isFavorite,
-                                               customId: const Uuid().v1(),
+                                              customId: const Uuid().v1(),
                                             );
 
                                             if (await ref

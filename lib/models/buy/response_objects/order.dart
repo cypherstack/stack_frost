@@ -8,7 +8,7 @@
  *
  */
 
-import 'package:stackwallet/models/buy/response_objects/quote.dart';
+import 'package:stackfrost/models/buy/response_objects/quote.dart';
 
 class SimplexOrder {
   final SimplexQuote quote;

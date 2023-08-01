@@ -12,18 +12,18 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackwallet/pages/paynym/subwidgets/paynym_card_button.dart';
-import 'package:stackwallet/providers/global/paynym_api_provider.dart';
-import 'package:stackwallet/providers/global/wallets_provider.dart';
-import 'package:stackwallet/providers/wallet/my_paynym_account_state_provider.dart';
-import 'package:stackwallet/services/mixins/paynym_wallet_interface.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/constants.dart';
-import 'package:stackwallet/utilities/logger.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/utilities/util.dart';
-import 'package:stackwallet/widgets/conditional_parent.dart';
-import 'package:stackwallet/widgets/rounded_white_container.dart';
+import 'package:stackfrost/pages/paynym/subwidgets/paynym_card_button.dart';
+import 'package:stackfrost/providers/global/paynym_api_provider.dart';
+import 'package:stackfrost/providers/global/wallets_provider.dart';
+import 'package:stackfrost/providers/wallet/my_paynym_account_state_provider.dart';
+import 'package:stackfrost/services/mixins/paynym_wallet_interface.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/constants.dart';
+import 'package:stackfrost/utilities/logger.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/utilities/util.dart';
+import 'package:stackfrost/widgets/conditional_parent.dart';
+import 'package:stackfrost/widgets/rounded_white_container.dart';
 
 class PaynymFollowingList extends ConsumerStatefulWidget {
   const PaynymFollowingList({

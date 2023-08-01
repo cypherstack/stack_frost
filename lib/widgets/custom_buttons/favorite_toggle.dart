@@ -11,9 +11,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/themes/theme_providers.dart';
-import 'package:stackwallet/utilities/assets.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/themes/theme_providers.dart';
+import 'package:stackfrost/utilities/assets.dart';
 
 class FavoriteToggle extends ConsumerStatefulWidget {
   const FavoriteToggle({

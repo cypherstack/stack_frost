@@ -8,8 +8,8 @@
  *
  */
 
-import 'package:stackwallet/models/add_wallet_list_entity/add_wallet_list_entity.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/models/add_wallet_list_entity/add_wallet_list_entity.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
 
 class CoinEntity extends AddWalletListEntity {
   CoinEntity(this._coin);

@@ -12,20 +12,20 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackwallet/models/isar/models/isar_models.dart';
-import 'package:stackwallet/pages/wallet_view/sub_widgets/tx_icon.dart';
-import 'package:stackwallet/pages/wallet_view/transaction_views/transaction_details_view.dart';
-import 'package:stackwallet/providers/db/main_db_provider.dart';
-import 'package:stackwallet/providers/providers.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/amount/amount.dart';
-import 'package:stackwallet/utilities/amount/amount_formatter.dart';
-import 'package:stackwallet/utilities/constants.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/format.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/utilities/util.dart';
-import 'package:stackwallet/widgets/desktop/desktop_dialog.dart';
+import 'package:stackfrost/models/isar/models/isar_models.dart';
+import 'package:stackfrost/pages/wallet_view/sub_widgets/tx_icon.dart';
+import 'package:stackfrost/pages/wallet_view/transaction_views/transaction_details_view.dart';
+import 'package:stackfrost/providers/db/main_db_provider.dart';
+import 'package:stackfrost/providers/providers.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/amount/amount.dart';
+import 'package:stackfrost/utilities/amount/amount_formatter.dart';
+import 'package:stackfrost/utilities/constants.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/format.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/utilities/util.dart';
+import 'package:stackfrost/widgets/desktop/desktop_dialog.dart';
 import 'package:tuple/tuple.dart';
 
 class TransactionCard extends ConsumerStatefulWidget {

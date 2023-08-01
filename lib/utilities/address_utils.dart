@@ -1,6 +1,6 @@
-/* 
+/*
  * This file is part of Stack Wallet.
- * 
+ *
  * Copyright (c) 2023 Cypher Stack
  * All Rights Reserved.
  * The code is distributed under GPLv3 license, see LICENSE file for details.
@@ -10,12 +10,12 @@
 
 import 'dart:convert';
 
-import 'package:bitbox/bitbox.dart' as bitbox;
 import 'package:bitcoindart/bitcoindart.dart';
 import 'package:crypto/crypto.dart';
-import 'package:nanodart/nanodart.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/logger.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/logger.dart';
+
+// import 'logger.dart';
 
 class AddressUtils {
   static String condenseAddress(String address) {
@@ -56,55 +56,56 @@ class AddressUtils {
         return Address.validateAddress(address, bitcoin);
       case Coin.bitcoinTestNet:
         return Address.validateAddress(address, testnet);
-  }
+    }
 
-  /// parse an address uri
-  /// returns an empty map if the input string does not begin with "firo:"
-  static Map<String, String> parseUri(String uri) {
-    Map<String, String> result = {};
-    try {
-      final u = Uri.parse(uri);
-      if (u.hasScheme) {
-        result["scheme"] = u.scheme.toLowerCase();
-        result["address"] = u.path;
-        result.addAll(u.queryParameters);
+    /// parse an address uri
+    /// returns an empty map if the input string does not begin with "firo:"
+    Map<String, String> parseUri(String uri) {
+      Map<String, String> result = {};
+      try {
+        final u = Uri.parse(uri);
+        if (u.hasScheme) {
+          result["scheme"] = u.scheme.toLowerCase();
+          result["address"] = u.path;
+          result.addAll(u.queryParameters);
+        }
+      } catch (e) {
+        Logging.instance.log("Exception caught in parseUri($uri): $e",
+            level: LogLevel.Error);
       }
-    } catch (e) {
-      Logging.instance
-          .log("Exception caught in parseUri($uri): $e", level: LogLevel.Error);
+      return result;
     }
-    return result;
-  }
 
-  /// builds a uri string with the given address and query parameters if any
-  static String buildUriString(
-    Coin coin,
-    String address,
-    Map<String, String> params,
-  ) {
-    // TODO: other sanitation as well ?
-    String sanitizedAddress = address;
-    String uriString = "${coin.uriScheme}:$sanitizedAddress";
-    if (params.isNotEmpty) {
-      uriString += Uri(queryParameters: params).toString();
+    /// builds a uri string with the given address and query parameters if any
+    String buildUriString(
+      Coin coin,
+      String address,
+      Map<String, String> params,
+    ) {
+      // TODO: other sanitation as well ?
+      String sanitizedAddress = address;
+      String uriString = "${coin.uriScheme}:$sanitizedAddress";
+      if (params.isNotEmpty) {
+        uriString += Uri(queryParameters: params).toString();
+      }
+      return uriString;
     }
-    return uriString;
-  }
 
-  /// returns empty if bad data
-  static Map<String, dynamic> decodeQRSeedData(String data) {
-    Map<String, dynamic> result = {};
-    try {
-      result = Map<String, dynamic>.from(jsonDecode(data) as Map);
-    } catch (e) {
-      Logging.instance.log("Exception caught in parseQRSeedData($data): $e",
-          level: LogLevel.Error);
+    /// returns empty if bad data
+    Map<String, dynamic> decodeQRSeedData(String data) {
+      Map<String, dynamic> result = {};
+      try {
+        result = Map<String, dynamic>.from(jsonDecode(data) as Map);
+      } catch (e) {
+        Logging.instance.log("Exception caught in parseQRSeedData($data): $e",
+            level: LogLevel.Error);
+      }
+      return result;
     }
-    return result;
-  }
 
-  /// encode mnemonic words to qrcode formatted string
-  static String encodeQRSeedData(List<String> words) {
-    return jsonEncode({"mnemonic": words});
+    /// encode mnemonic words to qrcode formatted string
+    String encodeQRSeedData(List<String> words) {
+      return jsonEncode({"mnemonic": words});
+    }
   }
 }

@@ -15,40 +15,40 @@ import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:stackwallet/models/paynym/paynym_account_lite.dart';
-import 'package:stackwallet/notifications/show_flush_bar.dart';
-import 'package:stackwallet/pages/pinpad_views/lock_screen_view.dart';
-import 'package:stackwallet/pages/send_view/sub_widgets/sending_transaction_dialog.dart';
-import 'package:stackwallet/pages/token_view/token_view.dart';
-import 'package:stackwallet/pages/wallet_view/wallet_view.dart';
-import 'package:stackwallet/pages_desktop_specific/coin_control/desktop_coin_control_use_dialog.dart';
-import 'package:stackwallet/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/desktop_auth_send.dart';
-import 'package:stackwallet/providers/providers.dart';
-import 'package:stackwallet/providers/wallet/public_private_balance_state_provider.dart';
-import 'package:stackwallet/route_generator.dart';
-import 'package:stackwallet/services/coins/epiccash/epiccash_wallet.dart';
-import 'package:stackwallet/services/coins/firo/firo_wallet.dart';
-import 'package:stackwallet/services/mixins/paynym_wallet_interface.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/themes/theme_providers.dart';
-import 'package:stackwallet/utilities/amount/amount.dart';
-import 'package:stackwallet/utilities/amount/amount_formatter.dart';
-import 'package:stackwallet/utilities/constants.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/utilities/util.dart';
-import 'package:stackwallet/widgets/background.dart';
-import 'package:stackwallet/widgets/conditional_parent.dart';
-import 'package:stackwallet/widgets/custom_buttons/app_bar_icon_button.dart';
-import 'package:stackwallet/widgets/desktop/desktop_dialog.dart';
-import 'package:stackwallet/widgets/desktop/desktop_dialog_close_button.dart';
-import 'package:stackwallet/widgets/desktop/primary_button.dart';
-import 'package:stackwallet/widgets/icon_widgets/x_icon.dart';
-import 'package:stackwallet/widgets/rounded_container.dart';
-import 'package:stackwallet/widgets/rounded_white_container.dart';
-import 'package:stackwallet/widgets/stack_dialog.dart';
-import 'package:stackwallet/widgets/stack_text_field.dart';
-import 'package:stackwallet/widgets/textfield_icon_button.dart';
+import 'package:stackfrost/models/paynym/paynym_account_lite.dart';
+import 'package:stackfrost/notifications/show_flush_bar.dart';
+import 'package:stackfrost/pages/pinpad_views/lock_screen_view.dart';
+import 'package:stackfrost/pages/send_view/sub_widgets/sending_transaction_dialog.dart';
+import 'package:stackfrost/pages/token_view/token_view.dart';
+import 'package:stackfrost/pages/wallet_view/wallet_view.dart';
+import 'package:stackfrost/pages_desktop_specific/coin_control/desktop_coin_control_use_dialog.dart';
+import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/desktop_auth_send.dart';
+import 'package:stackfrost/providers/providers.dart';
+import 'package:stackfrost/providers/wallet/public_private_balance_state_provider.dart';
+import 'package:stackfrost/route_generator.dart';
+import 'package:stackfrost/services/coins/epiccash/epiccash_wallet.dart';
+import 'package:stackfrost/services/coins/firo/firo_wallet.dart';
+import 'package:stackfrost/services/mixins/paynym_wallet_interface.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/themes/theme_providers.dart';
+import 'package:stackfrost/utilities/amount/amount.dart';
+import 'package:stackfrost/utilities/amount/amount_formatter.dart';
+import 'package:stackfrost/utilities/constants.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/utilities/util.dart';
+import 'package:stackfrost/widgets/background.dart';
+import 'package:stackfrost/widgets/conditional_parent.dart';
+import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
+import 'package:stackfrost/widgets/desktop/desktop_dialog.dart';
+import 'package:stackfrost/widgets/desktop/desktop_dialog_close_button.dart';
+import 'package:stackfrost/widgets/desktop/primary_button.dart';
+import 'package:stackfrost/widgets/icon_widgets/x_icon.dart';
+import 'package:stackfrost/widgets/rounded_container.dart';
+import 'package:stackfrost/widgets/rounded_white_container.dart';
+import 'package:stackfrost/widgets/stack_dialog.dart';
+import 'package:stackfrost/widgets/stack_text_field.dart';
+import 'package:stackfrost/widgets/textfield_icon_button.dart';
 
 class ConfirmTransactionView extends ConsumerStatefulWidget {
   const ConfirmTransactionView({
@@ -89,10 +89,8 @@ class _ConfirmTransactionViewState
   late final FocusNode _noteFocusNode;
   late final TextEditingController noteController;
 
-
   late final FocusNode _onChainNoteFocusNode;
   late final TextEditingController onChainNoteController;
-
 
   Future<void> _attemptSend(BuildContext context) async {
     final manager =
@@ -283,7 +281,8 @@ class _ConfirmTransactionViewState
 
     _onChainNoteFocusNode = FocusNode();
     onChainNoteController = TextEditingController();
-    onChainNoteController.text = transactionInfo["onChainNote"] as String? ?? "";
+    onChainNoteController.text =
+        transactionInfo["onChainNote"] as String? ?? "";
 
     super.initState();
   }
@@ -885,23 +884,22 @@ class _ConfirmTransactionViewState
                           ).copyWith(
                             suffixIcon: onChainNoteController.text.isNotEmpty
                                 ? Padding(
-                              padding:
-                              const EdgeInsets.only(right: 0),
-                              child: UnconstrainedBox(
-                                child: Row(
-                                  children: [
-                                    TextFieldIconButton(
-                                      child: const XIcon(),
-                                      onTap: () async {
-                                        setState(() {
-                                          onChainNoteController.text = "";
-                                        });
-                                      },
+                                    padding: const EdgeInsets.only(right: 0),
+                                    child: UnconstrainedBox(
+                                      child: Row(
+                                        children: [
+                                          TextFieldIconButton(
+                                            child: const XIcon(),
+                                            onTap: () async {
+                                              setState(() {
+                                                onChainNoteController.text = "";
+                                              });
+                                            },
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ],
-                                ),
-                              ),
-                            )
+                                  )
                                 : null,
                           ),
                         ),
@@ -911,7 +909,8 @@ class _ConfirmTransactionViewState
                         height: 12,
                       ),
                     Text(
-                      (coin == Coin.epicCash) ? "Local Note (optional)"
+                      (coin == Coin.epicCash)
+                          ? "Local Note (optional)"
                           : "Note (optional)",
                       style:
                           STextStyles.desktopTextExtraSmall(context).copyWith(

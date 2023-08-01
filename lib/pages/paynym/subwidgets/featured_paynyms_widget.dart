@@ -9,12 +9,12 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:stackwallet/pages/paynym/subwidgets/paynym_card.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/featured_paynyms.dart';
-import 'package:stackwallet/utilities/util.dart';
-import 'package:stackwallet/widgets/conditional_parent.dart';
-import 'package:stackwallet/widgets/rounded_white_container.dart';
+import 'package:stackfrost/pages/paynym/subwidgets/paynym_card.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/featured_paynyms.dart';
+import 'package:stackfrost/utilities/util.dart';
+import 'package:stackfrost/widgets/conditional_parent.dart';
+import 'package:stackfrost/widgets/rounded_white_container.dart';
 
 class FeaturedPaynymsWidget extends StatelessWidget {
   const FeaturedPaynymsWidget({

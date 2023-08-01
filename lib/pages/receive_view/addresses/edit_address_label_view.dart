@@ -11,20 +11,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isar/isar.dart';
-import 'package:stackwallet/db/isar/main_db.dart';
-import 'package:stackwallet/models/isar/models/address_label.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/constants.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/utilities/util.dart';
-import 'package:stackwallet/widgets/background.dart';
-import 'package:stackwallet/widgets/conditional_parent.dart';
-import 'package:stackwallet/widgets/custom_buttons/app_bar_icon_button.dart';
-import 'package:stackwallet/widgets/desktop/desktop_dialog_close_button.dart';
-import 'package:stackwallet/widgets/desktop/primary_button.dart';
-import 'package:stackwallet/widgets/icon_widgets/x_icon.dart';
-import 'package:stackwallet/widgets/stack_text_field.dart';
-import 'package:stackwallet/widgets/textfield_icon_button.dart';
+import 'package:stackfrost/db/isar/main_db.dart';
+import 'package:stackfrost/models/isar/models/address_label.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/constants.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/utilities/util.dart';
+import 'package:stackfrost/widgets/background.dart';
+import 'package:stackfrost/widgets/conditional_parent.dart';
+import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
+import 'package:stackfrost/widgets/desktop/desktop_dialog_close_button.dart';
+import 'package:stackfrost/widgets/desktop/primary_button.dart';
+import 'package:stackfrost/widgets/icon_widgets/x_icon.dart';
+import 'package:stackfrost/widgets/stack_text_field.dart';
+import 'package:stackfrost/widgets/textfield_icon_button.dart';
 
 class EditAddressLabelView extends ConsumerStatefulWidget {
   const EditAddressLabelView({

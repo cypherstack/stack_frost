@@ -14,8 +14,8 @@ import 'dart:io';
 import 'package:event_bus/event_bus.dart';
 import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
-import 'package:stackwallet/models/isar/models/log.dart';
-import 'package:stackwallet/utilities/logger.dart';
+import 'package:stackfrost/models/isar/models/log.dart';
+import 'package:stackfrost/utilities/logger.dart';
 
 class DebugService extends ChangeNotifier {
   DebugService._();
@@ -44,7 +44,11 @@ class DebugService extends ChangeNotifier {
     // });
   }
 
-  List<Log> get recentLogs => isar.logs.where().sortByTimestampInMillisUTCDesc().limit(100).findAllSync();
+  List<Log> get recentLogs => isar.logs
+      .where()
+      .sortByTimestampInMillisUTCDesc()
+      .limit(100)
+      .findAllSync();
 
   // Future<void> updateRecentLogs() async {
   //   int totalCount = await isar.logs.count();

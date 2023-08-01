@@ -1,12 +1,12 @@
 import 'dart:async';
 
 import 'package:isar/isar.dart';
-import 'package:stackwallet/db/isar/main_db.dart';
-import 'package:stackwallet/dto/ordinals/inscription_data.dart';
-import 'package:stackwallet/models/isar/models/blockchain_data/utxo.dart';
-import 'package:stackwallet/models/isar/ordinal.dart';
-import 'package:stackwallet/services/litescribe_api.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/db/isar/main_db.dart';
+import 'package:stackfrost/dto/ordinals/inscription_data.dart';
+import 'package:stackfrost/models/isar/models/blockchain_data/utxo.dart';
+import 'package:stackfrost/models/isar/ordinal.dart';
+import 'package:stackfrost/services/litescribe_api.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
 
 mixin OrdinalsInterface {
   late final String _walletId;

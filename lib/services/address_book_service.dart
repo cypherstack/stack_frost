@@ -10,9 +10,9 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:stackwallet/db/isar/main_db.dart';
-import 'package:stackwallet/models/isar/models/contact_entry.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/db/isar/main_db.dart';
+import 'package:stackfrost/models/isar/models/contact_entry.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
 
 class AddressBookService extends ChangeNotifier {
   ContactEntry getContactById(String id) {

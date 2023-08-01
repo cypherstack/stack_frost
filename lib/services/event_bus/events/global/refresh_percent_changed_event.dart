@@ -8,7 +8,7 @@
  *
  */
 
-import 'package:stackwallet/utilities/logger.dart';
+import 'package:stackfrost/utilities/logger.dart';
 
 class RefreshPercentChangedEvent {
   double percent;

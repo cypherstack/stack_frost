@@ -11,10 +11,10 @@
 import 'dart:math' as math;
 
 import 'package:decimal/decimal.dart';
-import 'package:stackwallet/models/isar/models/ethereum/eth_contract.dart';
-import 'package:stackwallet/utilities/amount/amount.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/util.dart';
+import 'package:stackfrost/models/isar/models/ethereum/eth_contract.dart';
+import 'package:stackfrost/utilities/amount/amount.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/util.dart';
 
 // preserve index order as index is used to store value in preferences
 enum AmountUnit {

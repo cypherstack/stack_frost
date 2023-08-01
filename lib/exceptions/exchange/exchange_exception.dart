@@ -8,7 +8,7 @@
  *
  */
 
-import 'package:stackwallet/exceptions/sw_exception.dart';
+import 'package:stackfrost/exceptions/sw_exception.dart';
 
 enum ExchangeExceptionType { generic, serializeResponseError, orderNotFound }
 

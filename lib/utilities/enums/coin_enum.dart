@@ -8,8 +8,8 @@
  *
  */
 
-import 'package:stackwallet/services/coins/bitcoin/bitcoin_wallet.dart' as btc;
-import 'package:stackwallet/utilities/constants.dart';
+import 'package:stackfrost/services/coins/bitcoin/bitcoin_wallet.dart' as btc;
+import 'package:stackfrost/utilities/constants.dart';
 
 enum Coin {
   bitcoin,

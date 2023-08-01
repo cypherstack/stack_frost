@@ -9,9 +9,9 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/utilities/util.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/utilities/util.dart';
 
 class StackDialogBase extends StatelessWidget {
   const StackDialogBase({

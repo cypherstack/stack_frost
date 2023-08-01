@@ -13,19 +13,19 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:stackwallet/models/paynym/paynym_account_lite.dart';
-import 'package:stackwallet/models/paynym/paynym_response.dart';
-import 'package:stackwallet/notifications/show_flush_bar.dart';
-import 'package:stackwallet/providers/global/paynym_api_provider.dart';
-import 'package:stackwallet/providers/global/wallets_provider.dart';
-import 'package:stackwallet/providers/wallet/my_paynym_account_state_provider.dart';
-import 'package:stackwallet/services/mixins/paynym_wallet_interface.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/assets.dart';
-import 'package:stackwallet/utilities/util.dart';
-import 'package:stackwallet/widgets/desktop/primary_button.dart';
-import 'package:stackwallet/widgets/desktop/secondary_button.dart';
-import 'package:stackwallet/widgets/loading_indicator.dart';
+import 'package:stackfrost/models/paynym/paynym_account_lite.dart';
+import 'package:stackfrost/models/paynym/paynym_response.dart';
+import 'package:stackfrost/notifications/show_flush_bar.dart';
+import 'package:stackfrost/providers/global/paynym_api_provider.dart';
+import 'package:stackfrost/providers/global/wallets_provider.dart';
+import 'package:stackfrost/providers/wallet/my_paynym_account_state_provider.dart';
+import 'package:stackfrost/services/mixins/paynym_wallet_interface.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/assets.dart';
+import 'package:stackfrost/utilities/util.dart';
+import 'package:stackfrost/widgets/desktop/primary_button.dart';
+import 'package:stackfrost/widgets/desktop/secondary_button.dart';
+import 'package:stackfrost/widgets/loading_indicator.dart';
 
 enum PaynymFollowToggleButtonStyle {
   primary,

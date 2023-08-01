@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:stackwallet/dto/ordinals/inscription_data.dart';
-import 'package:stackwallet/dto/ordinals/litescribe_response.dart';
+import 'package:stackfrost/dto/ordinals/inscription_data.dart';
+import 'package:stackfrost/dto/ordinals/litescribe_response.dart';
 
 class LitescribeAPI {
   static final LitescribeAPI _instance = LitescribeAPI._internal();

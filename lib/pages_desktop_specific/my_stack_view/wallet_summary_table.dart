@@ -13,17 +13,17 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:stackwallet/pages/wallets_view/wallets_overview.dart';
-import 'package:stackwallet/providers/providers.dart';
-import 'package:stackwallet/themes/coin_icon_provider.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/amount/amount.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/widgets/conditional_parent.dart';
-import 'package:stackwallet/widgets/desktop/desktop_dialog.dart';
-import 'package:stackwallet/widgets/desktop/desktop_dialog_close_button.dart';
-import 'package:stackwallet/widgets/rounded_white_container.dart';
+import 'package:stackfrost/pages/wallets_view/wallets_overview.dart';
+import 'package:stackfrost/providers/providers.dart';
+import 'package:stackfrost/themes/coin_icon_provider.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/amount/amount.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/widgets/conditional_parent.dart';
+import 'package:stackfrost/widgets/desktop/desktop_dialog.dart';
+import 'package:stackfrost/widgets/desktop/desktop_dialog_close_button.dart';
+import 'package:stackfrost/widgets/rounded_white_container.dart';
 
 class WalletSummaryTable extends ConsumerStatefulWidget {
   const WalletSummaryTable({Key? key}) : super(key: key);

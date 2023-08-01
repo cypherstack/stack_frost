@@ -1,8 +1,8 @@
 import 'dart:math';
 
 import 'package:flutter/services.dart';
-import 'package:stackwallet/utilities/amount/amount_unit.dart';
-import 'package:stackwallet/utilities/util.dart';
+import 'package:stackfrost/utilities/amount/amount_unit.dart';
+import 'package:stackfrost/utilities/util.dart';
 
 class AmountInputFormatter extends TextInputFormatter {
   final int decimals;

@@ -13,28 +13,28 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:stackwallet/electrumx_rpc/electrumx.dart';
-import 'package:stackwallet/notifications/show_flush_bar.dart';
-import 'package:stackwallet/pages/settings_views/global_settings_view/manage_nodes_views/add_edit_node_view.dart';
-import 'package:stackwallet/providers/global/secure_store_provider.dart';
-import 'package:stackwallet/providers/providers.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/assets.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/flutter_secure_storage_interface.dart';
-import 'package:stackwallet/utilities/logger.dart';
-import 'package:stackwallet/utilities/test_epic_box_connection.dart';
-import 'package:stackwallet/utilities/test_eth_node_connection.dart';
-import 'package:stackwallet/utilities/test_monero_node_connection.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/utilities/util.dart';
-import 'package:stackwallet/widgets/background.dart';
-import 'package:stackwallet/widgets/conditional_parent.dart';
-import 'package:stackwallet/widgets/custom_buttons/app_bar_icon_button.dart';
-import 'package:stackwallet/widgets/desktop/delete_button.dart';
-import 'package:stackwallet/widgets/desktop/desktop_dialog.dart';
-import 'package:stackwallet/widgets/desktop/primary_button.dart';
-import 'package:stackwallet/widgets/desktop/secondary_button.dart';
+import 'package:stackfrost/electrumx_rpc/electrumx.dart';
+import 'package:stackfrost/notifications/show_flush_bar.dart';
+import 'package:stackfrost/pages/settings_views/global_settings_view/manage_nodes_views/add_edit_node_view.dart';
+import 'package:stackfrost/providers/global/secure_store_provider.dart';
+import 'package:stackfrost/providers/providers.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/assets.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/flutter_secure_storage_interface.dart';
+import 'package:stackfrost/utilities/logger.dart';
+import 'package:stackfrost/utilities/test_epic_box_connection.dart';
+import 'package:stackfrost/utilities/test_eth_node_connection.dart';
+import 'package:stackfrost/utilities/test_monero_node_connection.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/utilities/util.dart';
+import 'package:stackfrost/widgets/background.dart';
+import 'package:stackfrost/widgets/conditional_parent.dart';
+import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
+import 'package:stackfrost/widgets/desktop/delete_button.dart';
+import 'package:stackfrost/widgets/desktop/desktop_dialog.dart';
+import 'package:stackfrost/widgets/desktop/primary_button.dart';
+import 'package:stackfrost/widgets/desktop/secondary_button.dart';
 import 'package:tuple/tuple.dart';
 
 class NodeDetailsView extends ConsumerStatefulWidget {
@@ -175,7 +175,7 @@ class _NodeDetailsViewState extends ConsumerState<NodeDetailsView> {
       case Coin.stellar:
       case Coin.stellarTestnet:
         throw UnimplementedError();
-        //TODO: check network/node
+      //TODO: check network/node
     }
 
     if (testPassed) {

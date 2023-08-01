@@ -18,53 +18,53 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:stackwallet/models/isar/models/isar_models.dart';
-import 'package:stackwallet/models/paynym/paynym_account_lite.dart';
-import 'package:stackwallet/models/send_view_auto_fill_data.dart';
-import 'package:stackwallet/pages/address_book_views/address_book_view.dart';
-import 'package:stackwallet/pages/coin_control/coin_control_view.dart';
-import 'package:stackwallet/pages/send_view/confirm_transaction_view.dart';
-import 'package:stackwallet/pages/send_view/sub_widgets/building_transaction_dialog.dart';
-import 'package:stackwallet/pages/send_view/sub_widgets/firo_balance_selection_sheet.dart';
-import 'package:stackwallet/pages/send_view/sub_widgets/transaction_fee_selection_sheet.dart';
-import 'package:stackwallet/providers/providers.dart';
-import 'package:stackwallet/providers/ui/fee_rate_type_state_provider.dart';
-import 'package:stackwallet/providers/ui/preview_tx_button_state_provider.dart';
-import 'package:stackwallet/providers/wallet/public_private_balance_state_provider.dart';
-import 'package:stackwallet/route_generator.dart';
-import 'package:stackwallet/services/coins/firo/firo_wallet.dart';
-import 'package:stackwallet/services/coins/manager.dart';
-import 'package:stackwallet/services/mixins/paynym_wallet_interface.dart';
-import 'package:stackwallet/themes/coin_icon_provider.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/address_utils.dart';
-import 'package:stackwallet/utilities/amount/amount.dart';
-import 'package:stackwallet/utilities/amount/amount_formatter.dart';
-import 'package:stackwallet/utilities/amount/amount_input_formatter.dart';
-import 'package:stackwallet/utilities/amount/amount_unit.dart';
-import 'package:stackwallet/utilities/assets.dart';
-import 'package:stackwallet/utilities/barcode_scanner_interface.dart';
-import 'package:stackwallet/utilities/clipboard_interface.dart';
-import 'package:stackwallet/utilities/constants.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/enums/fee_rate_type_enum.dart';
-import 'package:stackwallet/utilities/logger.dart';
-import 'package:stackwallet/utilities/prefs.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/utilities/util.dart';
-import 'package:stackwallet/widgets/animated_text.dart';
-import 'package:stackwallet/widgets/background.dart';
-import 'package:stackwallet/widgets/custom_buttons/app_bar_icon_button.dart';
-import 'package:stackwallet/widgets/custom_buttons/blue_text_button.dart';
-import 'package:stackwallet/widgets/fee_slider.dart';
-import 'package:stackwallet/widgets/icon_widgets/addressbook_icon.dart';
-import 'package:stackwallet/widgets/icon_widgets/clipboard_icon.dart';
-import 'package:stackwallet/widgets/icon_widgets/qrcode_icon.dart';
-import 'package:stackwallet/widgets/icon_widgets/x_icon.dart';
-import 'package:stackwallet/widgets/rounded_white_container.dart';
-import 'package:stackwallet/widgets/stack_dialog.dart';
-import 'package:stackwallet/widgets/stack_text_field.dart';
-import 'package:stackwallet/widgets/textfield_icon_button.dart';
+import 'package:stackfrost/models/isar/models/isar_models.dart';
+import 'package:stackfrost/models/paynym/paynym_account_lite.dart';
+import 'package:stackfrost/models/send_view_auto_fill_data.dart';
+import 'package:stackfrost/pages/address_book_views/address_book_view.dart';
+import 'package:stackfrost/pages/coin_control/coin_control_view.dart';
+import 'package:stackfrost/pages/send_view/confirm_transaction_view.dart';
+import 'package:stackfrost/pages/send_view/sub_widgets/building_transaction_dialog.dart';
+import 'package:stackfrost/pages/send_view/sub_widgets/firo_balance_selection_sheet.dart';
+import 'package:stackfrost/pages/send_view/sub_widgets/transaction_fee_selection_sheet.dart';
+import 'package:stackfrost/providers/providers.dart';
+import 'package:stackfrost/providers/ui/fee_rate_type_state_provider.dart';
+import 'package:stackfrost/providers/ui/preview_tx_button_state_provider.dart';
+import 'package:stackfrost/providers/wallet/public_private_balance_state_provider.dart';
+import 'package:stackfrost/route_generator.dart';
+import 'package:stackfrost/services/coins/firo/firo_wallet.dart';
+import 'package:stackfrost/services/coins/manager.dart';
+import 'package:stackfrost/services/mixins/paynym_wallet_interface.dart';
+import 'package:stackfrost/themes/coin_icon_provider.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/address_utils.dart';
+import 'package:stackfrost/utilities/amount/amount.dart';
+import 'package:stackfrost/utilities/amount/amount_formatter.dart';
+import 'package:stackfrost/utilities/amount/amount_input_formatter.dart';
+import 'package:stackfrost/utilities/amount/amount_unit.dart';
+import 'package:stackfrost/utilities/assets.dart';
+import 'package:stackfrost/utilities/barcode_scanner_interface.dart';
+import 'package:stackfrost/utilities/clipboard_interface.dart';
+import 'package:stackfrost/utilities/constants.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/enums/fee_rate_type_enum.dart';
+import 'package:stackfrost/utilities/logger.dart';
+import 'package:stackfrost/utilities/prefs.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/utilities/util.dart';
+import 'package:stackfrost/widgets/animated_text.dart';
+import 'package:stackfrost/widgets/background.dart';
+import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
+import 'package:stackfrost/widgets/custom_buttons/blue_text_button.dart';
+import 'package:stackfrost/widgets/fee_slider.dart';
+import 'package:stackfrost/widgets/icon_widgets/addressbook_icon.dart';
+import 'package:stackfrost/widgets/icon_widgets/clipboard_icon.dart';
+import 'package:stackfrost/widgets/icon_widgets/qrcode_icon.dart';
+import 'package:stackfrost/widgets/icon_widgets/x_icon.dart';
+import 'package:stackfrost/widgets/rounded_white_container.dart';
+import 'package:stackfrost/widgets/stack_dialog.dart';
+import 'package:stackfrost/widgets/stack_text_field.dart';
+import 'package:stackfrost/widgets/textfield_icon_button.dart';
 import 'package:tuple/tuple.dart';
 
 class SendView extends ConsumerStatefulWidget {
@@ -1817,7 +1817,8 @@ class _SendViewState extends ConsumerState<SendView> {
                               ),
                               child: TextField(
                                 autocorrect: Util.isDesktop ? false : true,
-                                enableSuggestions: Util.isDesktop ? false : true,
+                                enableSuggestions:
+                                    Util.isDesktop ? false : true,
                                 maxLength: 256,
                                 controller: onChainNoteController,
                                 focusNode: _onChainNoteFocusNode,
@@ -1828,25 +1829,27 @@ class _SendViewState extends ConsumerState<SendView> {
                                   _onChainNoteFocusNode,
                                   context,
                                 ).copyWith(
-                                  suffixIcon: onChainNoteController.text.isNotEmpty
+                                  suffixIcon: onChainNoteController
+                                          .text.isNotEmpty
                                       ? Padding(
-                                    padding:
-                                    const EdgeInsets.only(right: 0),
-                                    child: UnconstrainedBox(
-                                      child: Row(
-                                        children: [
-                                          TextFieldIconButton(
-                                            child: const XIcon(),
-                                            onTap: () async {
-                                              setState(() {
-                                                onChainNoteController.text = "";
-                                              });
-                                            },
+                                          padding:
+                                              const EdgeInsets.only(right: 0),
+                                          child: UnconstrainedBox(
+                                            child: Row(
+                                              children: [
+                                                TextFieldIconButton(
+                                                  child: const XIcon(),
+                                                  onTap: () async {
+                                                    setState(() {
+                                                      onChainNoteController
+                                                          .text = "";
+                                                    });
+                                                  },
+                                                ),
+                                              ],
+                                            ),
                                           ),
-                                        ],
-                                      ),
-                                    ),
-                                  )
+                                        )
                                       : null,
                                 ),
                               ),
@@ -1856,8 +1859,9 @@ class _SendViewState extends ConsumerState<SendView> {
                               height: 12,
                             ),
                           Text(
-                              (coin == Coin.epicCash) ? "Local Note (optional)"
-                                  : "Note (optional)",
+                            (coin == Coin.epicCash)
+                                ? "Local Note (optional)"
+                                : "Note (optional)",
                             style: STextStyles.smallMed12(context),
                             textAlign: TextAlign.left,
                           ),

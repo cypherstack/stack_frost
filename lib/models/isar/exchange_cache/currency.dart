@@ -9,8 +9,8 @@
  */
 
 import 'package:isar/isar.dart';
-import 'package:stackwallet/models/isar/exchange_cache/pair.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/models/isar/exchange_cache/pair.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
 
 part 'currency.g.dart';
 

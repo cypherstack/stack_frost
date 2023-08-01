@@ -10,9 +10,9 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackwallet/models/wallet_restore_state.dart';
-import 'package:stackwallet/services/coins/manager.dart';
-import 'package:stackwallet/utilities/enums/stack_restoring_status.dart';
+import 'package:stackfrost/models/wallet_restore_state.dart';
+import 'package:stackfrost/services/coins/manager.dart';
+import 'package:stackfrost/utilities/enums/stack_restoring_status.dart';
 
 class StackRestoringUIState extends ChangeNotifier {
   bool _walletsWasSet = false;

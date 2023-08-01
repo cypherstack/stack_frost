@@ -11,15 +11,15 @@
 import 'package:decimal/decimal.dart';
 import 'package:flutter_native_splash/cli_commands.dart';
 import 'package:isar/isar.dart';
-import 'package:stackwallet/exceptions/main_db/main_db_exception.dart';
-import 'package:stackwallet/models/isar/models/block_explorer.dart';
-import 'package:stackwallet/models/isar/models/contact_entry.dart';
-import 'package:stackwallet/models/isar/models/isar_models.dart';
-import 'package:stackwallet/models/isar/ordinal.dart';
-import 'package:stackwallet/models/isar/stack_theme.dart';
-import 'package:stackwallet/utilities/amount/amount.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/stack_file_system.dart';
+import 'package:stackfrost/exceptions/main_db/main_db_exception.dart';
+import 'package:stackfrost/models/isar/models/block_explorer.dart';
+import 'package:stackfrost/models/isar/models/contact_entry.dart';
+import 'package:stackfrost/models/isar/models/isar_models.dart';
+import 'package:stackfrost/models/isar/ordinal.dart';
+import 'package:stackfrost/models/isar/stack_theme.dart';
+import 'package:stackfrost/utilities/amount/amount.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/stack_file_system.dart';
 import 'package:tuple/tuple.dart';
 
 part '../queries/queries.dart';

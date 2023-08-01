@@ -14,19 +14,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:stackwallet/models/isar/models/contact_entry.dart';
-import 'package:stackwallet/notifications/show_flush_bar.dart';
-import 'package:stackwallet/pages/address_book_views/subviews/edit_contact_address_view.dart';
-import 'package:stackwallet/providers/ui/address_book_providers/address_entry_data_provider.dart';
-import 'package:stackwallet/themes/coin_icon_provider.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/assets.dart';
-import 'package:stackwallet/utilities/clipboard_interface.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/widgets/custom_buttons/app_bar_icon_button.dart';
-import 'package:stackwallet/widgets/custom_buttons/blue_text_button.dart';
-import 'package:stackwallet/widgets/desktop/desktop_dialog.dart';
+import 'package:stackfrost/models/isar/models/contact_entry.dart';
+import 'package:stackfrost/notifications/show_flush_bar.dart';
+import 'package:stackfrost/pages/address_book_views/subviews/edit_contact_address_view.dart';
+import 'package:stackfrost/providers/ui/address_book_providers/address_entry_data_provider.dart';
+import 'package:stackfrost/themes/coin_icon_provider.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/assets.dart';
+import 'package:stackfrost/utilities/clipboard_interface.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
+import 'package:stackfrost/widgets/custom_buttons/blue_text_button.dart';
+import 'package:stackfrost/widgets/desktop/desktop_dialog.dart';
 
 class DesktopAddressCard extends ConsumerWidget {
   const DesktopAddressCard({

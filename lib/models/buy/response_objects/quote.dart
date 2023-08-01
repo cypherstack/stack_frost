@@ -9,8 +9,8 @@
  */
 
 import 'package:decimal/decimal.dart';
-import 'package:stackwallet/models/buy/response_objects/crypto.dart';
-import 'package:stackwallet/models/buy/response_objects/fiat.dart';
+import 'package:stackfrost/models/buy/response_objects/crypto.dart';
+import 'package:stackfrost/models/buy/response_objects/fiat.dart';
 
 class SimplexQuote {
   final Crypto crypto;

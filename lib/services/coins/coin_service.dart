@@ -8,18 +8,18 @@
  *
  */
 
-import 'package:stackwallet/electrumx_rpc/cached_electrumx.dart';
-import 'package:stackwallet/electrumx_rpc/electrumx.dart';
-import 'package:stackwallet/models/balance.dart';
-import 'package:stackwallet/models/isar/models/isar_models.dart' as isar_models;
-import 'package:stackwallet/models/node_model.dart';
-import 'package:stackwallet/models/paymint/fee_object_model.dart';
-import 'package:stackwallet/services/coins/bitcoin/bitcoin_wallet.dart';
-import 'package:stackwallet/services/transaction_notification_tracker.dart';
-import 'package:stackwallet/utilities/amount/amount.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/flutter_secure_storage_interface.dart';
-import 'package:stackwallet/utilities/prefs.dart';
+import 'package:stackfrost/electrumx_rpc/cached_electrumx.dart';
+import 'package:stackfrost/electrumx_rpc/electrumx.dart';
+import 'package:stackfrost/models/balance.dart';
+import 'package:stackfrost/models/isar/models/isar_models.dart' as isar_models;
+import 'package:stackfrost/models/node_model.dart';
+import 'package:stackfrost/models/paymint/fee_object_model.dart';
+import 'package:stackfrost/services/coins/bitcoin/bitcoin_wallet.dart';
+import 'package:stackfrost/services/transaction_notification_tracker.dart';
+import 'package:stackfrost/utilities/amount/amount.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/flutter_secure_storage_interface.dart';
+import 'package:stackfrost/utilities/prefs.dart';
 
 /*
  * This file implements the CoinServiceAPI abstract class that is used by wallet files to implement the coin specific functionality.

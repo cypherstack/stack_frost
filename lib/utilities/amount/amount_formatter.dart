@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackwallet/models/isar/models/ethereum/eth_contract.dart';
-import 'package:stackwallet/providers/global/locale_provider.dart';
-import 'package:stackwallet/providers/global/prefs_provider.dart';
-import 'package:stackwallet/utilities/amount/amount.dart';
-import 'package:stackwallet/utilities/amount/amount_unit.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/models/isar/models/ethereum/eth_contract.dart';
+import 'package:stackfrost/providers/global/locale_provider.dart';
+import 'package:stackfrost/providers/global/prefs_provider.dart';
+import 'package:stackfrost/utilities/amount/amount.dart';
+import 'package:stackfrost/utilities/amount/amount_unit.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
 
 final pAmountUnit = Provider.family<AmountUnit, Coin>(
   (ref, coin) => ref.watch(

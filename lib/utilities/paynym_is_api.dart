@@ -12,12 +12,12 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
-import 'package:stackwallet/models/paynym/created_paynym.dart';
-import 'package:stackwallet/models/paynym/paynym_account.dart';
-import 'package:stackwallet/models/paynym/paynym_claim.dart';
-import 'package:stackwallet/models/paynym/paynym_follow.dart';
-import 'package:stackwallet/models/paynym/paynym_response.dart';
-import 'package:stackwallet/models/paynym/paynym_unfollow.dart';
+import 'package:stackfrost/models/paynym/created_paynym.dart';
+import 'package:stackfrost/models/paynym/paynym_account.dart';
+import 'package:stackfrost/models/paynym/paynym_claim.dart';
+import 'package:stackfrost/models/paynym/paynym_follow.dart';
+import 'package:stackfrost/models/paynym/paynym_response.dart';
+import 'package:stackfrost/models/paynym/paynym_unfollow.dart';
 import 'package:tuple/tuple.dart';
 
 // todo: better error message parsing (from response itself?)

@@ -8,8 +8,8 @@
  *
  */
 
-import 'package:stackwallet/models/paynym/paynym_account_lite.dart';
-import 'package:stackwallet/models/paynym/paynym_code.dart';
+import 'package:stackfrost/models/paynym/paynym_account_lite.dart';
+import 'package:stackfrost/models/paynym/paynym_code.dart';
 
 class PaynymAccount {
   final String nymID;

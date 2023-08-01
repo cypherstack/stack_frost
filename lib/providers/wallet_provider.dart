@@ -10,7 +10,7 @@
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackwallet/services/coins/manager.dart';
+import 'package:stackfrost/services/coins/manager.dart';
 
 class ContractWalletId implements Equatable {
   final String walletId;

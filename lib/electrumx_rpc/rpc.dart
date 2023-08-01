@@ -14,7 +14,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:mutex/mutex.dart';
-import 'package:stackwallet/utilities/logger.dart';
+import 'package:stackfrost/utilities/logger.dart';
 
 // Json RPC class to handle connecting to electrumx servers
 class JsonRPC {

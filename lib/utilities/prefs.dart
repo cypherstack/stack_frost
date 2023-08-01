@@ -9,13 +9,13 @@
  */
 
 import 'package:flutter/cupertino.dart';
-import 'package:stackwallet/db/hive/db.dart';
-import 'package:stackwallet/utilities/amount/amount_unit.dart';
-import 'package:stackwallet/utilities/constants.dart';
-import 'package:stackwallet/utilities/enums/backup_frequency_type.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/enums/languages_enum.dart';
-import 'package:stackwallet/utilities/enums/sync_type_enum.dart';
+import 'package:stackfrost/db/hive/db.dart';
+import 'package:stackfrost/utilities/amount/amount_unit.dart';
+import 'package:stackfrost/utilities/constants.dart';
+import 'package:stackfrost/utilities/enums/backup_frequency_type.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/enums/languages_enum.dart';
+import 'package:stackfrost/utilities/enums/sync_type_enum.dart';
 import 'package:uuid/uuid.dart';
 
 class Prefs extends ChangeNotifier {

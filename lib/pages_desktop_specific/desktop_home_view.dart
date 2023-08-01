@@ -10,26 +10,26 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackwallet/pages_desktop_specific/address_book_view/desktop_address_book.dart';
-import 'package:stackwallet/pages_desktop_specific/desktop_buy/desktop_buy_view.dart';
-import 'package:stackwallet/pages_desktop_specific/desktop_exchange/desktop_exchange_view.dart';
-import 'package:stackwallet/pages_desktop_specific/desktop_menu.dart';
-import 'package:stackwallet/pages_desktop_specific/my_stack_view/my_stack_view.dart';
-import 'package:stackwallet/pages_desktop_specific/notifications/desktop_notifications_view.dart';
-import 'package:stackwallet/pages_desktop_specific/settings/desktop_settings_view.dart';
-import 'package:stackwallet/pages_desktop_specific/settings/settings_menu/desktop_about_view.dart';
-import 'package:stackwallet/pages_desktop_specific/settings/settings_menu/desktop_support_view.dart';
-import 'package:stackwallet/providers/desktop/current_desktop_menu_item.dart';
-import 'package:stackwallet/providers/global/auto_swb_service_provider.dart';
-import 'package:stackwallet/providers/global/notifications_provider.dart';
-import 'package:stackwallet/providers/global/prefs_provider.dart';
-import 'package:stackwallet/providers/global/wallets_provider.dart';
-import 'package:stackwallet/providers/ui/transaction_filter_provider.dart';
-import 'package:stackwallet/providers/ui/unread_notifications_provider.dart';
-import 'package:stackwallet/route_generator.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/enums/backup_frequency_type.dart';
-import 'package:stackwallet/widgets/background.dart';
+import 'package:stackfrost/pages_desktop_specific/address_book_view/desktop_address_book.dart';
+import 'package:stackfrost/pages_desktop_specific/desktop_buy/desktop_buy_view.dart';
+import 'package:stackfrost/pages_desktop_specific/desktop_exchange/desktop_exchange_view.dart';
+import 'package:stackfrost/pages_desktop_specific/desktop_menu.dart';
+import 'package:stackfrost/pages_desktop_specific/my_stack_view/my_stack_view.dart';
+import 'package:stackfrost/pages_desktop_specific/notifications/desktop_notifications_view.dart';
+import 'package:stackfrost/pages_desktop_specific/settings/desktop_settings_view.dart';
+import 'package:stackfrost/pages_desktop_specific/settings/settings_menu/desktop_about_view.dart';
+import 'package:stackfrost/pages_desktop_specific/settings/settings_menu/desktop_support_view.dart';
+import 'package:stackfrost/providers/desktop/current_desktop_menu_item.dart';
+import 'package:stackfrost/providers/global/auto_swb_service_provider.dart';
+import 'package:stackfrost/providers/global/notifications_provider.dart';
+import 'package:stackfrost/providers/global/prefs_provider.dart';
+import 'package:stackfrost/providers/global/wallets_provider.dart';
+import 'package:stackfrost/providers/ui/transaction_filter_provider.dart';
+import 'package:stackfrost/providers/ui/unread_notifications_provider.dart';
+import 'package:stackfrost/route_generator.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/enums/backup_frequency_type.dart';
+import 'package:stackfrost/widgets/background.dart';
 
 final currentWalletIdProvider = StateProvider<String?>((_) => null);
 

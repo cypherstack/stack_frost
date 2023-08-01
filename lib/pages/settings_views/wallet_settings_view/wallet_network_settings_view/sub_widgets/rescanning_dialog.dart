@@ -9,11 +9,11 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:stackwallet/utilities/util.dart';
-import 'package:stackwallet/widgets/animated_widgets/rotating_arrows.dart';
-import 'package:stackwallet/widgets/conditional_parent.dart';
-import 'package:stackwallet/widgets/desktop/desktop_dialog.dart';
-import 'package:stackwallet/widgets/stack_dialog.dart';
+import 'package:stackfrost/utilities/util.dart';
+import 'package:stackfrost/widgets/animated_widgets/rotating_arrows.dart';
+import 'package:stackfrost/widgets/conditional_parent.dart';
+import 'package:stackfrost/widgets/desktop/desktop_dialog.dart';
+import 'package:stackfrost/widgets/stack_dialog.dart';
 
 class RescanningDialog extends StatefulWidget {
   const RescanningDialog({
