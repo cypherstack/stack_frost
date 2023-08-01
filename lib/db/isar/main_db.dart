@@ -51,12 +51,10 @@ class MainDB {
         UTXOSchema,
         AddressSchema,
         AddressLabelSchema,
-        EthContractSchema,
         TransactionBlockExplorerSchema,
         StackThemeSchema,
         ContactEntrySchema,
         OrdinalSchema,
-        LelantusCoinSchema,
       ],
       directory: (await StackFileSystem.applicationIsarDirectory()).path,
       // inspector: kDebugMode,
@@ -378,8 +376,6 @@ class MainDB {
     final transactionCount = await getTransactions(walletId).count();
     final addressCount = await getAddresses(walletId).count();
     final utxoCount = await getUTXOs(walletId).count();
-    final lelantusCoinCount =
-        await isar.lelantusCoins.where().walletIdEqualTo(walletId).count();
 
     await isar.writeTxn(() async {
       const paginateLimit = 50;
@@ -412,18 +408,6 @@ class MainDB {
             .idProperty()
             .findAll();
         await isar.utxos.deleteAll(utxoIds);
-      }
-
-      // lelantusCoins
-      for (int i = 0; i < lelantusCoinCount; i += paginateLimit) {
-        final lelantusCoinIds = await isar.lelantusCoins
-            .where()
-            .walletIdEqualTo(walletId)
-            .offset(i)
-            .limit(paginateLimit)
-            .idProperty()
-            .findAll();
-        await isar.lelantusCoins.deleteAll(lelantusCoinIds);
       }
     });
   }
@@ -496,38 +480,5 @@ class MainDB {
     } catch (e) {
       throw MainDBException("failed addNewTransactionData", e);
     }
-  }
-
-  // ========== Ethereum =======================================================
-
-  // eth contracts
-
-  QueryBuilder<EthContract, EthContract, QWhere> getEthContracts() =>
-      isar.ethContracts.where();
-
-  Future<EthContract?> getEthContract(String contractAddress) =>
-      isar.ethContracts.where().addressEqualTo(contractAddress).findFirst();
-
-  EthContract? getEthContractSync(String contractAddress) =>
-      isar.ethContracts.where().addressEqualTo(contractAddress).findFirstSync();
-
-  Future<int> putEthContract(EthContract contract) => isar.writeTxn(() async {
-        return await isar.ethContracts.put(contract);
-      });
-
-  Future<void> putEthContracts(List<EthContract> contracts) =>
-      isar.writeTxn(() async {
-        await isar.ethContracts.putAll(contracts);
-      });
-
-  // ========== Lelantus =======================================================
-
-  Future<int?> getHighestUsedMintIndex({required String walletId}) async {
-    return await isar.lelantusCoins
-        .where()
-        .walletIdEqualTo(walletId)
-        .sortByMintIndexDesc()
-        .mintIndexProperty()
-        .findFirst();
   }
 }
