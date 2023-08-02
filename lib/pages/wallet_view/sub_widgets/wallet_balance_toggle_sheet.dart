@@ -14,7 +14,6 @@ import 'package:stackfrost/models/balance.dart';
 import 'package:stackfrost/providers/providers.dart';
 import 'package:stackfrost/providers/wallet/public_private_balance_state_provider.dart';
 import 'package:stackfrost/providers/wallet/wallet_balance_toggle_state_provider.dart';
-import 'package:stackfrost/services/coins/firo/firo_wallet.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/utilities/amount/amount.dart';
 import 'package:stackfrost/utilities/amount/amount_formatter.dart';
@@ -55,23 +54,6 @@ class WalletBalanceToggleSheet extends ConsumerWidget {
             : _BalanceType.full;
 
     Balance? balanceSecondary;
-    if (coin == Coin.firo || coin == Coin.firoTestNet) {
-      balanceSecondary = ref
-          .watch(
-            walletsChangeNotifierProvider.select(
-              (value) => value.getManager(walletId).wallet as FiroWallet?,
-            ),
-          )
-          ?.balancePrivate;
-
-      if (ref.watch(publicPrivateBalanceStateProvider.state).state ==
-          "Private") {
-        _bal = _bal == _BalanceType.available
-            ? _BalanceType.privateAvailable
-            : _BalanceType.privateFull;
-      }
-    }
-
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).extension<StackColors>()!.popupBG,

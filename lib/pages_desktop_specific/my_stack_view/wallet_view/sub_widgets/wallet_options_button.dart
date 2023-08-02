@@ -13,7 +13,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_settings_wallet_settings/change_representative_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_settings_wallet_settings/xpub_view.dart';
 import 'package:stackfrost/pages_desktop_specific/addresses/desktop_wallet_addresses_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/desktop_delete_wallet_dialog.dart';
@@ -22,13 +21,12 @@ import 'package:stackfrost/route_generator.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/utilities/assets.dart';
 import 'package:stackfrost/utilities/constants.dart';
-import 'package:stackfrost/utilities/enums/coin_enum.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
 
 enum _WalletOptions {
   addressList,
   deleteWallet,
-  changeRepresentative,
+  // changeRepresentative,
   showXpub;
 
   String get prettyName {
@@ -37,8 +35,8 @@ enum _WalletOptions {
         return "Address list";
       case _WalletOptions.deleteWallet:
         return "Delete wallet";
-      case _WalletOptions.changeRepresentative:
-        return "Change representative";
+      // case _WalletOptions.changeRepresentative:
+      //   return "Change representative";
       case _WalletOptions.showXpub:
         return "Show xPub";
     }
@@ -75,9 +73,9 @@ class WalletOptionsButton extends StatelessWidget {
               onAddressListPressed: () async {
                 Navigator.of(context).pop(_WalletOptions.addressList);
               },
-              onChangeRepPressed: () async {
-                Navigator.of(context).pop(_WalletOptions.changeRepresentative);
-              },
+              // onChangeRepPressed: () async {
+              //   Navigator.of(context).pop(_WalletOptions.changeRepresentative);
+              // },
               onShowXpubPressed: () async {
                 Navigator.of(context).pop(_WalletOptions.showXpub);
               },
@@ -148,25 +146,25 @@ class WalletOptionsButton extends StatelessWidget {
                 }
               }
               break;
-            case _WalletOptions.changeRepresentative:
-              final result = await showDialog<bool?>(
-                context: context,
-                barrierDismissible: false,
-                builder: (context) => Navigator(
-                  initialRoute: ChangeRepresentativeView.routeName,
-                  onGenerateRoute: RouteGenerator.generateRoute,
-                  onGenerateInitialRoutes: (_, __) {
-                    return [
-                      RouteGenerator.generateRoute(
-                        RouteSettings(
-                          name: ChangeRepresentativeView.routeName,
-                          arguments: walletId,
-                        ),
-                      ),
-                    ];
-                  },
-                ),
-              );
+              // case _WalletOptions.changeRepresentative:
+              //   final result = await showDialog<bool?>(
+              //     context: context,
+              //     barrierDismissible: false,
+              //     builder: (context) => Navigator(
+              //       initialRoute: ChangeRepresentativeView.routeName,
+              //       onGenerateRoute: RouteGenerator.generateRoute,
+              //       onGenerateInitialRoutes: (_, __) {
+              //         return [
+              //           RouteGenerator.generateRoute(
+              //             RouteSettings(
+              //               name: ChangeRepresentativeView.routeName,
+              //               arguments: walletId,
+              //             ),
+              //           ),
+              //         ];
+              //       },
+              //     ),
+              //   );
 
               if (result == true) {
                 if (context.mounted) {
@@ -205,14 +203,14 @@ class WalletOptionsPopupMenu extends ConsumerWidget {
     required this.onDeletePressed,
     required this.onAddressListPressed,
     required this.onShowXpubPressed,
-    required this.onChangeRepPressed,
+    // required this.onChangeRepPressed,
     required this.walletId,
   }) : super(key: key);
 
   final VoidCallback onDeletePressed;
   final VoidCallback onAddressListPressed;
   final VoidCallback onShowXpubPressed;
-  final VoidCallback onChangeRepPressed;
+  // final VoidCallback onChangeRepPressed;
   final String walletId;
 
   @override
@@ -221,8 +219,8 @@ class WalletOptionsPopupMenu extends ConsumerWidget {
         .select((value) => value.getManager(walletId)));
     final bool xpubEnabled = manager.hasXPub;
 
-    final bool canChangeRep =
-        manager.coin == Coin.nano || manager.coin == Coin.banano;
+    final bool canChangeRep = false;
+    // manager.coin == Coin.nano || manager.coin == Coin.banano;
 
     return Stack(
       children: [
@@ -277,43 +275,43 @@ class WalletOptionsPopupMenu extends ConsumerWidget {
                       ),
                     ),
                   ),
-                  if (canChangeRep)
-                    const SizedBox(
-                      height: 8,
-                    ),
-                  if (canChangeRep)
-                    TransparentButton(
-                      onPressed: onChangeRepPressed,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            SvgPicture.asset(
-                              Assets.svg.eye,
-                              width: 20,
-                              height: 20,
-                              color: Theme.of(context)
-                                  .extension<StackColors>()!
-                                  .textFieldActiveSearchIconLeft,
-                            ),
-                            const SizedBox(width: 14),
-                            Expanded(
-                              child: Text(
-                                _WalletOptions.changeRepresentative.prettyName,
-                                style: STextStyles.desktopTextExtraExtraSmall(
-                                        context)
-                                    .copyWith(
-                                  color: Theme.of(context)
-                                      .extension<StackColors>()!
-                                      .textDark,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                  // if (canChangeRep)
+                  //   const SizedBox(
+                  //     height: 8,
+                  //   ),
+                  // if (canChangeRep)
+                  //   TransparentButton(
+                  //     onPressed: onChangeRepPressed,
+                  //     child: Padding(
+                  //       padding: const EdgeInsets.all(8),
+                  //       child: Row(
+                  //         mainAxisAlignment: MainAxisAlignment.start,
+                  //         children: [
+                  //           SvgPicture.asset(
+                  //             Assets.svg.eye,
+                  //             width: 20,
+                  //             height: 20,
+                  //             color: Theme.of(context)
+                  //                 .extension<StackColors>()!
+                  //                 .textFieldActiveSearchIconLeft,
+                  //           ),
+                  //           const SizedBox(width: 14),
+                  //           // Expanded(
+                  //           //   child: Text(
+                  //           //     _WalletOptions.changeRepresentative.prettyName,
+                  //           //     style: STextStyles.desktopTextExtraExtraSmall(
+                  //           //             context)
+                  //           //         .copyWith(
+                  //           //       color: Theme.of(context)
+                  //           //           .extension<StackColors>()!
+                  //           //           .textDark,
+                  //           //     ),
+                  //           //   ),
+                  //           // ),
+                  //         ],
+                  //       ),
+                  //     ),
+                  //   ),
                   if (xpubEnabled)
                     const SizedBox(
                       height: 8,

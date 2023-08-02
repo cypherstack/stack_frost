@@ -13,7 +13,6 @@ import 'dart:async';
 import 'package:event_bus/event_bus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackfrost/pages/token_view/token_view.dart';
 import 'package:stackfrost/providers/global/wallets_provider.dart';
 import 'package:stackfrost/services/event_bus/events/global/wallet_sync_status_changed_event.dart';
 import 'package:stackfrost/services/event_bus/global_event_bus.dart';
@@ -143,10 +142,6 @@ class _RefreshButtonState extends ConsumerState<WalletRefreshButton> {
                       .read(managerProvider)
                       .refresh()
                       .then((_) => _spinController.stop?.call());
-                }
-              } else {
-                if (!ref.read(tokenServiceProvider)!.isRefreshing) {
-                  ref.read(tokenServiceProvider)!.refresh();
                 }
               }
             },

@@ -13,9 +13,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stackfrost/pages/wallet_view/sub_widgets/transactions_list.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/desktop_receive.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/desktop_send.dart';
-import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/desktop_token_send.dart';
 import 'package:stackfrost/providers/global/wallets_provider.dart';
-import 'package:stackfrost/utilities/enums/coin_enum.dart';
 import 'package:stackfrost/widgets/custom_tab_view.dart';
 import 'package:stackfrost/widgets/rounded_white_container.dart';
 
@@ -23,11 +21,9 @@ class MyWallet extends ConsumerStatefulWidget {
   const MyWallet({
     Key? key,
     required this.walletId,
-    this.contractAddress,
   }) : super(key: key);
 
   final String walletId;
-  final String? contractAddress;
 
   @override
   ConsumerState<MyWallet> createState() => _MyWalletState();
@@ -39,20 +35,8 @@ class _MyWalletState extends ConsumerState<MyWallet> {
     "Receive",
   ];
 
-  late final bool isEth;
-
   @override
   void initState() {
-    isEth = ref
-            .read(walletsChangeNotifierProvider)
-            .getManager(widget.walletId)
-            .coin ==
-        Coin.ethereum;
-
-    if (isEth && widget.contractAddress == null) {
-      titles.add("Transactions");
-    }
-
     super.initState();
   }
 
@@ -66,45 +50,36 @@ class _MyWalletState extends ConsumerState<MyWallet> {
           child: CustomTabView(
             titles: titles,
             children: [
-              widget.contractAddress == null
-                  ? Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: DesktopSend(
-                        walletId: widget.walletId,
-                      ),
-                    )
-                  : Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: DesktopTokenSend(
-                        walletId: widget.walletId,
-                      ),
-                    ),
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: DesktopSend(
+                  walletId: widget.walletId,
+                ),
+              ),
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: DesktopReceive(
                   walletId: widget.walletId,
-                  contractAddress: widget.contractAddress,
                 ),
               ),
-              if (isEth && widget.contractAddress == null)
-                Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxHeight: MediaQuery.of(context).size.height - 362,
-                    ),
-                    child: TransactionsList(
-                      walletId: widget.walletId,
-                      managerProvider: ref.watch(
-                        walletsChangeNotifierProvider.select(
-                          (value) => value.getManagerProvider(
-                            widget.walletId,
-                          ),
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.height - 362,
+                  ),
+                  child: TransactionsList(
+                    walletId: widget.walletId,
+                    managerProvider: ref.watch(
+                      walletsChangeNotifierProvider.select(
+                        (value) => value.getManagerProvider(
+                          widget.walletId,
                         ),
                       ),
                     ),
                   ),
                 ),
+              ),
             ],
           ),
         ),

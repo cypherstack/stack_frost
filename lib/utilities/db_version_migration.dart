@@ -14,7 +14,6 @@ import 'package:stackfrost/db/hive/db.dart';
 import 'package:stackfrost/db/isar/main_db.dart';
 import 'package:stackfrost/electrumx_rpc/electrumx.dart';
 import 'package:stackfrost/models/contact.dart';
-import 'package:stackfrost/models/exchange/change_now/exchange_transaction.dart';
 import 'package:stackfrost/models/exchange/response_objects/trade.dart';
 import 'package:stackfrost/models/isar/models/blockchain_data/address.dart';
 import 'package:stackfrost/models/isar/models/contact_entry.dart'

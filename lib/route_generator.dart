@@ -32,16 +32,12 @@ import 'package:stackfrost/pages/address_book_views/subviews/address_book_filter
 import 'package:stackfrost/pages/address_book_views/subviews/contact_details_view.dart';
 import 'package:stackfrost/pages/address_book_views/subviews/edit_contact_address_view.dart';
 import 'package:stackfrost/pages/address_book_views/subviews/edit_contact_name_emoji_view.dart';
-import 'package:stackfrost/pages/coin_control/coin_control_view.dart';
 import 'package:stackfrost/pages/coin_control/utxo_details_view.dart';
 import 'package:stackfrost/pages/generic/single_field_edit_view.dart';
 import 'package:stackfrost/pages/home_view/home_view.dart';
 import 'package:stackfrost/pages/intro_view.dart';
 import 'package:stackfrost/pages/manage_favorites_view/manage_favorites_view.dart';
 import 'package:stackfrost/pages/notification_views/notifications_view.dart';
-import 'package:stackfrost/pages/paynym/add_new_paynym_follow_view.dart';
-import 'package:stackfrost/pages/paynym/paynym_claim_view.dart';
-import 'package:stackfrost/pages/paynym/paynym_home_view.dart';
 import 'package:stackfrost/pages/pinpad_views/create_pin_view.dart';
 import 'package:stackfrost/pages/receive_view/addresses/address_details_view.dart';
 import 'package:stackfrost/pages/receive_view/addresses/edit_address_label_view.dart';
@@ -87,7 +83,6 @@ import 'package:stackfrost/pages/settings_views/global_settings_view/syncing_pre
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_backup_views/wallet_backup_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_network_settings_view/wallet_network_settings_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_settings_view.dart';
-import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_settings_wallet_settings/change_representative_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_settings_wallet_settings/delete_wallet_recovery_phrase_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_settings_wallet_settings/delete_wallet_warning_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_settings_wallet_settings/rename_wallet_view.dart';
@@ -106,7 +101,6 @@ import 'package:stackfrost/pages_desktop_specific/addresses/desktop_wallet_addre
 import 'package:stackfrost/pages_desktop_specific/coin_control/desktop_coin_control_view.dart';
 import 'package:stackfrost/pages_desktop_specific/desktop_home_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/my_stack_view.dart';
-import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/desktop_token_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/desktop_wallet_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/delete_wallet_keys_popup.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/desktop_attention_delete_wallet.dart';
@@ -133,7 +127,6 @@ import 'package:stackfrost/pages_desktop_specific/settings/settings_menu/syncing
 import 'package:stackfrost/services/coins/manager.dart';
 import 'package:stackfrost/services/event_bus/events/global/node_connection_status_changed_event.dart';
 import 'package:stackfrost/services/event_bus/events/global/wallet_sync_status_changed_event.dart';
-import 'package:stackfrost/utilities/amount/amount.dart';
 import 'package:stackfrost/utilities/enums/add_wallet_type_enum.dart';
 import 'package:stackfrost/utilities/enums/coin_enum.dart';
 import 'package:stackfrost/widgets/choose_coin_view.dart';
@@ -242,20 +235,6 @@ class RouteGenerator {
             builder: (_) => const AddWalletView(),
             settings: RouteSettings(name: settings.name));
 
-      case DesktopTokenView.routeName:
-        if (args is String) {
-          return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => DesktopTokenView(
-              walletId: args,
-            ),
-            settings: RouteSettings(
-              name: settings.name,
-            ),
-          );
-        }
-        return _routeError("${settings.name} invalid args: ${args.toString()}");
-
       case WalletsOverview.routeName:
         if (args is Coin) {
           return getRoute(
@@ -285,35 +264,6 @@ class RouteGenerator {
         }
         return _routeError("${settings.name} invalid args: ${args.toString()}");
 
-      case CoinControlView.routeName:
-        if (args is Tuple2<String, CoinControlViewType>) {
-          return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => CoinControlView(
-              walletId: args.item1,
-              type: args.item2,
-            ),
-            settings: RouteSettings(
-              name: settings.name,
-            ),
-          );
-        } else if (args
-            is Tuple4<String, CoinControlViewType, Amount?, Set<UTXO>?>) {
-          return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => CoinControlView(
-              walletId: args.item1,
-              type: args.item2,
-              requestedTotal: args.item3,
-              selectedUTXOs: args.item4,
-            ),
-            settings: RouteSettings(
-              name: settings.name,
-            ),
-          );
-        }
-        return _routeError("${settings.name} invalid args: ${args.toString()}");
-
       case UtxoDetailsView.routeName:
         if (args is Tuple2<Id, String>) {
           return getRoute(
@@ -321,48 +271,6 @@ class RouteGenerator {
             builder: (_) => UtxoDetailsView(
               walletId: args.item2,
               utxoId: args.item1,
-            ),
-            settings: RouteSettings(
-              name: settings.name,
-            ),
-          );
-        }
-        return _routeError("${settings.name} invalid args: ${args.toString()}");
-
-      case PaynymClaimView.routeName:
-        if (args is String) {
-          return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => PaynymClaimView(
-              walletId: args,
-            ),
-            settings: RouteSettings(
-              name: settings.name,
-            ),
-          );
-        }
-        return _routeError("${settings.name} invalid args: ${args.toString()}");
-
-      case PaynymHomeView.routeName:
-        if (args is String) {
-          return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => PaynymHomeView(
-              walletId: args,
-            ),
-            settings: RouteSettings(
-              name: settings.name,
-            ),
-          );
-        }
-        return _routeError("${settings.name} invalid args: ${args.toString()}");
-
-      case AddNewPaynymFollowView.routeName:
-        if (args is String) {
-          return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => AddNewPaynymFollowView(
-              walletId: args,
             ),
             settings: RouteSettings(
               name: settings.name,
@@ -465,20 +373,6 @@ class RouteGenerator {
           return getRoute(
             shouldUseMaterialRoute: useMaterialPageRoute,
             builder: (_) => XPubView(
-              walletId: args,
-            ),
-            settings: RouteSettings(
-              name: settings.name,
-            ),
-          );
-        }
-        return _routeError("${settings.name} invalid args: ${args.toString()}");
-
-      case ChangeRepresentativeView.routeName:
-        if (args is String) {
-          return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => ChangeRepresentativeView(
               walletId: args,
             ),
             settings: RouteSettings(

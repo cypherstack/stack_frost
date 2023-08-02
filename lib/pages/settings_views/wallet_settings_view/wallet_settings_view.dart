@@ -13,8 +13,6 @@ import 'dart:async';
 import 'package:event_bus/event_bus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackfrost/models/epicbox_config_model.dart';
-import 'package:stackfrost/notifications/show_flush_bar.dart';
 import 'package:stackfrost/pages/address_book_views/address_book_view.dart';
 import 'package:stackfrost/pages/home_view/home_view.dart';
 import 'package:stackfrost/pages/pinpad_views/lock_screen_view.dart';
@@ -23,13 +21,11 @@ import 'package:stackfrost/pages/settings_views/global_settings_view/syncing_pre
 import 'package:stackfrost/pages/settings_views/sub_widgets/settings_list_button.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_backup_views/wallet_backup_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_network_settings_view/wallet_network_settings_view.dart';
-import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_settings_wallet_settings/change_representative_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_settings_wallet_settings/wallet_settings_wallet_settings_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_settings_wallet_settings/xpub_view.dart';
 import 'package:stackfrost/providers/global/wallets_provider.dart';
 import 'package:stackfrost/providers/ui/transaction_filter_provider.dart';
 import 'package:stackfrost/route_generator.dart';
-import 'package:stackfrost/services/coins/epiccash/epiccash_wallet.dart';
 import 'package:stackfrost/services/event_bus/events/global/node_connection_status_changed_event.dart';
 import 'package:stackfrost/services/event_bus/events/global/wallet_sync_status_changed_event.dart';
 import 'package:stackfrost/services/event_bus/global_event_bus.dart';
@@ -37,7 +33,6 @@ import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/utilities/assets.dart';
 import 'package:stackfrost/utilities/enums/coin_enum.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
-import 'package:stackfrost/utilities/util.dart';
 import 'package:stackfrost/widgets/background.dart';
 import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackfrost/widgets/rounded_white_container.dart';
@@ -306,25 +301,6 @@ class _WalletSettingsViewState extends ConsumerState<WalletSettingsView> {
                                       );
                                     },
                                   ),
-                                if (coin == Coin.nano || coin == Coin.banano)
-                                  const SizedBox(
-                                    height: 8,
-                                  ),
-                                if (coin == Coin.nano || coin == Coin.banano)
-                                  Consumer(
-                                    builder: (_, ref, __) {
-                                      return SettingsListButton(
-                                        iconAssetName: Assets.svg.eye,
-                                        title: "Change representative",
-                                        onPressed: () {
-                                          Navigator.of(context).pushNamed(
-                                            ChangeRepresentativeView.routeName,
-                                            arguments: widget.walletId,
-                                          );
-                                        },
-                                      );
-                                    },
-                                  ),
                                 const SizedBox(
                                   height: 8,
                                 ),
@@ -381,108 +357,6 @@ class _WalletSettingsViewState extends ConsumerState<WalletSettingsView> {
             );
           },
         ),
-      ),
-    );
-  }
-}
-
-class EpicBoxInfoForm extends ConsumerStatefulWidget {
-  const EpicBoxInfoForm({
-    Key? key,
-    required this.walletId,
-  }) : super(key: key);
-
-  final String walletId;
-
-  @override
-  ConsumerState<EpicBoxInfoForm> createState() => _EpiBoxInfoFormState();
-}
-
-class _EpiBoxInfoFormState extends ConsumerState<EpicBoxInfoForm> {
-  final hostController = TextEditingController();
-  final portController = TextEditingController();
-
-  late EpicCashWallet wallet;
-
-  @override
-  void initState() {
-    wallet = ref
-        .read(walletsChangeNotifierProvider)
-        .getManager(widget.walletId)
-        .wallet as EpicCashWallet;
-
-    wallet.getEpicBoxConfig().then((EpicBoxConfigModel epicBoxConfig) {
-      hostController.text = epicBoxConfig.host;
-      portController.text = "${epicBoxConfig.port ?? 443}";
-    });
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    hostController.dispose();
-    portController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return RoundedWhiteContainer(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          TextField(
-            autocorrect: Util.isDesktop ? false : true,
-            enableSuggestions: Util.isDesktop ? false : true,
-            controller: hostController,
-            decoration: const InputDecoration(hintText: "Host"),
-          ),
-          const SizedBox(
-            height: 8,
-          ),
-          TextField(
-            autocorrect: Util.isDesktop ? false : true,
-            enableSuggestions: Util.isDesktop ? false : true,
-            controller: portController,
-            decoration: const InputDecoration(hintText: "Port"),
-            keyboardType:
-                Util.isDesktop ? null : const TextInputType.numberWithOptions(),
-          ),
-          const SizedBox(
-            height: 8,
-          ),
-          TextButton(
-            onPressed: () async {
-              try {
-                await wallet.updateEpicboxConfig(
-                  hostController.text,
-                  int.parse(portController.text),
-                );
-                if (mounted) {
-                  await showFloatingFlushBar(
-                    context: context,
-                    message: "Epicbox info saved!",
-                    type: FlushBarType.success,
-                  );
-                }
-                unawaited(wallet.refresh());
-              } catch (e) {
-                await showFloatingFlushBar(
-                  context: context,
-                  message: "Failed to save epicbox info: $e",
-                  type: FlushBarType.warning,
-                );
-              }
-            },
-            child: Text(
-              "Save",
-              style: STextStyles.button(context).copyWith(
-                  color: Theme.of(context)
-                      .extension<StackColors>()!
-                      .accentColorDark),
-            ),
-          ),
-        ],
       ),
     );
   }

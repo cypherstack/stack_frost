@@ -14,14 +14,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 import 'package:stackfrost/notifications/show_flush_bar.dart';
 import 'package:stackfrost/pages/receive_view/generate_receiving_uri_qr_code_view.dart';
-import 'package:stackfrost/pages/token_view/token_view.dart';
 import 'package:stackfrost/providers/providers.dart';
 import 'package:stackfrost/route_generator.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
-import 'package:stackfrost/utilities/address_utils.dart';
 import 'package:stackfrost/utilities/assets.dart';
 import 'package:stackfrost/utilities/clipboard_interface.dart';
 import 'package:stackfrost/utilities/constants.dart';
@@ -162,11 +159,7 @@ class _DesktopReceiveState extends ConsumerState<DesktopReceive> {
                     Row(
                       children: [
                         Text(
-                          "Your ${widget.contractAddress == null ? coin.ticker : ref.watch(
-                              tokenServiceProvider.select(
-                                (value) => value!.tokenContract.symbol,
-                              ),
-                            )} address",
+                          "Your ${coin.ticker} address",
                           style: STextStyles.itemSubtitle(context),
                         ),
                         const Spacer(),
@@ -216,37 +209,30 @@ class _DesktopReceiveState extends ConsumerState<DesktopReceive> {
             ),
           ),
         ),
-        if (coin != Coin.epicCash &&
-            coin != Coin.ethereum &&
-            coin != Coin.banano &&
-            coin != Coin.nano)
-          const SizedBox(
-            height: 20,
-          ),
-        if (coin != Coin.epicCash &&
-            coin != Coin.ethereum &&
-            coin != Coin.banano &&
-            coin != Coin.nano)
-          SecondaryButton(
-            buttonHeight: ButtonHeight.l,
-            onPressed: generateNewAddress,
-            label: "Generate new address",
-          ),
+        const SizedBox(
+          height: 20,
+        ),
+        SecondaryButton(
+          buttonHeight: ButtonHeight.l,
+          onPressed: generateNewAddress,
+          label: "Generate new address",
+        ),
         const SizedBox(
           height: 32,
         ),
-        Center(
-          child: QrImageView(
-            data: AddressUtils.buildUriString(
-              coin,
-              receivingAddress,
-              {},
-            ),
-            size: 200,
-            foregroundColor:
-                Theme.of(context).extension<StackColors>()!.accentColorDark,
-          ),
-        ),
+        // TODO: address utils #stackFrost
+        // Center(
+        //   child: QrImageView(
+        //     data: AddressUtils.buildUriString(
+        //       coin,
+        //       receivingAddress,
+        //       {},
+        //     ),
+        //     size: 200,
+        //     foregroundColor:
+        //         Theme.of(context).extension<StackColors>()!.accentColorDark,
+        //   ),
+        // ),
         const SizedBox(
           height: 32,
         ),

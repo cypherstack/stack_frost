@@ -15,11 +15,8 @@ import 'package:event_bus/event_bus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:stackfrost/pages/coin_control/coin_control_view.dart';
 import 'package:stackfrost/pages/home_view/home_view.dart';
 import 'package:stackfrost/pages/notification_views/notifications_view.dart';
-import 'package:stackfrost/pages/paynym/paynym_claim_view.dart';
-import 'package:stackfrost/pages/paynym/paynym_home_view.dart';
 import 'package:stackfrost/pages/receive_view/receive_view.dart';
 import 'package:stackfrost/pages/send_view/send_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_network_settings_view/wallet_network_settings_view.dart';
@@ -28,18 +25,15 @@ import 'package:stackfrost/pages/wallet_view/sub_widgets/transactions_list.dart'
 import 'package:stackfrost/pages/wallet_view/sub_widgets/wallet_summary.dart';
 import 'package:stackfrost/pages/wallet_view/transaction_views/all_transactions_view.dart';
 import 'package:stackfrost/providers/global/auto_swb_service_provider.dart';
-import 'package:stackfrost/providers/global/paynym_api_provider.dart';
 import 'package:stackfrost/providers/providers.dart';
 import 'package:stackfrost/providers/ui/transaction_filter_provider.dart';
 import 'package:stackfrost/providers/ui/unread_notifications_provider.dart';
-import 'package:stackfrost/providers/wallet/my_paynym_account_state_provider.dart';
 import 'package:stackfrost/providers/wallet/public_private_balance_state_provider.dart';
 import 'package:stackfrost/providers/wallet/wallet_balance_toggle_state_provider.dart';
 import 'package:stackfrost/services/coins/manager.dart';
 import 'package:stackfrost/services/event_bus/events/global/node_connection_status_changed_event.dart';
 import 'package:stackfrost/services/event_bus/events/global/wallet_sync_status_changed_event.dart';
 import 'package:stackfrost/services/event_bus/global_event_bus.dart';
-import 'package:stackfrost/services/mixins/paynym_wallet_interface.dart';
 import 'package:stackfrost/themes/coin_icon_provider.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/themes/theme_providers.dart';
@@ -49,7 +43,6 @@ import 'package:stackfrost/utilities/constants.dart';
 import 'package:stackfrost/utilities/enums/backup_frequency_type.dart';
 import 'package:stackfrost/utilities/enums/coin_enum.dart';
 import 'package:stackfrost/utilities/enums/wallet_balance_toggle_state.dart';
-import 'package:stackfrost/utilities/logger.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
 import 'package:stackfrost/widgets/background.dart';
 import 'package:stackfrost/widgets/conditional_parent.dart';
@@ -57,10 +50,7 @@ import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackfrost/widgets/custom_buttons/blue_text_button.dart';
 import 'package:stackfrost/widgets/custom_loading_overlay.dart';
 import 'package:stackfrost/widgets/desktop/secondary_button.dart';
-import 'package:stackfrost/widgets/loading_indicator.dart';
 import 'package:stackfrost/widgets/stack_dialog.dart';
-import 'package:stackfrost/widgets/wallet_navigation_bar/components/icons/coin_control_nav_icon.dart';
-import 'package:stackfrost/widgets/wallet_navigation_bar/components/icons/paynym_nav_icon.dart';
 import 'package:stackfrost/widgets/wallet_navigation_bar/components/icons/receive_nav_icon.dart';
 import 'package:stackfrost/widgets/wallet_navigation_bar/components/icons/send_nav_icon.dart';
 import 'package:stackfrost/widgets/wallet_navigation_bar/components/wallet_navigation_bar_item.dart';
@@ -736,89 +726,31 @@ class _WalletViewState extends ConsumerState<WalletView> {
                   ),
                 ],
                 moreItems: [
-                  if (ref.watch(
-                        walletsChangeNotifierProvider.select(
-                          (value) => value
-                              .getManager(widget.walletId)
-                              .hasCoinControlSupport,
-                        ),
-                      ) &&
-                      ref.watch(
-                        prefsChangeNotifierProvider.select(
-                          (value) => value.enableCoinControl,
-                        ),
-                      ))
-                    WalletNavigationBarItemData(
-                      label: "Coin control",
-                      icon: const CoinControlNavIcon(),
-                      onTap: () {
-                        Navigator.of(context).pushNamed(
-                          CoinControlView.routeName,
-                          arguments: Tuple2(
-                            widget.walletId,
-                            CoinControlViewType.manage,
-                          ),
-                        );
-                      },
-                    ),
-                  if (ref.watch(walletsChangeNotifierProvider.select((value) =>
-                      value.getManager(widget.walletId).hasPaynymSupport)))
-                    WalletNavigationBarItemData(
-                      label: "PayNym",
-                      icon: const PaynymNavIcon(),
-                      onTap: () async {
-                        unawaited(
-                          showDialog(
-                            context: context,
-                            builder: (context) => const LoadingIndicator(
-                              width: 100,
-                            ),
-                          ),
-                        );
-
-                        final manager = ref
-                            .read(walletsChangeNotifierProvider)
-                            .getManager(widget.walletId);
-
-                        final paynymInterface =
-                            manager.wallet as PaynymWalletInterface;
-
-                        final code = await paynymInterface.getPaymentCode(
-                          isSegwit: false,
-                        );
-
-                        final account = await ref
-                            .read(paynymAPIProvider)
-                            .nym(code.toString());
-
-                        Logging.instance.log(
-                          "my nym account: $account",
-                          level: LogLevel.Info,
-                        );
-
-                        if (mounted) {
-                          Navigator.of(context).pop();
-
-                          // check if account exists and for matching code to see if claimed
-                          if (account.value != null &&
-                              account.value!.nonSegwitPaymentCode.claimed &&
-                              account.value!.segwit) {
-                            ref.read(myPaynymAccountStateProvider.state).state =
-                                account.value!;
-
-                            await Navigator.of(context).pushNamed(
-                              PaynymHomeView.routeName,
-                              arguments: widget.walletId,
-                            );
-                          } else {
-                            await Navigator.of(context).pushNamed(
-                              PaynymClaimView.routeName,
-                              arguments: widget.walletId,
-                            );
-                          }
-                        }
-                      },
-                    ),
+                  // if (ref.watch(
+                  //       walletsChangeNotifierProvider.select(
+                  //         (value) => value
+                  //             .getManager(widget.walletId)
+                  //             .hasCoinControlSupport,
+                  //       ),
+                  //     ) &&
+                  //     ref.watch(
+                  //       prefsChangeNotifierProvider.select(
+                  //         (value) => value.enableCoinControl,
+                  //       ),
+                  //     ))
+                  //   WalletNavigationBarItemData(
+                  //     label: "Coin control",
+                  //     icon: const CoinControlNavIcon(),
+                  //     onTap: () {
+                  //       Navigator.of(context).pushNamed(
+                  //         CoinControlView.routeName,
+                  //         arguments: Tuple2(
+                  //           widget.walletId,
+                  //           CoinControlViewType.manage,
+                  //         ),
+                  //       );
+                  //     },
+                  //   ),
                 ],
               ),
             ],

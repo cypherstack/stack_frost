@@ -8,7 +8,6 @@
  *
  */
 
-import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -17,7 +16,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:stackfrost/db/hive/db.dart';
 import 'package:stackfrost/providers/global/prefs_provider.dart';
 import 'package:stackfrost/providers/global/price_provider.dart';
-import 'package:stackfrost/services/exchange/exchange_data_loading_service.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/themes/theme_providers.dart';
 import 'package:stackfrost/utilities/assets.dart';
@@ -184,9 +182,6 @@ class _StackPrivacyDialog extends ConsumerState<StackPrivacyDialog> {
                               value: isEasy)
                           .then((_) {
                         if (isEasy) {
-                          unawaited(
-                            ExchangeDataLoadingService.instance.loadAll(),
-                          );
                           ref
                               .read(priceAnd24hChangeNotifierProvider)
                               .start(true);

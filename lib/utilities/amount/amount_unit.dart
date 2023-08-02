@@ -11,7 +11,6 @@
 import 'dart:math' as math;
 
 import 'package:decimal/decimal.dart';
-import 'package:stackfrost/models/isar/models/ethereum/eth_contract.dart';
 import 'package:stackfrost/utilities/amount/amount.dart';
 import 'package:stackfrost/utilities/enums/coin_enum.dart';
 import 'package:stackfrost/utilities/util.dart';
@@ -73,34 +72,10 @@ extension AmountUnitExt on AmountUnit {
     }
   }
 
-  String unitForContract(EthContract contract) {
-    switch (this) {
-      case AmountUnit.normal:
-        return contract.symbol;
-      case AmountUnit.milli:
-        return "m${contract.symbol}";
-      case AmountUnit.micro:
-        return "µ${contract.symbol}";
-      case AmountUnit.nano:
-        return "gwei";
-      case AmountUnit.pico:
-        return "mwei";
-      case AmountUnit.femto:
-        return "kwei";
-      case AmountUnit.atto:
-        return "wei";
-      default:
-        throw ArgumentError(
-          "Does eth even allow more than 18 decimal places?",
-        );
-    }
-  }
-
   Amount? tryParse(
     String value, {
     required String locale,
     required Coin coin,
-    EthContract? tokenContract,
     bool overrideWithDecimalPlacesFromString = false,
   }) {
     final precisionLost = value.startsWith("~");
@@ -135,9 +110,8 @@ extension AmountUnitExt on AmountUnit {
       return null;
     }
 
-    final decimalPlaces = overrideWithDecimalPlacesFromString
-        ? decimal.scale
-        : tokenContract?.decimals ?? coin.decimals;
+    final decimalPlaces =
+        overrideWithDecimalPlacesFromString ? decimal.scale : coin.decimals;
     final realShift = math.min(shift, decimalPlaces);
 
     return decimal.shift(0 - realShift).toAmount(fractionDigits: decimalPlaces);
@@ -151,7 +125,6 @@ extension AmountUnitExt on AmountUnit {
     bool withUnitName = true,
     bool indicatePrecisionLoss = true,
     String? overrideUnit,
-    EthContract? tokenContract,
   }) {
     assert(maxDecimalPlaces >= 0);
 
@@ -191,14 +164,8 @@ extension AmountUnitExt on AmountUnit {
       // get final decimal based on max precision wanted while ensuring that
       // maxDecimalPlaces doesn't exceed the max per coin
       final int updatedMax;
-      if (tokenContract != null) {
-        updatedMax = maxDecimalPlaces > tokenContract.decimals
-            ? tokenContract.decimals
-            : maxDecimalPlaces;
-      } else {
-        updatedMax =
-            maxDecimalPlaces > coin.decimals ? coin.decimals : maxDecimalPlaces;
-      }
+      updatedMax =
+          maxDecimalPlaces > coin.decimals ? coin.decimals : maxDecimalPlaces;
       final int actualDecimalPlaces = math.min(places, updatedMax);
 
       // get remainder string without the prepending "0."
@@ -244,11 +211,6 @@ extension AmountUnitExt on AmountUnit {
 
     if (!withUnitName && indicatePrecisionLoss) {
       return returnValue;
-    }
-
-    // return the value with the proper unit symbol
-    if (tokenContract != null) {
-      overrideUnit = unitForContract(tokenContract);
     }
 
     return "$returnValue ${overrideUnit ?? unitForCoin(coin)}";

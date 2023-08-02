@@ -113,6 +113,7 @@ class WalletKeysDesktopPopup extends StatelessWidget {
                   child: SecondaryButton(
                     label: "Show QR code",
                     onPressed: () {
+                      // TODO: address utils
                       final String value = AddressUtils.encodeQRSeedData(words);
                       Navigator.of(context).pushNamed(
                         QRCodeDesktopPopupContent.routeName,

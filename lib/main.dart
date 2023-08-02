@@ -24,8 +24,6 @@ import 'package:keyboard_dismisser/keyboard_dismisser.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:stackfrost/db/hive/db.dart';
 import 'package:stackfrost/db/isar/main_db.dart';
-import 'package:stackfrost/models/exchange/change_now/exchange_transaction.dart';
-import 'package:stackfrost/models/exchange/change_now/exchange_transaction_status.dart';
 import 'package:stackfrost/models/exchange/response_objects/trade.dart';
 import 'package:stackfrost/models/isar/models/isar_models.dart';
 import 'package:stackfrost/models/models.dart';
@@ -46,7 +44,6 @@ import 'package:stackfrost/providers/global/trades_service_provider.dart';
 import 'package:stackfrost/providers/providers.dart';
 import 'package:stackfrost/route_generator.dart';
 import 'package:stackfrost/services/debug_service.dart';
-import 'package:stackfrost/services/exchange/exchange_data_loading_service.dart';
 import 'package:stackfrost/services/locale_service.dart';
 import 'package:stackfrost/services/node_service.dart';
 import 'package:stackfrost/services/notifications_api.dart';
@@ -113,17 +110,17 @@ void main() async {
     unawaited(DebugService.instance.deleteLogsOlderThan());
   }
 
-  // Registering Transaction Model Adapters
-  Hive.registerAdapter(TransactionDataAdapter());
-  Hive.registerAdapter(TransactionChunkAdapter());
-  Hive.registerAdapter(TransactionAdapter());
-  Hive.registerAdapter(InputAdapter());
-  Hive.registerAdapter(OutputAdapter());
-
-  // Registering Utxo Model Adapters
-  Hive.registerAdapter(UtxoDataAdapter());
-  Hive.registerAdapter(UtxoObjectAdapter());
-  Hive.registerAdapter(StatusAdapter());
+  // // Registering Transaction Model Adapters
+  // Hive.registerAdapter(TransactionDataAdapter());
+  // Hive.registerAdapter(TransactionChunkAdapter());
+  // Hive.registerAdapter(TransactionAdapter());
+  // Hive.registerAdapter(InputAdapter());
+  // Hive.registerAdapter(OutputAdapter());
+  //
+  // // Registering Utxo Model Adapters
+  // Hive.registerAdapter(UtxoDataAdapter());
+  // Hive.registerAdapter(UtxoObjectAdapter());
+  // Hive.registerAdapter(StatusAdapter());
 
   // Registering Lelantus Model Adapters
   Hive.registerAdapter(LelantusCoinAdapter());
@@ -132,8 +129,8 @@ void main() async {
   Hive.registerAdapter(NotificationModelAdapter());
 
   // change now trade adapters
-  Hive.registerAdapter(ExchangeTransactionAdapter());
-  Hive.registerAdapter(ExchangeTransactionStatusAdapter());
+  // Hive.registerAdapter(ExchangeTransactionAdapter());
+  // Hive.registerAdapter(ExchangeTransactionStatusAdapter());
 
   Hive.registerAdapter(TradeAdapter());
 
@@ -279,12 +276,12 @@ class _MaterialAppWithThemeState extends ConsumerState<MaterialAppWithTheme>
           await ref.read(storageCryptoHandlerProvider).hasPassword();
     }
 
-    ref
-        .read(priceAnd24hChangeNotifierProvider)
-        .tokenContractAddressesToCheck
-        .addAll(
-          await MainDB.instance.getEthContracts().addressProperty().findAll(),
-        );
+    // ref
+    //     .read(priceAnd24hChangeNotifierProvider)
+    //     .tokenContractAddressesToCheck
+    //     .addAll(
+    //       await MainDB.instance.getEthContracts().addressProperty().findAll(),
+    //     );
   }
 
   Future<void> load() async {
@@ -324,21 +321,13 @@ class _MaterialAppWithThemeState extends ConsumerState<MaterialAppWithTheme>
       // TODO: this should probably run unawaited. Keep commented out for now as proper community nodes ui hasn't been implemented yet
       //  unawaited(_nodeService.updateCommunityNodes());
 
-      await ExchangeDataLoadingService.instance.initDB();
       // run without awaiting
-      if (ref.read(prefsChangeNotifierProvider).externalCalls &&
-          await ref.read(prefsChangeNotifierProvider).isExternalCallsSet()) {
-        if (Constants.enableExchange) {
-          await ExchangeDataLoadingService.instance.setCurrenciesIfEmpty(
-            ref.read(efCurrencyPairProvider),
-            ref.read(efRateTypeProvider),
-          );
-          unawaited(ExchangeDataLoadingService.instance.loadAll());
-        }
-        // if (Constants.enableBuy) {
-        //   unawaited(BuyDataLoadingService().loadAll(ref));
-        // }
-      }
+      // if (ref.read(prefsChangeNotifierProvider).externalCalls &&
+      //     await ref.read(prefsChangeNotifierProvider).isExternalCallsSet()) {
+      //   // if (Constants.enableBuy) {
+      //   //   unawaited(BuyDataLoadingService().loadAll(ref));
+      //   // }
+      // }
 
       if (ref.read(prefsChangeNotifierProvider).isAutoBackupEnabled) {
         switch (ref.read(prefsChangeNotifierProvider).backupFrequencyType) {

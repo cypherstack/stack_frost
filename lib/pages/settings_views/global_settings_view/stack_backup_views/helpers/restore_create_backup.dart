@@ -15,7 +15,6 @@ import 'dart:typed_data';
 
 import 'package:stack_wallet_backup/stack_wallet_backup.dart';
 import 'package:stackfrost/db/hive/db.dart';
-import 'package:stackfrost/models/exchange/change_now/exchange_transaction.dart';
 import 'package:stackfrost/models/exchange/response_objects/trade.dart';
 import 'package:stackfrost/models/isar/models/contact_entry.dart';
 import 'package:stackfrost/models/node_model.dart';
@@ -415,7 +414,7 @@ abstract class SWB {
       await manager.recoverFromMnemonic(
         mnemonic: mnemonic,
         mnemonicPassphrase: mnemonicPassphrase,
-        maxUnusedAddressGap: manager.coin == Coin.firo ? 50 : 20,
+        maxUnusedAddressGap: 20,
         maxNumberOfIndexesToCheck: 1000,
         height: restoreHeight,
       );
@@ -1101,20 +1100,8 @@ abstract class SWB {
   ) async {
     final tradesService = TradesService();
     for (int i = 0; i < trades.length - 1; i++) {
-      ExchangeTransaction? exTx;
-      try {
-        exTx = ExchangeTransaction.fromJson(trades[i] as Map<String, dynamic>);
-      } catch (e) {
-        // unneeded log
-        // Logging.instance.log("$e\n$s", level: LogLevel.Warning);
-      }
-
       Trade trade;
-      if (exTx != null) {
-        trade = Trade.fromExchangeTransaction(exTx, false);
-      } else {
-        trade = Trade.fromMap(trades[i] as Map<String, dynamic>);
-      }
+      trade = Trade.fromMap(trades[i] as Map<String, dynamic>);
 
       await tradesService.add(
         trade: trade,
@@ -1123,21 +1110,8 @@ abstract class SWB {
     }
     // only call notifyListeners on last one added
     if (trades.isNotEmpty) {
-      ExchangeTransaction? exTx;
-      try {
-        exTx =
-            ExchangeTransaction.fromJson(trades.last as Map<String, dynamic>);
-      } catch (e) {
-        // unneeded log
-        // Logging.instance.log("$e\n$s", level: LogLevel.Warning);
-      }
-
       Trade trade;
-      if (exTx != null) {
-        trade = Trade.fromExchangeTransaction(exTx, false);
-      } else {
-        trade = Trade.fromMap(trades.last as Map<String, dynamic>);
-      }
+      trade = Trade.fromMap(trades.last as Map<String, dynamic>);
 
       await tradesService.add(
         trade: trade,

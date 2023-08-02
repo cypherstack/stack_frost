@@ -14,19 +14,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 import 'package:stackfrost/notifications/show_flush_bar.dart';
 import 'package:stackfrost/pages/add_wallet_views/new_wallet_recovery_phrase_view/sub_widgets/mnemonic_table.dart';
 import 'package:stackfrost/providers/global/wallets_provider.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
-import 'package:stackfrost/utilities/address_utils.dart';
 import 'package:stackfrost/utilities/assets.dart';
 import 'package:stackfrost/utilities/clipboard_interface.dart';
 import 'package:stackfrost/utilities/constants.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
 import 'package:stackfrost/widgets/background.dart';
 import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
-import 'package:stackfrost/widgets/stack_dialog.dart';
 
 class WalletBackupView extends ConsumerWidget {
   const WalletBackupView({
@@ -151,74 +148,75 @@ class WalletBackupView extends ConsumerWidget {
                     .extension<StackColors>()!
                     .getPrimaryEnabledButtonStyle(context),
                 onPressed: () {
-                  String data = AddressUtils.encodeQRSeedData(mnemonic);
-
-                  showDialog<dynamic>(
-                    context: context,
-                    useSafeArea: false,
-                    barrierDismissible: true,
-                    builder: (_) {
-                      final width = MediaQuery.of(context).size.width / 2;
-                      return StackDialogBase(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Center(
-                              child: Text(
-                                "Recovery phrase QR code",
-                                style: STextStyles.pageTitleH2(context),
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 12,
-                            ),
-                            Center(
-                              child: RepaintBoundary(
-                                // key: _qrKey,
-                                child: SizedBox(
-                                  width: width + 20,
-                                  height: width + 20,
-                                  child: QrImageView(
-                                      data: data,
-                                      size: width,
-                                      backgroundColor: Theme.of(context)
-                                          .extension<StackColors>()!
-                                          .popupBG,
-                                      foregroundColor: Theme.of(context)
-                                          .extension<StackColors>()!
-                                          .accentColorDark),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 12,
-                            ),
-                            Center(
-                              child: SizedBox(
-                                width: width,
-                                child: TextButton(
-                                  onPressed: () async {
-                                    // await _capturePng(true);
-                                    Navigator.of(context).pop();
-                                  },
-                                  style: Theme.of(context)
-                                      .extension<StackColors>()!
-                                      .getSecondaryEnabledButtonStyle(context),
-                                  child: Text(
-                                    "Cancel",
-                                    style: STextStyles.button(context).copyWith(
-                                        color: Theme.of(context)
-                                            .extension<StackColors>()!
-                                            .accentColorDark),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  );
+                  // todo: address utils
+                  // String data = AddressUtils.encodeQRSeedData(mnemonic);
+                  //
+                  // showDialog<dynamic>(
+                  //   context: context,
+                  //   useSafeArea: false,
+                  //   barrierDismissible: true,
+                  //   builder: (_) {
+                  //     final width = MediaQuery.of(context).size.width / 2;
+                  //     return StackDialogBase(
+                  //       child: Column(
+                  //         crossAxisAlignment: CrossAxisAlignment.stretch,
+                  //         children: [
+                  //           Center(
+                  //             child: Text(
+                  //               "Recovery phrase QR code",
+                  //               style: STextStyles.pageTitleH2(context),
+                  //             ),
+                  //           ),
+                  //           const SizedBox(
+                  //             height: 12,
+                  //           ),
+                  //           Center(
+                  //             child: RepaintBoundary(
+                  //               // key: _qrKey,
+                  //               child: SizedBox(
+                  //                 width: width + 20,
+                  //                 height: width + 20,
+                  //                 child: QrImageView(
+                  //                     data: data,
+                  //                     size: width,
+                  //                     backgroundColor: Theme.of(context)
+                  //                         .extension<StackColors>()!
+                  //                         .popupBG,
+                  //                     foregroundColor: Theme.of(context)
+                  //                         .extension<StackColors>()!
+                  //                         .accentColorDark),
+                  //               ),
+                  //             ),
+                  //           ),
+                  //           const SizedBox(
+                  //             height: 12,
+                  //           ),
+                  //           Center(
+                  //             child: SizedBox(
+                  //               width: width,
+                  //               child: TextButton(
+                  //                 onPressed: () async {
+                  //                   // await _capturePng(true);
+                  //                   Navigator.of(context).pop();
+                  //                 },
+                  //                 style: Theme.of(context)
+                  //                     .extension<StackColors>()!
+                  //                     .getSecondaryEnabledButtonStyle(context),
+                  //                 child: Text(
+                  //                   "Cancel",
+                  //                   style: STextStyles.button(context).copyWith(
+                  //                       color: Theme.of(context)
+                  //                           .extension<StackColors>()!
+                  //                           .accentColorDark),
+                  //                 ),
+                  //               ),
+                  //             ),
+                  //           ),
+                  //         ],
+                  //       ),
+                  //     );
+                  //   },
+                  // );
                 },
                 child: Text(
                   "Show QR Code",
