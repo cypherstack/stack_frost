@@ -14,15 +14,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:qr_flutter/qr_flutter.dart';
-import 'package:stackfrost/models/isar/models/isar_models.dart';
 import 'package:stackfrost/notifications/show_flush_bar.dart';
 import 'package:stackfrost/pages/receive_view/addresses/wallet_addresses_view.dart';
 import 'package:stackfrost/pages/receive_view/generate_receiving_uri_qr_code_view.dart';
 import 'package:stackfrost/providers/providers.dart';
 import 'package:stackfrost/route_generator.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
-import 'package:stackfrost/utilities/address_utils.dart';
 import 'package:stackfrost/utilities/assets.dart';
 import 'package:stackfrost/utilities/clipboard_interface.dart';
 import 'package:stackfrost/utilities/constants.dart';
@@ -38,14 +35,12 @@ class ReceiveView extends ConsumerStatefulWidget {
   const ReceiveView({
     Key? key,
     required this.walletId,
-    this.tokenContract,
     this.clipboard = const ClipboardWrapper(),
   }) : super(key: key);
 
   static const String routeName = "/receiveView";
 
   final String walletId;
-  final EthContract? tokenContract;
   final ClipboardInterface clipboard;
 
   @override
@@ -129,7 +124,7 @@ class _ReceiveViewState extends ConsumerState<ReceiveView> {
       }
     });
 
-    final ticker = widget.tokenContract?.symbol ?? coin.ticker;
+    final ticker = coin.ticker;
 
     return Background(
       child: Scaffold(
@@ -304,30 +299,22 @@ class _ReceiveViewState extends ConsumerState<ReceiveView> {
                       ),
                     ),
                   ),
-                  if (coin != Coin.epicCash &&
-                      coin != Coin.ethereum &&
-                      coin != Coin.banano &&
-                      coin != Coin.nano)
-                    const SizedBox(
-                      height: 12,
+                  const SizedBox(
+                    height: 12,
+                  ),
+                  TextButton(
+                    onPressed: generateNewAddress,
+                    style: Theme.of(context)
+                        .extension<StackColors>()!
+                        .getSecondaryEnabledButtonStyle(context),
+                    child: Text(
+                      "Generate new address",
+                      style: STextStyles.button(context).copyWith(
+                          color: Theme.of(context)
+                              .extension<StackColors>()!
+                              .accentColorDark),
                     ),
-                  if (coin != Coin.epicCash &&
-                      coin != Coin.ethereum &&
-                      coin != Coin.banano &&
-                      coin != Coin.nano)
-                    TextButton(
-                      onPressed: generateNewAddress,
-                      style: Theme.of(context)
-                          .extension<StackColors>()!
-                          .getSecondaryEnabledButtonStyle(context),
-                      child: Text(
-                        "Generate new address",
-                        style: STextStyles.button(context).copyWith(
-                            color: Theme.of(context)
-                                .extension<StackColors>()!
-                                .accentColorDark),
-                      ),
-                    ),
+                  ),
                   const SizedBox(
                     height: 30,
                   ),
@@ -337,16 +324,17 @@ class _ReceiveViewState extends ConsumerState<ReceiveView> {
                       child: Center(
                         child: Column(
                           children: [
-                            QrImageView(
-                                data: AddressUtils.buildUriString(
-                                  coin,
-                                  receivingAddress,
-                                  {},
-                                ),
-                                size: MediaQuery.of(context).size.width / 2,
-                                foregroundColor: Theme.of(context)
-                                    .extension<StackColors>()!
-                                    .accentColorDark),
+                            /// TODO: deal with address utils
+                            // QrImageView(
+                            //     data: AddressUtils.buildUriString(
+                            //       coin,
+                            //       receivingAddress,
+                            //       {},
+                            //     ),
+                            //     size: MediaQuery.of(context).size.width / 2,
+                            //     foregroundColor: Theme.of(context)
+                            //         .extension<StackColors>()!
+                            //         .accentColorDark),
                             const SizedBox(
                               height: 20,
                             ),

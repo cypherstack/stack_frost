@@ -43,7 +43,10 @@ class ManageCoinUnitsView extends ConsumerWidget {
       prefsChangeNotifierProvider.select((value) => value.showTestNetCoins),
     );
 
-    final _coins = Coin.values.where((e) => e != Coin.firoTestNet).toList();
+    // todo: a change from e != Coin.firoTestnet
+    final _coins = Coin.values
+        .where((e) => e == Coin.bitcoin || e == Coin.bitcoinTestNet)
+        .toList();
 
     List<Coin> coins = showTestNet
         ? _coins

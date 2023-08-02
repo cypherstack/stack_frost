@@ -24,8 +24,6 @@ import 'package:stackfrost/utilities/assets.dart';
 import 'package:stackfrost/utilities/constants.dart';
 import 'package:stackfrost/utilities/enums/coin_enum.dart';
 import 'package:stackfrost/utilities/flutter_secure_storage_interface.dart';
-import 'package:stackfrost/utilities/logger.dart';
-import 'package:stackfrost/utilities/test_epic_box_connection.dart';
 import 'package:stackfrost/utilities/test_monero_node_connection.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
 import 'package:stackfrost/utilities/util.dart';
@@ -117,58 +115,8 @@ class _AddEditNodeViewState extends ConsumerState<AddEditNodeView> {
     bool testPassed = false;
 
     switch (coin) {
-      case Coin.epicCash:
-        try {
-          final data = await testEpicNodeConnection(formData);
-
-          if (data != null) {
-            testPassed = true;
-            ref.read(nodeFormDataProvider).host = data.host;
-            ref.read(nodeFormDataProvider).port = data.port;
-            ref.read(nodeFormDataProvider).useSSL = data.useSSL;
-          }
-        } catch (e, s) {
-          Logging.instance.log("$e\n$s", level: LogLevel.Warning);
-        }
-        break;
-
-      case Coin.monero:
-      case Coin.wownero:
-        try {
-          final url = formData.host!;
-          final uri = Uri.tryParse(url);
-          if (uri != null) {
-            if (!uri.hasScheme) {
-              // try https first
-              testPassed = await _xmrHelper("https://$url", formData.port);
-
-              if (testPassed == false) {
-                // try http
-                testPassed = await _xmrHelper("http://$url", formData.port);
-              }
-            } else {
-              testPassed = await _xmrHelper(url, formData.port);
-            }
-          }
-        } catch (e, s) {
-          Logging.instance.log("$e\n$s", level: LogLevel.Warning);
-        }
-
-        break;
-
       case Coin.bitcoin:
-      case Coin.bitcoincash:
-      case Coin.litecoin:
-      case Coin.dogecoin:
-      case Coin.eCash:
-      case Coin.firo:
-      case Coin.namecoin:
-      case Coin.particl:
       case Coin.bitcoinTestNet:
-      case Coin.litecoinTestNet:
-      case Coin.bitcoincashTestnet:
-      case Coin.firoTestNet:
-      case Coin.dogecoinTestNet:
         final client = ElectrumX(
           host: formData.host!,
           port: formData.port!,
@@ -184,22 +132,6 @@ class _AddEditNodeViewState extends ConsumerState<AddEditNodeView> {
         }
 
         break;
-
-      case Coin.ethereum:
-        // TODO fix this
-        // final client = Web3Client(
-        //     "https://mainnet.infura.io/v3/22677300bf774e49a458b73313ee56ba",
-        //     Client());
-        try {
-          // await client.getSyncStatus();
-        } catch (_) {}
-
-      case Coin.nano:
-      case Coin.banano:
-      case Coin.stellar:
-      case Coin.stellarTestnet:
-        throw UnimplementedError();
-      //TODO: check network/node
     }
 
     if (showFlushBar && mounted) {
@@ -353,12 +285,6 @@ class _AddEditNodeViewState extends ConsumerState<AddEditNodeView> {
 
     // strip unused path
     String address = formData.host!;
-    if (coin == Coin.monero || coin == Coin.wownero) {
-      if (address.startsWith("http")) {
-        final uri = Uri.parse(address);
-        address = "${uri.scheme}://${uri.host}";
-      }
-    }
 
     switch (viewType) {
       case AddEditNodeViewType.add:
@@ -724,29 +650,8 @@ class _NodeFormState extends ConsumerState<NodeForm> {
     // TODO: which coin servers can have username and password?
     switch (coin) {
       case Coin.bitcoin:
-      case Coin.litecoin:
-      case Coin.dogecoin:
-      case Coin.firo:
-      case Coin.namecoin:
-      case Coin.bitcoincash:
-      case Coin.particl:
       case Coin.bitcoinTestNet:
-      case Coin.litecoinTestNet:
-      case Coin.bitcoincashTestnet:
-      case Coin.firoTestNet:
-      case Coin.dogecoinTestNet:
-      case Coin.epicCash:
-      case Coin.nano:
-      case Coin.banano:
-      case Coin.eCash:
-      case Coin.stellar:
-      case Coin.stellarTestnet:
         return false;
-
-      case Coin.ethereum:
-      case Coin.monero:
-      case Coin.wownero:
-        return true;
     }
   }
 
@@ -822,11 +727,7 @@ class _NodeFormState extends ConsumerState<NodeForm> {
       _useSSL = node.useSSL;
       _isFailover = node.isFailover;
       _trusted = node.trusted ?? false;
-      if (widget.coin == Coin.epicCash) {
-        enableSSLCheckbox = !node.host.startsWith("http");
-      } else {
-        enableSSLCheckbox = true;
-      }
+      enableSSLCheckbox = true;
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         // update provider state object so test connection works without having to modify a field in the ui first
@@ -921,9 +822,7 @@ class _NodeFormState extends ConsumerState<NodeForm> {
             focusNode: _hostFocusNode,
             style: STextStyles.field(context),
             decoration: standardInputDecoration(
-              (widget.coin != Coin.monero && widget.coin != Coin.wownero)
-                  ? "IP address"
-                  : "Url",
+              "IP address",
               _hostFocusNode,
               context,
             ).copyWith(
@@ -947,17 +846,6 @@ class _NodeFormState extends ConsumerState<NodeForm> {
                   : null,
             ),
             onChanged: (newValue) {
-              if (widget.coin == Coin.epicCash) {
-                if (newValue.startsWith("https://")) {
-                  _useSSL = true;
-                  enableSSLCheckbox = false;
-                } else if (newValue.startsWith("http://")) {
-                  _useSSL = false;
-                  enableSSLCheckbox = false;
-                } else {
-                  enableSSLCheckbox = true;
-                }
-              }
               _updateState();
               setState(() {});
             },
@@ -1111,175 +999,115 @@ class _NodeFormState extends ConsumerState<NodeForm> {
           const SizedBox(
             height: 8,
           ),
-        if (widget.coin != Coin.monero && widget.coin != Coin.wownero)
-          Row(
-            children: [
-              GestureDetector(
-                onTap: !shouldBeReadOnly && enableSSLCheckbox
-                    ? () {
-                        setState(() {
-                          _useSSL = !_useSSL;
-                        });
-                        _updateState();
-                      }
-                    : null,
-                child: Container(
-                  color: Colors.transparent,
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: Checkbox(
-                          fillColor: !shouldBeReadOnly && enableSSLCheckbox
-                              ? null
-                              : MaterialStateProperty.all(Theme.of(context)
-                                  .extension<StackColors>()!
-                                  .checkboxBGDisabled),
-                          materialTapTargetSize:
-                              MaterialTapTargetSize.shrinkWrap,
-                          value: _useSSL,
-                          onChanged: !shouldBeReadOnly && enableSSLCheckbox
-                              ? (newValue) {
-                                  setState(() {
-                                    _useSSL = newValue!;
-                                  });
-                                  _updateState();
-                                }
-                              : null,
-                        ),
+        Row(
+          children: [
+            GestureDetector(
+              onTap: !shouldBeReadOnly && enableSSLCheckbox
+                  ? () {
+                      setState(() {
+                        _useSSL = !_useSSL;
+                      });
+                      _updateState();
+                    }
+                  : null,
+              child: Container(
+                color: Colors.transparent,
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: Checkbox(
+                        fillColor: !shouldBeReadOnly && enableSSLCheckbox
+                            ? null
+                            : MaterialStateProperty.all(Theme.of(context)
+                                .extension<StackColors>()!
+                                .checkboxBGDisabled),
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        value: _useSSL,
+                        onChanged: !shouldBeReadOnly && enableSSLCheckbox
+                            ? (newValue) {
+                                setState(() {
+                                  _useSSL = newValue!;
+                                });
+                                _updateState();
+                              }
+                            : null,
                       ),
-                      const SizedBox(
-                        width: 12,
-                      ),
-                      Text(
-                        "Use SSL",
-                        style: STextStyles.itemSubtitle12(context),
-                      )
-                    ],
-                  ),
+                    ),
+                    const SizedBox(
+                      width: 12,
+                    ),
+                    Text(
+                      "Use SSL",
+                      style: STextStyles.itemSubtitle12(context),
+                    )
+                  ],
                 ),
               ),
-            ],
-          ),
-        if (widget.coin == Coin.monero || widget.coin == Coin.wownero)
-          Row(
-            children: [
-              GestureDetector(
-                onTap: !widget.readOnly /*&& trustedCheckbox*/
-                    ? () {
-                        setState(() {
-                          _trusted = !_trusted;
-                        });
-                        _updateState();
-                      }
-                    : null,
-                child: Container(
-                  color: Colors.transparent,
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: Checkbox(
-                          fillColor: !widget.readOnly
-                              ? null
-                              : MaterialStateProperty.all(Theme.of(context)
-                                  .extension<StackColors>()!
-                                  .checkboxBGDisabled),
-                          materialTapTargetSize:
-                              MaterialTapTargetSize.shrinkWrap,
-                          value: _trusted,
-                          onChanged: !widget.readOnly
-                              ? (newValue) {
-                                  setState(() {
-                                    _trusted = newValue!;
-                                  });
-                                  _updateState();
-                                }
-                              : null,
-                        ),
+            ),
+          ],
+        ),
+        const SizedBox(
+          height: 8,
+        ),
+        Row(
+          children: [
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  _isFailover = !_isFailover;
+                });
+                if (widget.readOnly) {
+                  ref.read(nodeServiceChangeNotifierProvider).edit(
+                        widget.node!.copyWith(isFailover: _isFailover),
+                        null,
+                        true,
+                      );
+                } else {
+                  _updateState();
+                }
+              },
+              child: Container(
+                color: Colors.transparent,
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: Checkbox(
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        value: _isFailover,
+                        onChanged: (newValue) {
+                          setState(() {
+                            _isFailover = newValue!;
+                          });
+                          if (widget.readOnly) {
+                            ref.read(nodeServiceChangeNotifierProvider).edit(
+                                  widget.node!
+                                      .copyWith(isFailover: _isFailover),
+                                  null,
+                                  true,
+                                );
+                          } else {
+                            _updateState();
+                          }
+                        },
                       ),
-                      const SizedBox(
-                        width: 12,
-                      ),
-                      Text(
-                        "Trusted",
-                        style: STextStyles.itemSubtitle12(context),
-                      )
-                    ],
-                  ),
+                    ),
+                    const SizedBox(
+                      width: 12,
+                    ),
+                    Text(
+                      "Use as failover",
+                      style: STextStyles.itemSubtitle12(context),
+                    )
+                  ],
                 ),
               ),
-            ],
-          ),
-        if (widget.coin != Coin.monero &&
-            widget.coin != Coin.wownero &&
-            widget.coin != Coin.epicCash)
-          const SizedBox(
-            height: 8,
-          ),
-        if (widget.coin != Coin.monero &&
-            widget.coin != Coin.wownero &&
-            widget.coin != Coin.epicCash)
-          Row(
-            children: [
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _isFailover = !_isFailover;
-                  });
-                  if (widget.readOnly) {
-                    ref.read(nodeServiceChangeNotifierProvider).edit(
-                          widget.node!.copyWith(isFailover: _isFailover),
-                          null,
-                          true,
-                        );
-                  } else {
-                    _updateState();
-                  }
-                },
-                child: Container(
-                  color: Colors.transparent,
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: Checkbox(
-                          materialTapTargetSize:
-                              MaterialTapTargetSize.shrinkWrap,
-                          value: _isFailover,
-                          onChanged: (newValue) {
-                            setState(() {
-                              _isFailover = newValue!;
-                            });
-                            if (widget.readOnly) {
-                              ref.read(nodeServiceChangeNotifierProvider).edit(
-                                    widget.node!
-                                        .copyWith(isFailover: _isFailover),
-                                    null,
-                                    true,
-                                  );
-                            } else {
-                              _updateState();
-                            }
-                          },
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 12,
-                      ),
-                      Text(
-                        "Use as failover",
-                        style: STextStyles.itemSubtitle12(context),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
+        ),
       ],
     );
   }

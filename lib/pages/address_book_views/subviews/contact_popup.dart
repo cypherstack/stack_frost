@@ -17,7 +17,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:stackfrost/models/send_view_auto_fill_data.dart';
 import 'package:stackfrost/notifications/show_flush_bar.dart';
 import 'package:stackfrost/pages/address_book_views/subviews/contact_details_view.dart';
-import 'package:stackfrost/pages/exchange_view/exchange_step_views/step_2_view.dart';
 import 'package:stackfrost/pages/send_view/send_view.dart';
 import 'package:stackfrost/providers/global/address_book_service_provider.dart';
 import 'package:stackfrost/providers/providers.dart';
@@ -60,11 +59,9 @@ class ContactPopUp extends ConsumerWidget {
     assert(active.isEmpty || active.length == 1);
 
     bool hasActiveWallet = active.length == 1;
-    bool isExchangeFlow =
-        ref.watch(exchangeFlowIsActiveStateProvider.state).state;
 
     final addresses = contact.addressesSorted.where((e) {
-      if (hasActiveWallet && !isExchangeFlow) {
+      if (hasActiveWallet) {
         return e.coin == active[0].coin;
       } else {
         return true;
@@ -307,54 +304,13 @@ class ContactPopUp extends ConsumerWidget {
                                           ),
                                         ],
                                       ),
-                                      if (isExchangeFlow)
-                                        const SizedBox(
-                                          width: 6,
-                                        ),
-                                      if (isExchangeFlow)
-                                        Column(
-                                          children: [
-                                            const SizedBox(
-                                              height: 2,
-                                            ),
-                                            GestureDetector(
-                                              onTap: () {
-                                                ref
-                                                    .read(
-                                                        exchangeFromAddressBookAddressStateProvider
-                                                            .state)
-                                                    .state = e.address;
-                                                Navigator.of(context).popUntil(
-                                                    ModalRoute.withName(
-                                                        Step2View.routeName));
-                                              },
-                                              child: RoundedContainer(
-                                                color: Theme.of(context)
-                                                    .extension<StackColors>()!
-                                                    .textFieldDefaultBG,
-                                                padding:
-                                                    const EdgeInsets.all(6),
-                                                child: SvgPicture.asset(
-                                                    Assets.svg.chevronRight,
-                                                    width: 16,
-                                                    height: 16,
-                                                    color: Theme.of(context)
-                                                        .extension<
-                                                            StackColors>()!
-                                                        .accentColorDark),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
                                       if (contact.customId != "default" &&
-                                          hasActiveWallet &&
-                                          !isExchangeFlow)
+                                          hasActiveWallet)
                                         const SizedBox(
                                           width: 4,
                                         ),
                                       if (contact.customId != "default" &&
-                                          hasActiveWallet &&
-                                          !isExchangeFlow)
+                                          hasActiveWallet)
                                         Column(
                                           children: [
                                             const SizedBox(

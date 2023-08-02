@@ -19,15 +19,11 @@ import 'package:stackfrost/models/paynym/paynym_account_lite.dart';
 import 'package:stackfrost/notifications/show_flush_bar.dart';
 import 'package:stackfrost/pages/pinpad_views/lock_screen_view.dart';
 import 'package:stackfrost/pages/send_view/sub_widgets/sending_transaction_dialog.dart';
-import 'package:stackfrost/pages/token_view/token_view.dart';
 import 'package:stackfrost/pages/wallet_view/wallet_view.dart';
 import 'package:stackfrost/pages_desktop_specific/coin_control/desktop_coin_control_use_dialog.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/desktop_auth_send.dart';
 import 'package:stackfrost/providers/providers.dart';
-import 'package:stackfrost/providers/wallet/public_private_balance_state_provider.dart';
 import 'package:stackfrost/route_generator.dart';
-import 'package:stackfrost/services/coins/epiccash/epiccash_wallet.dart';
-import 'package:stackfrost/services/coins/firo/firo_wallet.dart';
 import 'package:stackfrost/services/mixins/paynym_wallet_interface.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/themes/theme_providers.dart';
@@ -124,28 +120,14 @@ class _ConfirmTransactionViewState
     final note = noteController.text;
 
     try {
-      if (widget.isTokenTx) {
-        txidFuture = ref
-            .read(tokenServiceProvider)!
-            .confirmSend(txData: transactionInfo);
-      } else if (widget.isPaynymNotificationTransaction) {
+      if (widget.isPaynymNotificationTransaction) {
         txidFuture = (manager.wallet as PaynymWalletInterface)
             .broadcastNotificationTx(preparedTx: transactionInfo);
       } else if (widget.isPaynymTransaction) {
         txidFuture = manager.confirmSend(txData: transactionInfo);
       } else {
         final coin = manager.coin;
-        if ((coin == Coin.firo || coin == Coin.firoTestNet) &&
-            ref.read(publicPrivateBalanceStateProvider.state).state !=
-                "Private") {
-          txidFuture = (manager.wallet as FiroWallet)
-              .confirmSendPublic(txData: transactionInfo);
-        } else {
-          if (coin == Coin.epicCash) {
-            transactionInfo["onChainNote"] = onChainNoteController.text;
-          }
-          txidFuture = manager.confirmSend(txData: transactionInfo);
-        }
+        txidFuture = manager.confirmSend(txData: transactionInfo);
       }
 
       final results = await Future.wait([
@@ -164,11 +146,7 @@ class _ConfirmTransactionViewState
           .read(notesServiceChangeNotifierProvider(walletId))
           .editOrAddNote(txid: txid, note: note);
 
-      if (widget.isTokenTx) {
-        unawaited(ref.read(tokenServiceProvider)!.refresh());
-      } else {
-        unawaited(manager.refresh());
-      }
+      unawaited(manager.refresh());
 
       // pop back to wallet
       if (mounted) {
@@ -178,20 +156,6 @@ class _ConfirmTransactionViewState
         } else {
           widget.onSuccessInsteadOfRouteOnSuccess!.call();
         }
-      }
-    } on BadEpicHttpAddressException catch (_) {
-      if (mounted) {
-        // pop building dialog
-        Navigator.of(context).pop();
-        unawaited(
-          showFloatingFlushBar(
-            type: FlushBarType.warning,
-            message:
-                "Connection failed. Please check the address and try again.",
-            context: context,
-          ),
-        );
-        return;
       }
     } catch (e, s) {
       //todo: comeback to this
@@ -306,12 +270,7 @@ class _ConfirmTransactionViewState
         .select((value) => value.getManager(walletId).coin));
 
     final String unit;
-    if (widget.isTokenTx) {
-      unit = ref.watch(
-          tokenServiceProvider.select((value) => value!.tokenContract.symbol));
-    } else {
-      unit = coin.ticker;
-    }
+    unit = coin.ticker;
 
     return ConditionalParent(
       condition: !isDesktop,
@@ -440,9 +399,6 @@ class _ConfirmTransactionViewState
                         Text(
                           ref.watch(pAmountFormatter(coin)).format(
                                 transactionInfo["recipientAmt"] as Amount,
-                                ethContract: ref
-                                    .watch(tokenServiceProvider)
-                                    ?.tokenContract,
                               ),
                           style: STextStyles.itemSubtitle12(context),
                           textAlign: TextAlign.right,
@@ -450,38 +406,36 @@ class _ConfirmTransactionViewState
                       ],
                     ),
                   ),
-                  if (coin != Coin.banano && coin != Coin.nano)
-                    const SizedBox(
-                      height: 12,
-                    ),
-                  if (coin != Coin.banano && coin != Coin.nano)
-                    RoundedWhiteContainer(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Transaction fee",
-                            style: STextStyles.smallMed12(context),
-                          ),
-                          Text(
-                            ref.watch(pAmountFormatter(coin)).format(
-                                  (transactionInfo["fee"] is Amount
-                                      ? transactionInfo["fee"] as Amount
-                                      : (transactionInfo["fee"] as int)
-                                          .toAmountAsRaw(
-                                          fractionDigits: ref.watch(
-                                            managerProvider.select(
-                                              (value) => value.coin.decimals,
-                                            ),
+                  const SizedBox(
+                    height: 12,
+                  ),
+                  RoundedWhiteContainer(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Transaction fee",
+                          style: STextStyles.smallMed12(context),
+                        ),
+                        Text(
+                          ref.watch(pAmountFormatter(coin)).format(
+                                (transactionInfo["fee"] is Amount
+                                    ? transactionInfo["fee"] as Amount
+                                    : (transactionInfo["fee"] as int)
+                                        .toAmountAsRaw(
+                                        fractionDigits: ref.watch(
+                                          managerProvider.select(
+                                            (value) => value.coin.decimals,
                                           ),
-                                        )),
-                                ),
-                            style: STextStyles.itemSubtitle12(context),
-                            textAlign: TextAlign.right,
-                          ),
-                        ],
-                      ),
+                                        ),
+                                      )),
+                              ),
+                          style: STextStyles.itemSubtitle12(context),
+                          textAlign: TextAlign.right,
+                        ),
+                      ],
                     ),
+                  ),
                   if (transactionInfo["fee"] is int &&
                       transactionInfo["vSize"] is int)
                     const SizedBox(
@@ -507,13 +461,11 @@ class _ConfirmTransactionViewState
                         ],
                       ),
                     ),
-                  if (coin == Coin.epicCash &&
-                      (transactionInfo["onChainNote"] as String).isNotEmpty)
+                  if ((transactionInfo["onChainNote"] as String).isNotEmpty)
                     const SizedBox(
                       height: 12,
                     ),
-                  if (coin == Coin.epicCash &&
-                      (transactionInfo["onChainNote"] as String).isNotEmpty)
+                  if ((transactionInfo["onChainNote"] as String).isNotEmpty)
                     RoundedWhiteContainer(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -542,7 +494,7 @@ class _ConfirmTransactionViewState
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           Text(
-                            (coin == Coin.epicCash) ? "Local Note" : "Note",
+                            "Note",
                             style: STextStyles.smallMed12(context),
                           ),
                           const SizedBox(
@@ -645,22 +597,10 @@ class _ConfirmTransactionViewState
                                 String fiatAmount = "N/A";
 
                                 if (externalCalls) {
-                                  final price = widget.isTokenTx
-                                      ? ref
-                                          .read(
-                                              priceAnd24hChangeNotifierProvider)
-                                          .getTokenPrice(
-                                            ref
-                                                .read(tokenServiceProvider)!
-                                                .tokenContract
-                                                .address,
-                                          )
-                                          .item1
-                                      : ref
-                                          .read(
-                                              priceAnd24hChangeNotifierProvider)
-                                          .getPrice(coin)
-                                          .item1;
+                                  final price = ref
+                                      .read(priceAnd24hChangeNotifierProvider)
+                                      .getPrice(coin)
+                                      .item1;
                                   if (price > Decimal.zero) {
                                     fiatAmount = (amount.decimal * price)
                                         .toAmount(fractionDigits: 2)
@@ -677,10 +617,8 @@ class _ConfirmTransactionViewState
                                   children: [
                                     Text(
                                       ref.watch(pAmountFormatter(coin)).format(
-                                          amount,
-                                          ethContract: ref
-                                              .read(tokenServiceProvider)
-                                              ?.tokenContract),
+                                            amount,
+                                          ),
                                       style: STextStyles
                                               .desktopTextExtraExtraSmall(
                                                   context)
@@ -854,64 +792,8 @@ class _ConfirmTransactionViewState
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (coin == Coin.epicCash)
-                      Text(
-                        "On chain Note (optional)",
-                        style: STextStyles.smallMed12(context),
-                        textAlign: TextAlign.left,
-                      ),
-                    if (coin == Coin.epicCash)
-                      const SizedBox(
-                        height: 8,
-                      ),
-                    if (coin == Coin.epicCash)
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(
-                          Constants.size.circularBorderRadius,
-                        ),
-                        child: TextField(
-                          autocorrect: Util.isDesktop ? false : true,
-                          enableSuggestions: Util.isDesktop ? false : true,
-                          maxLength: 256,
-                          controller: onChainNoteController,
-                          focusNode: _onChainNoteFocusNode,
-                          style: STextStyles.field(context),
-                          onChanged: (_) => setState(() {}),
-                          decoration: standardInputDecoration(
-                            "Type something...",
-                            _onChainNoteFocusNode,
-                            context,
-                          ).copyWith(
-                            suffixIcon: onChainNoteController.text.isNotEmpty
-                                ? Padding(
-                                    padding: const EdgeInsets.only(right: 0),
-                                    child: UnconstrainedBox(
-                                      child: Row(
-                                        children: [
-                                          TextFieldIconButton(
-                                            child: const XIcon(),
-                                            onTap: () async {
-                                              setState(() {
-                                                onChainNoteController.text = "";
-                                              });
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  )
-                                : null,
-                          ),
-                        ),
-                      ),
-                    if (coin == Coin.epicCash)
-                      const SizedBox(
-                        height: 12,
-                      ),
                     Text(
-                      (coin == Coin.epicCash)
-                          ? "Local Note (optional)"
-                          : "Note (optional)",
+                      "Note (optional)",
                       style:
                           STextStyles.desktopTextExtraSmall(context).copyWith(
                         color: Theme.of(context)

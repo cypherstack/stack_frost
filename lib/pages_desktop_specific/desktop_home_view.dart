@@ -11,8 +11,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stackfrost/pages_desktop_specific/address_book_view/desktop_address_book.dart';
-import 'package:stackfrost/pages_desktop_specific/desktop_buy/desktop_buy_view.dart';
-import 'package:stackfrost/pages_desktop_specific/desktop_exchange/desktop_exchange_view.dart';
 import 'package:stackfrost/pages_desktop_specific/desktop_menu.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/my_stack_view.dart';
 import 'package:stackfrost/pages_desktop_specific/notifications/desktop_notifications_view.dart';
@@ -62,16 +60,6 @@ class _DesktopHomeViewState extends ConsumerState<DesktopHomeView> {
         // onGenerateRoute: RouteGenerator.generateRoute,
         // initialRoute: MyStackView.routeName,
         ),
-    DesktopMenuItemId.exchange: const Navigator(
-      key: Key("desktopExchangeHomeKey"),
-      onGenerateRoute: RouteGenerator.generateRoute,
-      initialRoute: DesktopExchangeView.routeName,
-    ),
-    DesktopMenuItemId.buy: const Navigator(
-      key: Key("desktopBuyHomeKey"),
-      onGenerateRoute: RouteGenerator.generateRoute,
-      initialRoute: DesktopBuyView.routeName,
-    ),
     DesktopMenuItemId.notifications: const Navigator(
       key: Key("desktopNotificationsHomeKey"),
       onGenerateRoute: RouteGenerator.generateRoute,

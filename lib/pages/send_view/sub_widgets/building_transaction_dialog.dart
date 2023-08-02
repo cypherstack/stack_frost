@@ -12,14 +12,14 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:stackfrost/themes/coin_image_provider.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/utilities/enums/coin_enum.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
 import 'package:stackfrost/utilities/util.dart';
 import 'package:stackfrost/widgets/animated_widgets/rotating_arrows.dart';
 import 'package:stackfrost/widgets/desktop/secondary_button.dart';
 import 'package:stackfrost/widgets/stack_dialog.dart';
-import 'package:stackfrost/themes/coin_image_provider.dart';
-import 'package:stackfrost/themes/stack_colorsart';
 
 class BuildingTransactionDialog extends ConsumerStatefulWidget {
   const BuildingTransactionDialog({

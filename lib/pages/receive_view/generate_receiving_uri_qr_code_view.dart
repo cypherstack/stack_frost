@@ -159,10 +159,7 @@ class _GenerateUriQrCodeViewState extends State<GenerateUriQrCodeView> {
     }
 
     String receivingAddress = widget.receivingAddress;
-    if ((widget.coin == Coin.bitcoincash ||
-            widget.coin == Coin.eCash ||
-            widget.coin == Coin.bitcoincashTestnet) &&
-        receivingAddress.contains(":")) {
+    if (receivingAddress.contains(":")) {
       // remove cash addr prefix
       receivingAddress = receivingAddress.split(":").sublist(1).join();
     }
@@ -256,10 +253,7 @@ class _GenerateUriQrCodeViewState extends State<GenerateUriQrCodeView> {
     isDesktop = Util.isDesktop;
 
     String receivingAddress = widget.receivingAddress;
-    if ((widget.coin == Coin.bitcoincash ||
-            widget.coin == Coin.eCash ||
-            widget.coin == Coin.bitcoincashTestnet) &&
-        receivingAddress.contains(":")) {
+    if (receivingAddress.contains(":")) {
       // remove cash addr prefix
       receivingAddress = receivingAddress.split(":").sublist(1).join();
     }
