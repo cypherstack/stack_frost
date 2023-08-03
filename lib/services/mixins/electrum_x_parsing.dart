@@ -10,10 +10,8 @@
 
 import 'dart:convert';
 
-import 'package:bip47/src/util.dart';
 import 'package:decimal/decimal.dart';
 import 'package:stackfrost/models/isar/models/isar_models.dart';
-import 'package:stackfrost/services/mixins/paynym_wallet_interface.dart';
 import 'package:stackfrost/utilities/amount/amount.dart';
 import 'package:stackfrost/utilities/enums/coin_enum.dart';
 import 'package:tuple/tuple.dart';
@@ -234,20 +232,6 @@ mixin ElectrumXParsing {
     }
 
     TransactionSubType txSubType = TransactionSubType.none;
-    if (this is PaynymWalletInterface && outs.length > 1 && ins.isNotEmpty) {
-      for (int i = 0; i < outs.length; i++) {
-        List<String>? scriptChunks = outs[i].scriptPubKeyAsm?.split(" ");
-        if (scriptChunks?.length == 2 && scriptChunks?[0] == "OP_RETURN") {
-          final blindedPaymentCode = scriptChunks![1];
-          final bytes = blindedPaymentCode.fromHex;
-
-          // https://en.bitcoin.it/wiki/BIP_0047#Sending
-          if (bytes.length == 80 && bytes.first == 1) {
-            txSubType = TransactionSubType.bip47Notification;
-          }
-        }
-      }
-    }
 
     final tx = Transaction(
       walletId: walletId,

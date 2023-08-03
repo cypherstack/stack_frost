@@ -15,7 +15,6 @@ import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:stackfrost/models/paynym/paynym_account_lite.dart';
 import 'package:stackfrost/notifications/show_flush_bar.dart';
 import 'package:stackfrost/pages/pinpad_views/lock_screen_view.dart';
 import 'package:stackfrost/pages/send_view/sub_widgets/sending_transaction_dialog.dart';
@@ -24,7 +23,6 @@ import 'package:stackfrost/pages_desktop_specific/coin_control/desktop_coin_cont
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/desktop_auth_send.dart';
 import 'package:stackfrost/providers/providers.dart';
 import 'package:stackfrost/route_generator.dart';
-import 'package:stackfrost/services/mixins/paynym_wallet_interface.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/themes/theme_providers.dart';
 import 'package:stackfrost/utilities/amount/amount.dart';
@@ -53,9 +51,6 @@ class ConfirmTransactionView extends ConsumerStatefulWidget {
     required this.walletId,
     this.routeOnSuccessName = WalletView.routeName,
     this.isTradeTransaction = false,
-    this.isPaynymTransaction = false,
-    this.isPaynymNotificationTransaction = false,
-    this.isTokenTx = false,
     this.onSuccessInsteadOfRouteOnSuccess,
   }) : super(key: key);
 
@@ -65,9 +60,6 @@ class ConfirmTransactionView extends ConsumerStatefulWidget {
   final String walletId;
   final String routeOnSuccessName;
   final bool isTradeTransaction;
-  final bool isPaynymTransaction;
-  final bool isPaynymNotificationTransaction;
-  final bool isTokenTx;
   final VoidCallback? onSuccessInsteadOfRouteOnSuccess;
 
   @override
@@ -120,15 +112,8 @@ class _ConfirmTransactionViewState
     final note = noteController.text;
 
     try {
-      if (widget.isPaynymNotificationTransaction) {
-        txidFuture = (manager.wallet as PaynymWalletInterface)
-            .broadcastNotificationTx(preparedTx: transactionInfo);
-      } else if (widget.isPaynymTransaction) {
-        txidFuture = manager.confirmSend(txData: transactionInfo);
-      } else {
-        final coin = manager.coin;
-        txidFuture = manager.confirmSend(txData: transactionInfo);
-      }
+      final coin = manager.coin;
+      txidFuture = manager.confirmSend(txData: transactionInfo);
 
       final results = await Future.wait([
         txidFuture,
@@ -366,20 +351,14 @@ class _ConfirmTransactionViewState
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Text(
-                          widget.isPaynymTransaction
-                              ? "PayNym recipient"
-                              : "Recipient",
+                          "Recipient",
                           style: STextStyles.smallMed12(context),
                         ),
                         const SizedBox(
                           height: 4,
                         ),
                         Text(
-                          widget.isPaynymTransaction
-                              ? (transactionInfo["paynymAccountLite"]
-                                      as PaynymAccountLite)
-                                  .nymName
-                              : "${transactionInfo["address"] ?? "ERROR"}",
+                          "${transactionInfo["address"] ?? "ERROR"}",
                           style: STextStyles.itemSubtitle12(context),
                         ),
                       ],
@@ -664,9 +643,7 @@ class _ConfirmTransactionViewState
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              widget.isPaynymTransaction
-                                  ? "PayNym recipient"
-                                  : "Send to",
+                              "Send to",
                               style: STextStyles.desktopTextExtraExtraSmall(
                                   context),
                             ),
@@ -674,11 +651,7 @@ class _ConfirmTransactionViewState
                               height: 2,
                             ),
                             Text(
-                              widget.isPaynymTransaction
-                                  ? (transactionInfo["paynymAccountLite"]
-                                          as PaynymAccountLite)
-                                      .nymName
-                                  : "${transactionInfo["address"] ?? "ERROR"}",
+                              "${transactionInfo["address"] ?? "ERROR"}",
                               style: STextStyles.desktopTextExtraExtraSmall(
                                       context)
                                   .copyWith(
@@ -690,61 +663,6 @@ class _ConfirmTransactionViewState
                           ],
                         ),
                       ),
-                      if (widget.isPaynymTransaction)
-                        Container(
-                          height: 1,
-                          color: Theme.of(context)
-                              .extension<StackColors>()!
-                              .background,
-                        ),
-                      if (widget.isPaynymTransaction)
-                        Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Transaction fee",
-                                style: STextStyles.desktopTextExtraExtraSmall(
-                                    context),
-                              ),
-                              const SizedBox(
-                                height: 2,
-                              ),
-                              Builder(
-                                builder: (context) {
-                                  final coin = ref
-                                      .watch(walletsChangeNotifierProvider
-                                          .select((value) =>
-                                              value.getManager(walletId)))
-                                      .coin;
-
-                                  final fee = transactionInfo["fee"] is Amount
-                                      ? transactionInfo["fee"] as Amount
-                                      : (transactionInfo["fee"] as int)
-                                          .toAmountAsRaw(
-                                          fractionDigits: coin.decimals,
-                                        );
-
-                                  return Text(
-                                    ref
-                                        .watch(pAmountFormatter(coin))
-                                        .format(fee),
-                                    style:
-                                        STextStyles.desktopTextExtraExtraSmall(
-                                                context)
-                                            .copyWith(
-                                      color: Theme.of(context)
-                                          .extension<StackColors>()!
-                                          .textDark,
-                                    ),
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
                       // Container(
                       //   height: 1,
                       //   color: Theme.of(context)
@@ -864,7 +782,7 @@ class _ConfirmTransactionViewState
                   ],
                 ),
               ),
-            if (isDesktop && !widget.isPaynymTransaction)
+            if (isDesktop)
               Padding(
                 padding: const EdgeInsets.only(
                   left: 32,
@@ -874,7 +792,7 @@ class _ConfirmTransactionViewState
                   style: STextStyles.desktopTextExtraExtraSmall(context),
                 ),
               ),
-            if (isDesktop && !widget.isPaynymTransaction)
+            if (isDesktop)
               Padding(
                 padding: const EdgeInsets.only(
                   top: 10,
@@ -911,7 +829,6 @@ class _ConfirmTransactionViewState
                 ),
               ),
             if (isDesktop &&
-                !widget.isPaynymTransaction &&
                 transactionInfo["fee"] is int &&
                 transactionInfo["vSize"] is int)
               Padding(
@@ -924,7 +841,6 @@ class _ConfirmTransactionViewState
                 ),
               ),
             if (isDesktop &&
-                !widget.isPaynymTransaction &&
                 transactionInfo["fee"] is int &&
                 transactionInfo["vSize"] is int)
               Padding(
@@ -951,28 +867,51 @@ class _ConfirmTransactionViewState
             SizedBox(
               height: isDesktop ? 23 : 12,
             ),
-            if (!widget.isTokenTx)
-              Padding(
+            Padding(
+              padding: isDesktop
+                  ? const EdgeInsets.symmetric(
+                      horizontal: 32,
+                    )
+                  : const EdgeInsets.all(0),
+              child: RoundedContainer(
                 padding: isDesktop
                     ? const EdgeInsets.symmetric(
-                        horizontal: 32,
+                        horizontal: 16,
+                        vertical: 18,
                       )
-                    : const EdgeInsets.all(0),
-                child: RoundedContainer(
-                  padding: isDesktop
-                      ? const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 18,
-                        )
-                      : const EdgeInsets.all(12),
-                  color: Theme.of(context)
-                      .extension<StackColors>()!
-                      .snackBarBackSuccess,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        isDesktop ? "Total amount to send" : "Total amount",
+                    : const EdgeInsets.all(12),
+                color: Theme.of(context)
+                    .extension<StackColors>()!
+                    .snackBarBackSuccess,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      isDesktop ? "Total amount to send" : "Total amount",
+                      style: isDesktop
+                          ? STextStyles.desktopTextExtraExtraSmall(context)
+                              .copyWith(
+                              color: Theme.of(context)
+                                  .extension<StackColors>()!
+                                  .textConfirmTotalAmount,
+                            )
+                          : STextStyles.titleBold12(context).copyWith(
+                              color: Theme.of(context)
+                                  .extension<StackColors>()!
+                                  .textConfirmTotalAmount,
+                            ),
+                    ),
+                    Builder(builder: (context) {
+                      final coin = ref.watch(walletsChangeNotifierProvider
+                          .select((value) => value.getManager(walletId).coin));
+                      final fee = transactionInfo["fee"] is Amount
+                          ? transactionInfo["fee"] as Amount
+                          : (transactionInfo["fee"] as int)
+                              .toAmountAsRaw(fractionDigits: coin.decimals);
+
+                      final amount = transactionInfo["recipientAmt"] as Amount;
+                      return Text(
+                        ref.watch(pAmountFormatter(coin)).format(amount + fee),
                         style: isDesktop
                             ? STextStyles.desktopTextExtraExtraSmall(context)
                                 .copyWith(
@@ -980,46 +919,18 @@ class _ConfirmTransactionViewState
                                     .extension<StackColors>()!
                                     .textConfirmTotalAmount,
                               )
-                            : STextStyles.titleBold12(context).copyWith(
+                            : STextStyles.itemSubtitle12(context).copyWith(
                                 color: Theme.of(context)
                                     .extension<StackColors>()!
                                     .textConfirmTotalAmount,
                               ),
-                      ),
-                      Builder(builder: (context) {
-                        final coin = ref.watch(
-                            walletsChangeNotifierProvider.select(
-                                (value) => value.getManager(walletId).coin));
-                        final fee = transactionInfo["fee"] is Amount
-                            ? transactionInfo["fee"] as Amount
-                            : (transactionInfo["fee"] as int)
-                                .toAmountAsRaw(fractionDigits: coin.decimals);
-
-                        final amount =
-                            transactionInfo["recipientAmt"] as Amount;
-                        return Text(
-                          ref
-                              .watch(pAmountFormatter(coin))
-                              .format(amount + fee),
-                          style: isDesktop
-                              ? STextStyles.desktopTextExtraExtraSmall(context)
-                                  .copyWith(
-                                  color: Theme.of(context)
-                                      .extension<StackColors>()!
-                                      .textConfirmTotalAmount,
-                                )
-                              : STextStyles.itemSubtitle12(context).copyWith(
-                                  color: Theme.of(context)
-                                      .extension<StackColors>()!
-                                      .textConfirmTotalAmount,
-                                ),
-                          textAlign: TextAlign.right,
-                        );
-                      }),
-                    ],
-                  ),
+                        textAlign: TextAlign.right,
+                      );
+                    }),
+                  ],
                 ),
               ),
+            ),
             SizedBox(
               height: isDesktop ? 28 : 16,
             ),

@@ -426,7 +426,6 @@ class _SendViewState extends ConsumerState<SendView> {
             builder: (_) => ConfirmTransactionView(
               transactionInfo: txData,
               walletId: walletId,
-              isPaynymTransaction: isPaynymSend,
             ),
             settings: const RouteSettings(
               name: ConfirmTransactionView.routeName,

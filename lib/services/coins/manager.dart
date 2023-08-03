@@ -21,7 +21,6 @@ import 'package:stackfrost/services/event_bus/events/global/node_connection_stat
 import 'package:stackfrost/services/event_bus/events/global/updated_in_background_event.dart';
 import 'package:stackfrost/services/event_bus/global_event_bus.dart';
 import 'package:stackfrost/services/mixins/coin_control_interface.dart';
-import 'package:stackfrost/services/mixins/paynym_wallet_interface.dart';
 import 'package:stackfrost/services/mixins/xpubable.dart';
 import 'package:stackfrost/utilities/amount/amount.dart';
 import 'package:stackfrost/utilities/enums/coin_enum.dart';
@@ -239,8 +238,6 @@ class Manager with ChangeNotifier {
   }
 
   int get currentHeight => _currentWallet.storedChainHeight;
-
-  bool get hasPaynymSupport => _currentWallet is PaynymWalletInterface;
 
   bool get hasCoinControlSupport => _currentWallet is CoinControlInterface;
 

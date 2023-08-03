@@ -13,12 +13,6 @@ import 'package:stackfrost/utilities/constants.dart';
 
 enum Coin {
   bitcoin,
-
-  ///
-
-  ///
-  ///
-
   bitcoinTestNet,
 }
 
@@ -57,16 +51,6 @@ extension CoinExt on Coin {
       case Coin.bitcoin:
       case Coin.bitcoinTestNet:
         return true;
-    }
-  }
-
-  bool get hasBuySupport {
-    switch (this) {
-      case Coin.bitcoin:
-        return true;
-
-      case Coin.bitcoinTestNet:
-        return false;
     }
   }
 

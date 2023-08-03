@@ -37,7 +37,6 @@ import 'package:stackfrost/services/event_bus/events/global/wallet_sync_status_c
 import 'package:stackfrost/services/event_bus/global_event_bus.dart';
 import 'package:stackfrost/services/mixins/coin_control_interface.dart';
 import 'package:stackfrost/services/mixins/electrum_x_parsing.dart';
-import 'package:stackfrost/services/mixins/paynym_wallet_interface.dart';
 import 'package:stackfrost/services/mixins/wallet_cache.dart';
 import 'package:stackfrost/services/mixins/wallet_db.dart';
 import 'package:stackfrost/services/mixins/xpubable.dart';
@@ -54,7 +53,6 @@ import 'package:stackfrost/utilities/enums/fee_rate_type_enum.dart';
 import 'package:stackfrost/utilities/flutter_secure_storage_interface.dart';
 import 'package:stackfrost/utilities/format.dart';
 import 'package:stackfrost/utilities/logger.dart';
-import 'package:stackfrost/utilities/paynym_is_api.dart';
 import 'package:stackfrost/utilities/prefs.dart';
 import 'package:stackfrost/widgets/crypto_notifications.dart';
 import 'package:tuple/tuple.dart';
@@ -113,12 +111,7 @@ String constructDerivePath({
 }
 
 class BitcoinWallet extends CoinServiceAPI
-    with
-        WalletCache,
-        WalletDB,
-        ElectrumXParsing,
-        PaynymWalletInterface,
-        CoinControlInterface
+    with WalletCache, WalletDB, ElectrumXParsing, CoinControlInterface
     implements XPubAble {
   BitcoinWallet({
     required String walletId,
@@ -149,31 +142,6 @@ class BitcoinWallet extends CoinServiceAPI
         _balance = balance;
         await updateCachedBalance(_balance!);
       },
-    );
-    initPaynymWalletInterface(
-      walletId: walletId,
-      walletName: walletName,
-      network: _network,
-      coin: coin,
-      db: db,
-      electrumXClient: electrumXClient,
-      secureStorage: secureStore,
-      getMnemonicString: () => mnemonicString,
-      getMnemonicPassphrase: () => mnemonicPassphrase,
-      getChainHeight: () => chainHeight,
-      // getCurrentChangeAddress: () => currentChangeAddressP2PKH,
-      getCurrentChangeAddress: () => currentChangeAddress,
-      estimateTxFee: estimateTxFee,
-      prepareSend: prepareSend,
-      getTxCount: getTxCount,
-      fetchBuildTxData: fetchBuildTxData,
-      refresh: refresh,
-      checkChangeAddressForTransactions: _checkChangeAddressForTransactions,
-      // checkChangeAddressForTransactions:
-      //     _checkP2PKHChangeAddressForTransactions,
-      dustLimitP2PKH: DUST_LIMIT_P2PKH.raw.toInt(),
-      minConfirms: MINIMUM_CONFIRMATIONS,
-      dustLimit: DUST_LIMIT.raw.toInt(),
     );
   }
 
@@ -687,39 +655,26 @@ class BitcoinWallet extends CoinServiceAPI
         await db.putAddresses(addressesToStore);
       }
 
-      // get own payment code
-      // isSegwit does not matter here at all
-      final myCode = await getPaymentCode(isSegwit: false);
-
-      // refresh transactions to pick up any received notification transactions
-      await _refreshNotificationAddressTransactions();
-
-      try {
-        final Set<String> codesToCheck = {};
-        final nym = await PaynymIsApi().nym(myCode.toString());
-        if (nym.value != null) {
-          for (final follower in nym.value!.followers) {
-            codesToCheck.add(follower.code);
-          }
-          for (final following in nym.value!.following) {
-            codesToCheck.add(following.code);
-          }
-        }
-
-        // restore paynym transactions
-        await restoreAllHistory(
-          maxUnusedAddressGap: maxUnusedAddressGap,
-          maxNumberOfIndexesToCheck: maxNumberOfIndexesToCheck,
-          paymentCodeStrings: codesToCheck,
-        );
-      } catch (e, s) {
-        Logging.instance.log(
-          "Failed to check paynym.is followers/following for history during "
-          "bitcoin wallet ($walletId $walletName) "
-          "_recoverWalletFromBIP32SeedPhrase: $e/n$s",
-          level: LogLevel.Error,
-        );
-      }
+      // try {
+      //   final Set<String> codesToCheck = {};
+      //   final nym = await PaynymIsApi().nym(myCode.toString());
+      //   if (nym.value != null) {
+      //     for (final follower in nym.value!.followers) {
+      //       codesToCheck.add(follower.code);
+      //     }
+      //     for (final following in nym.value!.following) {
+      //       codesToCheck.add(following.code);
+      //     }
+      //   }
+      //
+      // } catch (e, s) {
+      //   Logging.instance.log(
+      //     "Failed to check paynym.is followers/following for history during "
+      //     "bitcoin wallet ($walletId $walletName) "
+      //     "_recoverWalletFromBIP32SeedPhrase: $e/n$s",
+      //     level: LogLevel.Error,
+      //   );
+      // }
 
       await Future.wait([
         _refreshTransactions(),
@@ -959,18 +914,7 @@ class BitcoinWallet extends CoinServiceAPI
       GlobalEventBus.instance.fire(RefreshPercentChangedEvent(0.0, walletId));
 
       GlobalEventBus.instance.fire(RefreshPercentChangedEvent(0.1, walletId));
-      // isSegwit does not matter here at all
-      final myCode = await getPaymentCode(isSegwit: false);
       final Set<String> codesToCheck = {};
-      final nym = await PaynymIsApi().nym(myCode.toString());
-      if (nym.value != null) {
-        for (final follower in nym.value!.followers) {
-          codesToCheck.add(follower.code);
-        }
-        for (final following in nym.value!.following) {
-          codesToCheck.add(following.code);
-        }
-      }
 
       final currentHeight = await chainHeight;
       const storedHeight = 1; //await storedChainHeight;
@@ -989,7 +933,6 @@ class BitcoinWallet extends CoinServiceAPI
         await _checkCurrentReceivingAddressesForTransactions();
 
         GlobalEventBus.instance.fire(RefreshPercentChangedEvent(0.4, walletId));
-        await checkAllCurrentReceivingPaynymAddressesForTransactions();
 
         final fetchFuture = _refreshTransactions();
         GlobalEventBus.instance
@@ -1007,7 +950,6 @@ class BitcoinWallet extends CoinServiceAPI
         GlobalEventBus.instance
             .fire(RefreshPercentChangedEvent(0.80, walletId));
 
-        await checkForNotificationTransactionsTo(codesToCheck);
         await _updateUTXOs();
         await getAllTxsToWatch();
         GlobalEventBus.instance
@@ -1325,10 +1267,6 @@ class BitcoinWallet extends CoinServiceAPI
 
     await _prefs.init();
 
-    // this will add the notification address to the db if it isn't
-    // already there for older wallets
-    await getMyNotificationAddress();
-
     // await _checkCurrentChangeAddressesForTransactions();
     // await _checkCurrentReceivingAddressesForTransactions();
   }
@@ -1552,10 +1490,6 @@ class BitcoinWallet extends CoinServiceAPI
       _generateAddressForChain(0, 0, DerivePathType.bip49),
       _generateAddressForChain(1, 0, DerivePathType.bip49),
     ]);
-
-    // this will add the notification address to the db if it isn't
-    // already there so it can be watched
-    await getMyNotificationAddress();
 
     await db.putAddresses(initialAddresses);
 
@@ -2097,59 +2031,59 @@ class BitcoinWallet extends CoinServiceAPI
     return false;
   }
 
-  Future<void> _refreshNotificationAddressTransactions() async {
-    final address = await getMyNotificationAddress();
-    final hashes = await _fetchHistory([address.value]);
-
-    List<Map<String, dynamic>> allTransactions = [];
-
-    final currentHeight = await chainHeight;
-
-    for (final txHash in hashes) {
-      final storedTx = await db
-          .getTransactions(walletId)
-          .filter()
-          .txidEqualTo(txHash["tx_hash"] as String)
-          .findFirst();
-
-      // TODO: remove bip47Notification type check sometime after Q2 2023
-      if (storedTx == null ||
-          storedTx.subType ==
-              isar_models.TransactionSubType.bip47Notification ||
-          !storedTx.isConfirmed(currentHeight, MINIMUM_CONFIRMATIONS)) {
-        final tx = await cachedElectrumXClient.getTransaction(
-          txHash: txHash["tx_hash"] as String,
-          verbose: true,
-          coin: coin,
-        );
-
-        tx["address"] = await db
-            .getAddresses(walletId)
-            .filter()
-            .valueEqualTo(txHash["address"] as String)
-            .findFirst();
-        tx["height"] = txHash["height"];
-        allTransactions.add(tx);
-      }
-    }
-
-    final List<Tuple2<isar_models.Transaction, isar_models.Address?>> txnsData =
-        [];
-
-    for (final txObject in allTransactions) {
-      final data = await parseTransaction(
-        txObject,
-        cachedElectrumXClient,
-        [address],
-        coin,
-        MINIMUM_CONFIRMATIONS,
-        walletId,
-      );
-
-      txnsData.add(data);
-    }
-    await db.addNewTransactionData(txnsData, walletId);
-  }
+  // Future<void> _refreshNotificationAddressTransactions() async {
+  //   final address = await getMyNotificationAddress();
+  //   final hashes = await _fetchHistory([address.value]);
+  //
+  //   List<Map<String, dynamic>> allTransactions = [];
+  //
+  //   final currentHeight = await chainHeight;
+  //
+  //   for (final txHash in hashes) {
+  //     final storedTx = await db
+  //         .getTransactions(walletId)
+  //         .filter()
+  //         .txidEqualTo(txHash["tx_hash"] as String)
+  //         .findFirst();
+  //
+  //     // TODO: remove bip47Notification type check sometime after Q2 2023
+  //     if (storedTx == null ||
+  //         storedTx.subType ==
+  //             isar_models.TransactionSubType.bip47Notification ||
+  //         !storedTx.isConfirmed(currentHeight, MINIMUM_CONFIRMATIONS)) {
+  //       final tx = await cachedElectrumXClient.getTransaction(
+  //         txHash: txHash["tx_hash"] as String,
+  //         verbose: true,
+  //         coin: coin,
+  //       );
+  //
+  //       tx["address"] = await db
+  //           .getAddresses(walletId)
+  //           .filter()
+  //           .valueEqualTo(txHash["address"] as String)
+  //           .findFirst();
+  //       tx["height"] = txHash["height"];
+  //       allTransactions.add(tx);
+  //     }
+  //   }
+  //
+  //   final List<Tuple2<isar_models.Transaction, isar_models.Address?>> txnsData =
+  //       [];
+  //
+  //   for (final txObject in allTransactions) {
+  //     final data = await parseTransaction(
+  //       txObject,
+  //       cachedElectrumXClient,
+  //       [address],
+  //       coin,
+  //       MINIMUM_CONFIRMATIONS,
+  //       walletId,
+  //     );
+  //
+  //     txnsData.add(data);
+  //   }
+  //   await db.addNewTransactionData(txnsData, walletId);
+  // }
 
   Future<void> _refreshTransactions() async {
     final List<isar_models.Address> allAddresses =
@@ -2696,35 +2630,12 @@ class BitcoinWallet extends CoinServiceAPI
         final address = await db.getAddress(walletId, sd.utxo.address!);
         if (address?.derivationPath != null) {
           final bip32.BIP32 node;
-          if (address!.subType == isar_models.AddressSubType.paynymReceive) {
-            final code = await paymentCodeStringByKey(address.otherData!);
-
-            final bip47base = await getBip47BaseNode();
-
-            final privateKey = await getPrivateKeyForPaynymReceivingAddress(
-              paymentCodeString: code!,
-              index: address.derivationIndex,
-            );
-
-            node = bip32.BIP32.fromPrivateKey(
-              privateKey,
-              bip47base.chainCode,
-              bip32.NetworkType(
-                wif: _network.wif,
-                bip32: bip32.Bip32Type(
-                  public: _network.bip32.public,
-                  private: _network.bip32.private,
-                ),
-              ),
-            );
-          } else {
-            node = await Bip32Utils.getBip32Node(
-              (await mnemonicString)!,
-              (await mnemonicPassphrase)!,
-              _network,
-              address.derivationPath!.value,
-            );
-          }
+          node = await Bip32Utils.getBip32Node(
+            (await mnemonicString)!,
+            (await mnemonicPassphrase)!,
+            _network,
+            address!.derivationPath!.value,
+          );
 
           wif = node.toWIF();
           pubKey = Format.uint8listToString(node.publicKey);

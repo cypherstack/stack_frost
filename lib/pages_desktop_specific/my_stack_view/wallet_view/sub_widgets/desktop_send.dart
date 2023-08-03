@@ -308,7 +308,6 @@ class _DesktopSendState extends ConsumerState<DesktopSend> {
               child: ConfirmTransactionView(
                 transactionInfo: txData,
                 walletId: walletId,
-                isPaynymTransaction: isPaynymSend,
                 routeOnSuccessName: DesktopHomeView.routeName,
               ),
             ),
