@@ -13,34 +13,34 @@ import 'package:bitcoindart/bitcoindart.dart' as _i14;
 import 'package:flutter/foundation.dart' as _i4;
 import 'package:flutter_riverpod/flutter_riverpod.dart' as _i5;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:stackwallet/db/isar/main_db.dart' as _i13;
-import 'package:stackwallet/electrumx_rpc/cached_electrumx.dart' as _i11;
-import 'package:stackwallet/electrumx_rpc/electrumx.dart' as _i10;
-import 'package:stackwallet/models/balance.dart' as _i12;
-import 'package:stackwallet/models/isar/models/isar_models.dart' as _i18;
-import 'package:stackwallet/models/isar/stack_theme.dart' as _i33;
-import 'package:stackwallet/models/node_model.dart' as _i26;
-import 'package:stackwallet/models/paymint/fee_object_model.dart' as _i9;
-import 'package:stackwallet/models/signing_data.dart' as _i29;
-import 'package:stackwallet/services/coins/bitcoin/bitcoin_wallet.dart' as _i27;
-import 'package:stackwallet/services/coins/coin_service.dart' as _i20;
-import 'package:stackwallet/services/coins/manager.dart' as _i6;
-import 'package:stackwallet/services/locale_service.dart' as _i31;
-import 'package:stackwallet/services/node_service.dart' as _i3;
-import 'package:stackwallet/services/transaction_notification_tracker.dart'
+import 'package:stackfrost/db/isar/main_db.dart' as _i13;
+import 'package:stackfrost/electrumx_rpc/cached_electrumx.dart' as _i11;
+import 'package:stackfrost/electrumx_rpc/electrumx.dart' as _i10;
+import 'package:stackfrost/models/balance.dart' as _i12;
+import 'package:stackfrost/models/isar/models/isar_models.dart' as _i18;
+import 'package:stackfrost/models/isar/stack_theme.dart' as _i33;
+import 'package:stackfrost/models/node_model.dart' as _i26;
+import 'package:stackfrost/models/paymint/fee_object_model.dart' as _i9;
+import 'package:stackfrost/models/signing_data.dart' as _i29;
+import 'package:stackfrost/services/coins/bitcoin/bitcoin_wallet.dart' as _i27;
+import 'package:stackfrost/services/coins/coin_service.dart' as _i20;
+import 'package:stackfrost/services/coins/manager.dart' as _i6;
+import 'package:stackfrost/services/locale_service.dart' as _i31;
+import 'package:stackfrost/services/node_service.dart' as _i3;
+import 'package:stackfrost/services/transaction_notification_tracker.dart'
     as _i8;
-import 'package:stackwallet/services/wallets.dart' as _i21;
-import 'package:stackwallet/services/wallets_service.dart' as _i2;
-import 'package:stackwallet/themes/theme_service.dart' as _i32;
-import 'package:stackwallet/utilities/amount/amount.dart' as _i15;
-import 'package:stackwallet/utilities/amount/amount_unit.dart' as _i36;
-import 'package:stackwallet/utilities/enums/backup_frequency_type.dart' as _i35;
-import 'package:stackwallet/utilities/enums/coin_enum.dart' as _i22;
-import 'package:stackwallet/utilities/enums/derive_path_type_enum.dart' as _i28;
-import 'package:stackwallet/utilities/enums/sync_type_enum.dart' as _i34;
-import 'package:stackwallet/utilities/flutter_secure_storage_interface.dart'
+import 'package:stackfrost/services/wallets.dart' as _i21;
+import 'package:stackfrost/services/wallets_service.dart' as _i2;
+import 'package:stackfrost/themes/theme_service.dart' as _i32;
+import 'package:stackfrost/utilities/amount/amount.dart' as _i15;
+import 'package:stackfrost/utilities/amount/amount_unit.dart' as _i36;
+import 'package:stackfrost/utilities/enums/backup_frequency_type.dart' as _i35;
+import 'package:stackfrost/utilities/enums/coin_enum.dart' as _i22;
+import 'package:stackfrost/utilities/enums/derive_path_type_enum.dart' as _i28;
+import 'package:stackfrost/utilities/enums/sync_type_enum.dart' as _i34;
+import 'package:stackfrost/utilities/flutter_secure_storage_interface.dart'
     as _i7;
-import 'package:stackwallet/utilities/prefs.dart' as _i24;
+import 'package:stackfrost/utilities/prefs.dart' as _i24;
 import 'package:tuple/tuple.dart' as _i16;
 
 // ignore_for_file: type=lint

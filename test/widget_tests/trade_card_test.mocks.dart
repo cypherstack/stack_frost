@@ -7,9 +7,9 @@ import 'dart:async' as _i5;
 import 'dart:typed_data' as _i6;
 
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:stackwallet/db/isar/main_db.dart' as _i2;
-import 'package:stackwallet/models/isar/stack_theme.dart' as _i4;
-import 'package:stackwallet/themes/theme_service.dart' as _i3;
+import 'package:stackfrost/db/isar/main_db.dart' as _i2;
+import 'package:stackfrost/models/isar/stack_theme.dart' as _i4;
+import 'package:stackfrost/themes/theme_service.dart' as _i3;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values

@@ -5,12 +5,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-import 'package:stackwallet/exceptions/exchange/exchange_exception.dart';
-import 'package:stackwallet/models/exchange/change_now/exchange_transaction.dart';
-import 'package:stackwallet/models/exchange/change_now/exchange_transaction_status.dart';
-import 'package:stackwallet/models/exchange/response_objects/estimate.dart';
-import 'package:stackwallet/models/isar/exchange_cache/pair.dart';
-import 'package:stackwallet/services/exchange/change_now/change_now_api.dart';
+import 'package:stackfrost/exceptions/exchange/exchange_exception.dart';
+import 'package:stackfrost/models/exchange/change_now/exchange_transaction.dart';
+import 'package:stackfrost/models/exchange/change_now/exchange_transaction_status.dart';
+import 'package:stackfrost/models/exchange/response_objects/estimate.dart';
+import 'package:stackfrost/models/isar/exchange_cache/pair.dart';
+import 'package:stackfrost/services/exchange/change_now/change_now_api.dart';
 
 import 'change_now_sample_data.dart';
 import 'change_now_test.mocks.dart';

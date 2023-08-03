@@ -3,16 +3,16 @@
 // import 'package:mockingjay/mockingjay.dart' as mockingjay;
 import 'package:mockito/annotations.dart';
 // import 'package:mockito/mockito.dart';
-// import 'package:stackwallet/pages/onboarding_view/create_pin_view.dart';
-// import 'package:stackwallet/pages/onboarding_view/helpers/create_wallet_type.dart';
-import 'package:stackwallet/services/coins/manager.dart';
-import 'package:stackwallet/services/node_service.dart';
-import 'package:stackwallet/services/wallets_service.dart';
-// import 'package:stackwallet/utilities/flutter_secure_storage_interface.dart';
-// import 'package:stackwallet/utilities/misc_global_constants.dart';
-// import 'package:stackwallet/widgets/custom_buttons/gradient_button.dart';
-// import 'package:stackwallet/widgets/custom_pin_put/custom_pin_put.dart';
-// import 'package:stackwallet/widgets/custom_pin_put/pin_keyboard.dart';
+// import 'package:stackfrost/pages/onboarding_view/create_pin_view.dart';
+// import 'package:stackfrost/pages/onboarding_view/helpers/create_wallet_type.dart';
+import 'package:stackfrost/services/coins/manager.dart';
+import 'package:stackfrost/services/node_service.dart';
+import 'package:stackfrost/services/wallets_service.dart';
+// import 'package:stackfrost/utilities/flutter_secure_storage_interface.dart';
+// import 'package:stackfrost/utilities/misc_global_constants.dart';
+// import 'package:stackfrost/widgets/custom_buttons/gradient_button.dart';
+// import 'package:stackfrost/widgets/custom_pin_put/custom_pin_put.dart';
+// import 'package:stackfrost/widgets/custom_pin_put/pin_keyboard.dart';
 // import 'package:provider/provider.dart';
 //
 // import 'create_pin_view_screen_test.mocks.dart';

@@ -4,14 +4,14 @@
 // import 'package:mockingjay/mockingjay.dart' as mockingjay;
 import 'package:mockito/annotations.dart';
 // import 'package:mockito/mockito.dart';
-// import 'package:stackwallet/notifications/campfire_alert.dart';
-// import 'package:stackwallet/notifications/modal_popup_dialog.dart';
-// import 'package:stackwallet/pages/settings_view/settings_subviews/network_settings_subviews/node_details_view.dart';
-import 'package:stackwallet/services/coins/manager.dart';
-import 'package:stackwallet/services/node_service.dart';
-// import 'package:stackwallet/widgets/custom_buttons/app_bar_icon_button.dart';
-// import 'package:stackwallet/widgets/custom_buttons/gradient_button.dart';
-// import 'package:stackwallet/widgets/custom_buttons/simple_button.dart';
+// import 'package:stackfrost/notifications/campfire_alert.dart';
+// import 'package:stackfrost/notifications/modal_popup_dialog.dart';
+// import 'package:stackfrost/pages/settings_view/settings_subviews/network_settings_subviews/node_details_view.dart';
+import 'package:stackfrost/services/coins/manager.dart';
+import 'package:stackfrost/services/node_service.dart';
+// import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
+// import 'package:stackfrost/widgets/custom_buttons/gradient_button.dart';
+// import 'package:stackfrost/widgets/custom_buttons/simple_button.dart';
 // import 'package:provider/provider.dart';
 //
 // import 'node_details_view_screen_test.mocks.dart';

@@ -8,16 +8,16 @@ import 'dart:ui' as _i11;
 
 import 'package:barcode_scan2/barcode_scan2.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:stackwallet/models/balance.dart' as _i6;
-import 'package:stackwallet/models/isar/models/contact_entry.dart' as _i3;
-import 'package:stackwallet/models/isar/models/isar_models.dart' as _i14;
-import 'package:stackwallet/models/models.dart' as _i5;
-import 'package:stackwallet/services/address_book_service.dart' as _i10;
-import 'package:stackwallet/services/coins/coin_service.dart' as _i4;
-import 'package:stackwallet/services/coins/manager.dart' as _i12;
-import 'package:stackwallet/utilities/amount/amount.dart' as _i7;
-import 'package:stackwallet/utilities/barcode_scanner_interface.dart' as _i8;
-import 'package:stackwallet/utilities/enums/coin_enum.dart' as _i13;
+import 'package:stackfrost/models/balance.dart' as _i6;
+import 'package:stackfrost/models/isar/models/contact_entry.dart' as _i3;
+import 'package:stackfrost/models/isar/models/isar_models.dart' as _i14;
+import 'package:stackfrost/models/models.dart' as _i5;
+import 'package:stackfrost/services/address_book_service.dart' as _i10;
+import 'package:stackfrost/services/coins/coin_service.dart' as _i4;
+import 'package:stackfrost/services/coins/manager.dart' as _i12;
+import 'package:stackfrost/utilities/amount/amount.dart' as _i7;
+import 'package:stackfrost/utilities/barcode_scanner_interface.dart' as _i8;
+import 'package:stackfrost/utilities/enums/coin_enum.dart' as _i13;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values

@@ -3,12 +3,12 @@
 // import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 // import 'package:mockito/mockito.dart';
-// import 'package:stackwallet/models/lelantus_fee_data.dart';
-// import 'package:stackwallet/pages/main_view.dart';
-import 'package:stackwallet/services/coins/manager.dart';
-import 'package:stackwallet/services/locale_service.dart';
-import 'package:stackwallet/services/notes_service.dart';
-import 'package:stackwallet/services/wallets_service.dart';
+// import 'package:stackfrost/models/lelantus_fee_data.dart';
+// import 'package:stackfrost/pages/main_view.dart';
+import 'package:stackfrost/services/coins/manager.dart';
+import 'package:stackfrost/services/locale_service.dart';
+import 'package:stackfrost/services/notes_service.dart';
+import 'package:stackfrost/services/wallets_service.dart';
 // import 'package:provider/provider.dart';
 //
 // import '../../sample_data/transaction_data_samples.dart';

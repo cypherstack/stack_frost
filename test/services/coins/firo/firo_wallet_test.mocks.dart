@@ -8,15 +8,15 @@ import 'dart:async' as _i5;
 import 'package:decimal/decimal.dart' as _i2;
 import 'package:isar/isar.dart' as _i4;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:stackwallet/db/isar/main_db.dart' as _i9;
-import 'package:stackwallet/electrumx_rpc/cached_electrumx.dart' as _i6;
-import 'package:stackwallet/electrumx_rpc/electrumx.dart' as _i3;
-import 'package:stackwallet/models/isar/models/block_explorer.dart' as _i11;
-import 'package:stackwallet/models/isar/models/contact_entry.dart' as _i10;
-import 'package:stackwallet/models/isar/models/isar_models.dart' as _i12;
-import 'package:stackwallet/services/transaction_notification_tracker.dart'
+import 'package:stackfrost/db/isar/main_db.dart' as _i9;
+import 'package:stackfrost/electrumx_rpc/cached_electrumx.dart' as _i6;
+import 'package:stackfrost/electrumx_rpc/electrumx.dart' as _i3;
+import 'package:stackfrost/models/isar/models/block_explorer.dart' as _i11;
+import 'package:stackfrost/models/isar/models/contact_entry.dart' as _i10;
+import 'package:stackfrost/models/isar/models/isar_models.dart' as _i12;
+import 'package:stackfrost/services/transaction_notification_tracker.dart'
     as _i8;
-import 'package:stackwallet/utilities/enums/coin_enum.dart' as _i7;
+import 'package:stackfrost/utilities/enums/coin_enum.dart' as _i7;
 import 'package:tuple/tuple.dart' as _i13;
 
 // ignore_for_file: type=lint

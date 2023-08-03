@@ -1,10 +1,10 @@
-import 'package:stackwallet/models/balance.dart';
-import 'package:stackwallet/models/isar/models/blockchain_data/transaction.dart';
-import 'package:stackwallet/models/isar/models/blockchain_data/utxo.dart';
-import 'package:stackwallet/models/paymint/fee_object_model.dart';
-import 'package:stackwallet/services/coins/coin_service.dart';
-import 'package:stackwallet/utilities/amount/amount.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/models/balance.dart';
+import 'package:stackfrost/models/isar/models/blockchain_data/transaction.dart';
+import 'package:stackfrost/models/isar/models/blockchain_data/utxo.dart';
+import 'package:stackfrost/models/paymint/fee_object_model.dart';
+import 'package:stackfrost/services/coins/coin_service.dart';
+import 'package:stackfrost/utilities/amount/amount.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
 
 class FakeCoinServiceAPI extends CoinServiceAPI {
   @override

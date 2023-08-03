@@ -9,32 +9,30 @@ import 'dart:ui' as _i9;
 import 'package:decimal/decimal.dart' as _i16;
 import 'package:http/http.dart' as _i14;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:stackwallet/models/exchange/change_now/cn_exchange_estimate.dart'
+import 'package:stackfrost/models/exchange/change_now/cn_exchange_estimate.dart'
     as _i19;
-import 'package:stackwallet/models/exchange/change_now/exchange_transaction.dart'
+import 'package:stackfrost/models/exchange/change_now/exchange_transaction.dart'
     as _i21;
-import 'package:stackwallet/models/exchange/change_now/exchange_transaction_status.dart'
+import 'package:stackfrost/models/exchange/change_now/exchange_transaction_status.dart'
     as _i22;
-import 'package:stackwallet/models/exchange/response_objects/estimate.dart'
+import 'package:stackfrost/models/exchange/response_objects/estimate.dart'
     as _i18;
-import 'package:stackwallet/models/exchange/response_objects/fixed_rate_market.dart'
+import 'package:stackfrost/models/exchange/response_objects/fixed_rate_market.dart'
     as _i20;
-import 'package:stackwallet/models/exchange/response_objects/range.dart'
-    as _i17;
-import 'package:stackwallet/models/exchange/response_objects/trade.dart'
-    as _i11;
-import 'package:stackwallet/models/isar/exchange_cache/currency.dart' as _i15;
-import 'package:stackwallet/models/isar/exchange_cache/pair.dart' as _i23;
-import 'package:stackwallet/services/exchange/change_now/change_now_api.dart'
+import 'package:stackfrost/models/exchange/response_objects/range.dart' as _i17;
+import 'package:stackfrost/models/exchange/response_objects/trade.dart' as _i11;
+import 'package:stackfrost/models/isar/exchange_cache/currency.dart' as _i15;
+import 'package:stackfrost/models/isar/exchange_cache/pair.dart' as _i23;
+import 'package:stackfrost/services/exchange/change_now/change_now_api.dart'
     as _i13;
-import 'package:stackwallet/services/exchange/exchange_response.dart' as _i2;
-import 'package:stackwallet/services/trade_notes_service.dart' as _i12;
-import 'package:stackwallet/services/trade_service.dart' as _i10;
-import 'package:stackwallet/utilities/amount/amount_unit.dart' as _i7;
-import 'package:stackwallet/utilities/enums/backup_frequency_type.dart' as _i5;
-import 'package:stackwallet/utilities/enums/coin_enum.dart' as _i8;
-import 'package:stackwallet/utilities/enums/sync_type_enum.dart' as _i4;
-import 'package:stackwallet/utilities/prefs.dart' as _i3;
+import 'package:stackfrost/services/exchange/exchange_response.dart' as _i2;
+import 'package:stackfrost/services/trade_notes_service.dart' as _i12;
+import 'package:stackfrost/services/trade_service.dart' as _i10;
+import 'package:stackfrost/utilities/amount/amount_unit.dart' as _i7;
+import 'package:stackfrost/utilities/enums/backup_frequency_type.dart' as _i5;
+import 'package:stackfrost/utilities/enums/coin_enum.dart' as _i8;
+import 'package:stackfrost/utilities/enums/sync_type_enum.dart' as _i4;
+import 'package:stackfrost/utilities/prefs.dart' as _i3;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -1029,8 +1027,8 @@ class MockChangeNowAPI extends _i1.Mock implements _i13.ChangeNowAPI {
               [],
               {#apiKey: apiKey},
             ),
-            returnValue: _i6
-                .Future<_i2.ExchangeResponse<List<_i20.FixedRateMarket>>>.value(
+            returnValue: _i6.Future<
+                    _i2.ExchangeResponse<List<_i20.FixedRateMarket>>>.value(
                 _FakeExchangeResponse_0<List<_i20.FixedRateMarket>>(
               this,
               Invocation.method(
@@ -1071,8 +1069,8 @@ class MockChangeNowAPI extends _i1.Mock implements _i13.ChangeNowAPI {
                 #apiKey: apiKey,
               },
             ),
-            returnValue: _i6
-                .Future<_i2.ExchangeResponse<_i21.ExchangeTransaction>>.value(
+            returnValue: _i6.Future<
+                    _i2.ExchangeResponse<_i21.ExchangeTransaction>>.value(
                 _FakeExchangeResponse_0<_i21.ExchangeTransaction>(
               this,
               Invocation.method(
@@ -1128,8 +1126,8 @@ class MockChangeNowAPI extends _i1.Mock implements _i13.ChangeNowAPI {
                 #apiKey: apiKey,
               },
             ),
-            returnValue: _i6
-                .Future<_i2.ExchangeResponse<_i21.ExchangeTransaction>>.value(
+            returnValue: _i6.Future<
+                    _i2.ExchangeResponse<_i21.ExchangeTransaction>>.value(
                 _FakeExchangeResponse_0<_i21.ExchangeTransaction>(
               this,
               Invocation.method(
@@ -1153,35 +1151,35 @@ class MockChangeNowAPI extends _i1.Mock implements _i13.ChangeNowAPI {
             )),
           ) as _i6.Future<_i2.ExchangeResponse<_i21.ExchangeTransaction>>);
   @override
-  _i6.Future<
-      _i2
-      .ExchangeResponse<_i22.ExchangeTransactionStatus>> getTransactionStatus({
+  _i6.Future<_i2.ExchangeResponse<_i22.ExchangeTransactionStatus>>
+      getTransactionStatus({
     required String? id,
     String? apiKey,
   }) =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #getTransactionStatus,
-          [],
-          {
-            #id: id,
-            #apiKey: apiKey,
-          },
-        ),
-        returnValue: _i6
-            .Future<_i2.ExchangeResponse<_i22.ExchangeTransactionStatus>>.value(
-            _FakeExchangeResponse_0<_i22.ExchangeTransactionStatus>(
-          this,
-          Invocation.method(
-            #getTransactionStatus,
-            [],
-            {
-              #id: id,
-              #apiKey: apiKey,
-            },
-          ),
-        )),
-      ) as _i6.Future<_i2.ExchangeResponse<_i22.ExchangeTransactionStatus>>);
+          (super.noSuchMethod(
+            Invocation.method(
+              #getTransactionStatus,
+              [],
+              {
+                #id: id,
+                #apiKey: apiKey,
+              },
+            ),
+            returnValue: _i6.Future<
+                    _i2.ExchangeResponse<_i22.ExchangeTransactionStatus>>.value(
+                _FakeExchangeResponse_0<_i22.ExchangeTransactionStatus>(
+              this,
+              Invocation.method(
+                #getTransactionStatus,
+                [],
+                {
+                  #id: id,
+                  #apiKey: apiKey,
+                },
+              ),
+            )),
+          ) as _i6
+              .Future<_i2.ExchangeResponse<_i22.ExchangeTransactionStatus>>);
   @override
   _i6.Future<_i2.ExchangeResponse<List<_i23.Pair>>>
       getAvailableFloatingRatePairs({bool? includePartners = false}) =>

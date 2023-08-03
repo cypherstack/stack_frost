@@ -7,13 +7,13 @@ import 'dart:async' as _i8;
 import 'dart:ui' as _i10;
 
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:stackwallet/models/balance.dart' as _i4;
-import 'package:stackwallet/models/isar/models/isar_models.dart' as _i9;
-import 'package:stackwallet/models/models.dart' as _i3;
-import 'package:stackwallet/services/coins/coin_service.dart' as _i2;
-import 'package:stackwallet/services/coins/manager.dart' as _i6;
-import 'package:stackwallet/utilities/amount/amount.dart' as _i5;
-import 'package:stackwallet/utilities/enums/coin_enum.dart' as _i7;
+import 'package:stackfrost/models/balance.dart' as _i4;
+import 'package:stackfrost/models/isar/models/isar_models.dart' as _i9;
+import 'package:stackfrost/models/models.dart' as _i3;
+import 'package:stackfrost/services/coins/coin_service.dart' as _i2;
+import 'package:stackfrost/services/coins/manager.dart' as _i6;
+import 'package:stackfrost/utilities/amount/amount.dart' as _i5;
+import 'package:stackfrost/utilities/enums/coin_enum.dart' as _i7;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values

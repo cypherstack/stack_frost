@@ -4,12 +4,12 @@ import 'package:flutter_svg/svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-import 'package:stackwallet/models/isar/stack_theme.dart';
-import 'package:stackwallet/models/notification_model.dart';
-import 'package:stackwallet/notifications/notification_card.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/themes/theme_service.dart';
-import 'package:stackwallet/utilities/assets.dart';
+import 'package:stackfrost/models/isar/stack_theme.dart';
+import 'package:stackfrost/models/notification_model.dart';
+import 'package:stackfrost/notifications/notification_card.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/themes/theme_service.dart';
+import 'package:stackfrost/utilities/assets.dart';
 
 import '../sample_data/theme_json.dart';
 import 'notification_card_test.mocks.dart';

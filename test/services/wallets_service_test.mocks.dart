@@ -7,7 +7,7 @@ import 'dart:async' as _i3;
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart' as _i4;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:stackwallet/utilities/flutter_secure_storage_interface.dart'
+import 'package:stackfrost/utilities/flutter_secure_storage_interface.dart'
     as _i2;
 
 // ignore_for_file: type=lint

@@ -7,17 +7,17 @@ import 'dart:async' as _i8;
 import 'dart:ui' as _i10;
 
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:stackwallet/models/balance.dart' as _i5;
-import 'package:stackwallet/models/isar/models/isar_models.dart' as _i14;
-import 'package:stackwallet/models/models.dart' as _i4;
-import 'package:stackwallet/models/node_model.dart' as _i12;
-import 'package:stackwallet/services/coins/coin_service.dart' as _i3;
-import 'package:stackwallet/services/coins/manager.dart' as _i13;
-import 'package:stackwallet/services/node_service.dart' as _i11;
-import 'package:stackwallet/services/wallets_service.dart' as _i7;
-import 'package:stackwallet/utilities/amount/amount.dart' as _i6;
-import 'package:stackwallet/utilities/enums/coin_enum.dart' as _i9;
-import 'package:stackwallet/utilities/flutter_secure_storage_interface.dart'
+import 'package:stackfrost/models/balance.dart' as _i5;
+import 'package:stackfrost/models/isar/models/isar_models.dart' as _i14;
+import 'package:stackfrost/models/models.dart' as _i4;
+import 'package:stackfrost/models/node_model.dart' as _i12;
+import 'package:stackfrost/services/coins/coin_service.dart' as _i3;
+import 'package:stackfrost/services/coins/manager.dart' as _i13;
+import 'package:stackfrost/services/node_service.dart' as _i11;
+import 'package:stackfrost/services/wallets_service.dart' as _i7;
+import 'package:stackfrost/utilities/amount/amount.dart' as _i6;
+import 'package:stackfrost/utilities/enums/coin_enum.dart' as _i9;
+import 'package:stackfrost/utilities/flutter_secure_storage_interface.dart'
     as _i2;
 
 // ignore_for_file: type=lint

@@ -7,10 +7,10 @@ import 'dart:async' as _i5;
 import 'dart:ui' as _i7;
 
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:stackwallet/models/node_model.dart' as _i4;
-import 'package:stackwallet/services/node_service.dart' as _i3;
-import 'package:stackwallet/utilities/enums/coin_enum.dart' as _i6;
-import 'package:stackwallet/utilities/flutter_secure_storage_interface.dart'
+import 'package:stackfrost/models/node_model.dart' as _i4;
+import 'package:stackfrost/services/node_service.dart' as _i3;
+import 'package:stackfrost/utilities/enums/coin_enum.dart' as _i6;
+import 'package:stackfrost/utilities/flutter_secure_storage_interface.dart'
     as _i2;
 
 // ignore_for_file: type=lint
