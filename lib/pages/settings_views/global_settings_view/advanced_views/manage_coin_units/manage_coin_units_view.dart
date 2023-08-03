@@ -44,9 +44,7 @@ class ManageCoinUnitsView extends ConsumerWidget {
     );
 
     // todo: a change from e != Coin.firoTestnet
-    final _coins = Coin.values
-        .where((e) => e == Coin.bitcoin || e == Coin.bitcoinTestNet)
-        .toList();
+    final _coins = Coin.values.toList();
 
     List<Coin> coins = showTestNet
         ? _coins

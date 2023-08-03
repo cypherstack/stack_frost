@@ -14,7 +14,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:stackfrost/pages/home_view/sub_widgets/home_view_button_bar.dart';
 import 'package:stackfrost/pages/notification_views/notifications_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/global_settings_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/hidden_settings.dart';
@@ -25,7 +24,6 @@ import 'package:stackfrost/providers/ui/unread_notifications_provider.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/themes/theme_providers.dart';
 import 'package:stackfrost/utilities/assets.dart';
-import 'package:stackfrost/utilities/constants.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
 import 'package:stackfrost/widgets/animated_widgets/rotate_icon.dart';
 import 'package:stackfrost/widgets/background.dart';
@@ -314,33 +312,33 @@ class _HomeViewState extends ConsumerState<HomeView> {
           ),
           body: Column(
             children: [
-              if (Constants.enableExchange)
-                Container(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context)
-                        .extension<StackColors>()!
-                        .backgroundAppBar,
-                    boxShadow: Theme.of(context)
-                                .extension<StackColors>()!
-                                .homeViewButtonBarBoxShadow !=
-                            null
-                        ? [
-                            Theme.of(context)
-                                .extension<StackColors>()!
-                                .homeViewButtonBarBoxShadow!,
-                          ]
-                        : null,
-                  ),
-                  child: const Padding(
-                    padding: EdgeInsets.only(
-                      left: 16,
-                      bottom: 12,
-                      right: 16,
-                      top: 0,
-                    ),
-                    child: HomeViewButtonBar(),
-                  ),
-                ),
+              // if (Constants.enableExchange)
+              //   Container(
+              //     decoration: BoxDecoration(
+              //       color: Theme.of(context)
+              //           .extension<StackColors>()!
+              //           .backgroundAppBar,
+              //       boxShadow: Theme.of(context)
+              //                   .extension<StackColors>()!
+              //                   .homeViewButtonBarBoxShadow !=
+              //               null
+              //           ? [
+              //               Theme.of(context)
+              //                   .extension<StackColors>()!
+              //                   .homeViewButtonBarBoxShadow!,
+              //             ]
+              //           : null,
+              //     ),
+              //     child: const Padding(
+              //       padding: EdgeInsets.only(
+              //         left: 16,
+              //         bottom: 12,
+              //         right: 16,
+              //         top: 0,
+              //       ),
+              //       child: HomeViewButtonBar(),
+              //     ),
+              //   ),
               Expanded(
                 child: Consumer(
                   builder: (_, _ref, __) {
