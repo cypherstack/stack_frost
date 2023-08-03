@@ -14,7 +14,6 @@ import 'package:stackfrost/db/hive/db.dart';
 import 'package:stackfrost/db/isar/main_db.dart';
 import 'package:stackfrost/electrumx_rpc/electrumx.dart';
 import 'package:stackfrost/models/contact.dart';
-import 'package:stackfrost/models/exchange/response_objects/trade.dart';
 import 'package:stackfrost/models/isar/models/blockchain_data/address.dart';
 import 'package:stackfrost/models/isar/models/contact_entry.dart'
     as isar_contact;
@@ -59,31 +58,28 @@ class DbVersionMigrator with WalletDB {
         // try to continue migrating
         return await migrate(1, secureStore: secureStore);
 
+      // case 1:
+      //   await Hive.openBox<Trade>(DB.boxNameTradesV2);
+      //
+      //   for (final old in trades) {
+      //     if (old.statusObject != null) {
+      //       final trade = Trade.fromExchangeTransaction(old, false);
+      //       await DB.instance.put<Trade>(
+      //         boxName: DB.boxNameTradesV2,
+      //         key: trade.uuid,
+      //         value: trade,
+      //       );
+      //     }
+      //   }
+      //
+      //   // update version
+      //   await DB.instance.put<dynamic>(
+      //       boxName: DB.boxNameDBInfo, key: "hive_data_version", value: 2);
+      //
+      //   // try to continue migrating
+      //   return await migrate(2, secureStore: secureStore);
+
       case 1:
-        await Hive.openBox<ExchangeTransaction>(DB.boxNameTrades);
-        await Hive.openBox<Trade>(DB.boxNameTradesV2);
-        final trades =
-            DB.instance.values<ExchangeTransaction>(boxName: DB.boxNameTrades);
-
-        for (final old in trades) {
-          if (old.statusObject != null) {
-            final trade = Trade.fromExchangeTransaction(old, false);
-            await DB.instance.put<Trade>(
-              boxName: DB.boxNameTradesV2,
-              key: trade.uuid,
-              value: trade,
-            );
-          }
-        }
-
-        // update version
-        await DB.instance.put<dynamic>(
-            boxName: DB.boxNameDBInfo, key: "hive_data_version", value: 2);
-
-        // try to continue migrating
-        return await migrate(2, secureStore: secureStore);
-
-      case 2:
         await Hive.openBox<dynamic>(DB.boxNamePrefs);
         final prefs = Prefs.instance;
         await prefs.init();
@@ -96,7 +92,7 @@ class DbVersionMigrator with WalletDB {
             boxName: DB.boxNameDBInfo, key: "hive_data_version", value: 3);
         return await migrate(3, secureStore: secureStore);
 
-      case 3:
+      case 2:
 
         // update version
         await DB.instance.put<dynamic>(
@@ -105,7 +101,7 @@ class DbVersionMigrator with WalletDB {
         // try to continue migrating
         return await migrate(4, secureStore: secureStore);
 
-      case 4:
+      case 3:
         // migrate
         await _v4(secureStore);
 
@@ -116,7 +112,7 @@ class DbVersionMigrator with WalletDB {
         // try to continue migrating
         return await migrate(5, secureStore: secureStore);
 
-      case 5:
+      case 4:
         // migrate
         await Hive.openBox<dynamic>("theme");
         await Hive.openBox<dynamic>(DB.boxNamePrefs);
@@ -136,7 +132,7 @@ class DbVersionMigrator with WalletDB {
         // try to continue migrating
         return await migrate(6, secureStore: secureStore);
 
-      case 6:
+      case 5:
         // migrate
         await MainDB.instance.initMainDB();
         final count = await MainDB.instance.isar.addresses.count();
@@ -207,7 +203,7 @@ class DbVersionMigrator with WalletDB {
         // try to continue migrating
         return await migrate(7, secureStore: secureStore);
 
-      case 7:
+      case 6:
         // migrate
         await _v7(secureStore);
 
@@ -218,7 +214,7 @@ class DbVersionMigrator with WalletDB {
         // try to continue migrating
         return await migrate(8, secureStore: secureStore);
 
-      case 8:
+      case 7:
         // migrate
         await Hive.openBox<dynamic>(DB.boxNameAllWalletsData);
         final walletsService =
@@ -236,7 +232,7 @@ class DbVersionMigrator with WalletDB {
         // try to continue migrating
         return await migrate(9, secureStore: secureStore);
 
-      case 9:
+      case 8:
         // migrate
         await _v9();
 
@@ -247,7 +243,7 @@ class DbVersionMigrator with WalletDB {
         // try to continue migrating
         return await migrate(10, secureStore: secureStore);
 
-      case 10:
+      case 9:
         // migrate
         await _v10(secureStore);
 
