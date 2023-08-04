@@ -24,7 +24,6 @@ import 'package:stackfrost/utilities/assets.dart';
 import 'package:stackfrost/utilities/constants.dart';
 import 'package:stackfrost/utilities/enums/coin_enum.dart';
 import 'package:stackfrost/utilities/flutter_secure_storage_interface.dart';
-import 'package:stackfrost/utilities/test_monero_node_connection.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
 import 'package:stackfrost/utilities/util.dart';
 import 'package:stackfrost/widgets/background.dart';
@@ -70,44 +69,6 @@ class _AddEditNodeViewState extends ConsumerState<AddEditNodeView> {
 
   late bool saveEnabled;
   late bool testConnectionEnabled;
-
-  Future<bool> _xmrHelper(String url, int? port) async {
-    final uri = Uri.parse(url);
-
-    final String path = uri.path.isEmpty ? "/json_rpc" : uri.path;
-
-    final uriString = "${uri.scheme}://${uri.host}:${port ?? 0}$path";
-
-    ref.read(nodeFormDataProvider).useSSL = true;
-
-    final response = await testMoneroNodeConnection(
-      Uri.parse(uriString),
-      false,
-    );
-
-    if (response.cert != null) {
-      if (mounted) {
-        final shouldAllowBadCert = await showBadX509CertificateDialog(
-          response.cert!,
-          response.url!,
-          response.port!,
-          context,
-        );
-
-        if (shouldAllowBadCert) {
-          final response =
-              await testMoneroNodeConnection(Uri.parse(uriString), true);
-          ref.read(nodeFormDataProvider).host = url;
-          return response.success;
-        }
-      }
-    } else {
-      ref.read(nodeFormDataProvider).host = url;
-      return response.success;
-    }
-
-    return false;
-  }
 
   Future<bool> _testConnection({bool showFlushBar = true}) async {
     final formData = ref.read(nodeFormDataProvider);

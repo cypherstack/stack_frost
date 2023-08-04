@@ -1,8 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stackfrost/models/models.dart';
 
-import '../services/coins/firo/sample_data/transaction_data_samples.dart';
-
 void main() {
   group("TransactionData", () {
     test("TransactionData from Json", () {
