@@ -154,14 +154,6 @@ class DbVersionMigrator with WalletDB {
               case AddressSubType.change:
                 tags = ["change"];
                 break;
-              case AddressSubType.paynymNotification:
-                tags = ["paynym notification"];
-                break;
-              case AddressSubType.paynymSend:
-                break;
-              case AddressSubType.paynymReceive:
-                tags = ["paynym receiving"];
-                break;
               case AddressSubType.unknown:
                 break;
               case AddressSubType.nonWallet:

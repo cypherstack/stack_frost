@@ -26,10 +26,7 @@ mixin ElectrumXParsing {
     String walletId,
   ) async {
     Set<String> receivingAddresses = myAddresses
-        .where((e) =>
-            e.subType == AddressSubType.receiving ||
-            e.subType == AddressSubType.paynymReceive ||
-            e.subType == AddressSubType.paynymNotification)
+        .where((e) => e.subType == AddressSubType.receiving)
         .map((e) => e.value)
         .toSet();
     Set<String> changeAddresses = myAddresses

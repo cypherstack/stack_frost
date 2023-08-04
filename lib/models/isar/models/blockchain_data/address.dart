@@ -65,11 +65,6 @@ class Address extends CryptoCurrencyAddress {
     }
   }
 
-  bool isPaynymAddress() =>
-      subType == AddressSubType.paynymNotification ||
-      subType == AddressSubType.paynymSend ||
-      subType == AddressSubType.paynymReceive;
-
   @override
   String toString() => "{ "
       "id: $id, "
@@ -167,9 +162,6 @@ enum AddressType {
 enum AddressSubType {
   receiving,
   change,
-  paynymNotification,
-  paynymSend,
-  paynymReceive,
   unknown,
   nonWallet;
 
@@ -179,12 +171,6 @@ enum AddressSubType {
         return "Receiving";
       case AddressSubType.change:
         return "Change";
-      case AddressSubType.paynymNotification:
-        return "PayNym Notification";
-      case AddressSubType.paynymSend:
-        return "PayNym Send";
-      case AddressSubType.paynymReceive:
-        return "PayNym Receiving";
       case AddressSubType.unknown:
         return "Unknown";
       case AddressSubType.nonWallet:
