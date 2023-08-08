@@ -16,7 +16,7 @@ enum Coin {
   bitcoinTestNet,
 }
 
-final int kTestNetCoinCount = 1; // Util.isDesktop ? 5 : 4;
+const int kTestNetCoinCount = 1;
 
 extension CoinExt on Coin {
   String get prettyName {

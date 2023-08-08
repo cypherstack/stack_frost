@@ -50,10 +50,10 @@ class _AddWalletViewState extends ConsumerState<AddWalletView> {
   String _searchTerm = "";
 
   final List<Coin> _coinsTestnet = [
-    ...Coin.values.sublist(Coin.values.length - kTestNetCoinCount - 1),
+    ...Coin.values.where((e) => e.isTestNet),
   ];
   final List<Coin> _coins = [
-    ...Coin.values.sublist(0, Coin.values.length - kTestNetCoinCount - 1)
+    ...Coin.values.where((e) => !e.isTestNet),
   ];
   final List<AddWalletListEntity> coinEntities = [];
 
