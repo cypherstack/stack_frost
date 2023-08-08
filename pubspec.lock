@@ -100,15 +100,6 @@ packages:
       url: "https://github.com/cypherstack/bip47.git"
     source: git
     version: "2.0.0"
-  bitbox:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: "50bf29957514a5712466ba37590a851212a244bf"
-      resolved-ref: "50bf29957514a5712466ba37590a851212a244bf"
-      url: "https://github.com/PiRK/bitbox-flutter.git"
-    source: git
-    version: "1.0.1"
   bitcoindart:
     dependency: "direct main"
     description:
