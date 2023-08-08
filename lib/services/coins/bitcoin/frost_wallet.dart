@@ -205,6 +205,16 @@ class FrostWallet extends CoinServiceAPI
   late final Coin _coin;
 
   @override
+  Future<Map<String, dynamic>> prepareSend({
+    required String address,
+    required Amount amount,
+    Map<String, dynamic>? args,
+  }) {
+    // TODO: implement prepareSend
+    throw UnimplementedError();
+  }
+
+  @override
   Future<String> confirmSend({required Map<String, dynamic> txData}) {
     // TODO: implement confirmSend
     throw UnimplementedError();
@@ -223,9 +233,83 @@ class FrostWallet extends CoinServiceAPI
       .findFirst())!;
 
   @override
-  Future<Amount> estimateFeeFor(Amount amount, int feeRate) {
-    // TODO: implement estimateFeeFor
-    throw UnimplementedError();
+  Future<Amount> estimateFeeFor(Amount amount, int feeRate) async {
+    final available = balance.spendable;
+
+    if (available == amount) {
+      return amount - (await sweepAllEstimate(feeRate));
+    } else if (amount <= Amount.zero || amount > available) {
+      return roughFeeEstimate(1, 2, feeRate);
+    }
+
+    Amount runningBalance = Amount(
+      rawValue: BigInt.zero,
+      fractionDigits: coin.decimals,
+    );
+    int inputCount = 0;
+    for (final output in (await utxos)) {
+      if (!output.isBlocked) {
+        runningBalance += Amount(
+          rawValue: BigInt.from(output.value),
+          fractionDigits: coin.decimals,
+        );
+        inputCount++;
+        if (runningBalance > amount) {
+          break;
+        }
+      }
+    }
+
+    final oneOutPutFee = roughFeeEstimate(inputCount, 1, feeRate);
+    final twoOutPutFee = roughFeeEstimate(inputCount, 2, feeRate);
+
+    if (runningBalance - amount > oneOutPutFee) {
+      if (runningBalance - amount > oneOutPutFee + DUST_LIMIT) {
+        final change = runningBalance - amount - twoOutPutFee;
+        if (change > DUST_LIMIT &&
+            runningBalance - amount - change == twoOutPutFee) {
+          return runningBalance - amount - change;
+        } else {
+          return runningBalance - amount;
+        }
+      } else {
+        return runningBalance - amount;
+      }
+    } else if (runningBalance - amount == oneOutPutFee) {
+      return oneOutPutFee;
+    } else {
+      return twoOutPutFee;
+    }
+  }
+
+  Amount roughFeeEstimate(int inputCount, int outputCount, int feeRatePerKB) {
+    return Amount(
+      rawValue: BigInt.from(
+          ((42 + (272 * inputCount) + (128 * outputCount)) / 4).ceil() *
+              (feeRatePerKB / 1000).ceil()),
+      fractionDigits: coin.decimals,
+    );
+  }
+
+  Future<Amount> sweepAllEstimate(int feeRate) async {
+    int available = 0;
+    int inputCount = 0;
+    for (final output in (await utxos)) {
+      if (!output.isBlocked &&
+          output.isConfirmed(storedChainHeight, MINIMUM_CONFIRMATIONS)) {
+        available += output.value;
+        inputCount++;
+      }
+    }
+
+    // transaction will only have 1 output minus the fee
+    final estimatedFee = roughFeeEstimate(inputCount, 1, feeRate);
+
+    return Amount(
+          rawValue: BigInt.from(available),
+          fractionDigits: coin.decimals,
+        ) -
+        estimatedFee;
   }
 
   @override
@@ -473,16 +557,6 @@ class FrostWallet extends CoinServiceAPI
   Future<String?> get mnemonicString async => (await mnemonic).join(" ");
 
   @override
-  Future<Map<String, dynamic>> prepareSend({
-    required String address,
-    required Amount amount,
-    Map<String, dynamic>? args,
-  }) {
-    // TODO: implement prepareSend
-    throw UnimplementedError();
-  }
-
-  @override
   Future<void> recoverFromMnemonic({
     required String mnemonic,
     String? mnemonicPassphrase,
@@ -490,8 +564,7 @@ class FrostWallet extends CoinServiceAPI
     required int maxNumberOfIndexesToCheck,
     required int height,
   }) {
-    // TODO: implement recoverFromMnemonic
-    throw UnimplementedError();
+    throw UnimplementedError("Not used for FROST multisig wallets");
   }
 
   @override
