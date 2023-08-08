@@ -80,7 +80,7 @@ class _AppearanceOptionSettings
                                 ),
                                 TextSpan(
                                   text:
-                                      "\n\nCustomize how your Stack Wallet looks according to your preferences.",
+                                      "\n\nCustomize how your Stack Frost looks according to your preferences.",
                                   style: STextStyles.desktopTextExtraExtraSmall(
                                       context),
                                 ),

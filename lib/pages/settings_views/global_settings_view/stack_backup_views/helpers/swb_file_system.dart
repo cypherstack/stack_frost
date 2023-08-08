@@ -43,13 +43,13 @@ class SWBFileSystem {
     if (Platform.isIOS) {
       sampleFolder = Directory(rootPath!.path);
     } else if (Platform.isAndroid) {
-      sampleFolder = Directory('${rootPath!.path}Documents/Stack_backups');
+      sampleFolder = Directory('${rootPath!.path}Documents/StackFrost_backups');
     } else if (Platform.isLinux) {
-      sampleFolder = Directory('${rootPath!.path}/Stack_backups');
+      sampleFolder = Directory('${rootPath!.path}/StackFrost_backups');
     } else if (Platform.isWindows) {
-      sampleFolder = Directory('${rootPath!.path}/Stack_backups');
+      sampleFolder = Directory('${rootPath!.path}/StackFrost_backups');
     } else if (Platform.isMacOS) {
-      sampleFolder = Directory('${rootPath!.path}/Stack_backups');
+      sampleFolder = Directory('${rootPath!.path}/StackFrost_backups');
     }
 
     try {

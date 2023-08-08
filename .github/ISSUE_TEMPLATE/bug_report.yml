@@ -29,7 +29,7 @@ body:
     attributes:
       label: 'Reproduce Steps'
       description: |
-        Please provide a the _smallest, complete steps_ that Stack Wallet's maintainers can run to reproduce the issue ([read more about what this entails](https://stackoverflow.com/help/minimal-reproducible-example)).  Failing this, any sort of reproduction steps are better than nothing!
+        Please provide a the _smallest, complete steps_ that Stack Frost's maintainers can run to reproduce the issue ([read more about what this entails](https://stackoverflow.com/help/minimal-reproducible-example)).  Failing this, any sort of reproduction steps are better than nothing!
     validations:
       required: true
   - type: textarea

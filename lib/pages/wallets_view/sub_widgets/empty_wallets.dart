@@ -83,9 +83,9 @@ class EmptyWallets extends ConsumerWidget {
                   ),
                 ),
               if (!isDesktop)
-                Row(
+                const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
+                  children: [
                     AddWalletButton(
                       isDesktop: false,
                     ),
