@@ -40,6 +40,26 @@ abstract class Frost {
     }
   }
 
+  static String getName({
+    required String multisigConfig,
+  }) {
+    try {
+      final name = multisigName(
+        multisigConfigPointer: decodeMultisigConfig(
+          multisigConfig: multisigConfig,
+        ),
+      );
+
+      return name;
+    } catch (e, s) {
+      Logging.instance.log(
+        "getParticipants failed: $e\n$s",
+        level: LogLevel.Fatal,
+      );
+      rethrow;
+    }
+  }
+
   //==================== wallet creation =======================================
 
   static String createMultisigConfig({

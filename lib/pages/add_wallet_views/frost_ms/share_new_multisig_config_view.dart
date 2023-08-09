@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
 import 'package:stackfrost/services/frost.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
@@ -6,25 +8,20 @@ import 'package:stackfrost/widgets/background.dart';
 import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackfrost/widgets/desktop/primary_button.dart';
 
-class ShareNewMultisigConfigView extends StatefulWidget {
+class ShareNewMultisigConfigView extends ConsumerStatefulWidget {
   const ShareNewMultisigConfigView({
     super.key,
-    required this.config,
-    required this.participants,
   });
 
   static const String routeName = "/shareNewMultisigConfigView";
 
-  final String config;
-  final List<String> participants;
-
   @override
-  State<ShareNewMultisigConfigView> createState() =>
+  ConsumerState<ShareNewMultisigConfigView> createState() =>
       _ShareNewMultisigConfigViewState();
 }
 
 class _ShareNewMultisigConfigViewState
-    extends State<ShareNewMultisigConfigView> {
+    extends ConsumerState<ShareNewMultisigConfigView> {
   @override
   Widget build(BuildContext context) {
     return Background(
@@ -62,8 +59,17 @@ class _ShareNewMultisigConfigViewState
                           height: 16,
                         ),
                         SelectableText(
-                          widget.config,
+                          ref.watch(pCurrentMultisigConfig.state).state!,
                           style: STextStyles.itemSubtitle(context),
+                        ),
+
+                        Text(
+                          Frost.getParticipants(
+                                  multisigConfig: ref
+                                      .watch(pCurrentMultisigConfig.state)
+                                      .state!)
+                              .join("\n"),
+                          style: STextStyles.label(context),
                         ),
 
                         // TODO QR code
@@ -72,12 +78,16 @@ class _ShareNewMultisigConfigViewState
                         PrimaryButton(
                           label: "Start key generation",
                           onPressed: () async {
-                            final data = Frost.startKeyGeneration(
-                              multisigConfig: widget.config,
-                              myName: widget.participants.first,
+                            ref.read(pStartKeyGenData.notifier).state =
+                                Frost.startKeyGeneration(
+                              multisigConfig: ref
+                                  .watch(pCurrentMultisigConfig.state)
+                                  .state!,
+                              myName: Frost.getName(
+                                  multisigConfig: ref
+                                      .read(pCurrentMultisigConfig.state)
+                                      .state!),
                             );
-
-                            print(data.seed);
                           },
                         ),
                       ],

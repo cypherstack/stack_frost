@@ -791,22 +791,13 @@ class RouteGenerator {
         return _routeError("${settings.name} invalid args: ${args.toString()}");
 
       case ShareNewMultisigConfigView.routeName:
-        if (args is ({
-          String config,
-          List<String> participants,
-        })) {
-          return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => ShareNewMultisigConfigView(
-              config: args.config,
-              participants: args.participants,
-            ),
-            settings: RouteSettings(
-              name: settings.name,
-            ),
-          );
-        }
-        return _routeError("${settings.name} invalid args: ${args.toString()}");
+        return getRoute(
+          shouldUseMaterialRoute: useMaterialPageRoute,
+          builder: (_) => const ShareNewMultisigConfigView(),
+          settings: RouteSettings(
+            name: settings.name,
+          ),
+        );
 
       case NewWalletRecoveryPhraseWarningView.routeName:
         if (args is Tuple2<String, Coin>) {
