@@ -283,10 +283,14 @@ abstract class SWB {
         level: LogLevel.Warning,
       );
 
+      final walletInfoMap = await _wallets.walletsService.walletNames;
+
       List<dynamic> backupWallets = [];
       for (var manager in _wallets.managers) {
+        final type = walletInfoMap[manager.walletId]!.type;
         Map<String, dynamic> backupWallet = {};
         backupWallet['name'] = manager.walletName;
+        backupWallet['walletType'] = type.name;
         backupWallet['id'] = manager.walletId;
         backupWallet['isFavorite'] = manager.isFavorite;
         backupWallet['mnemonic'] = await manager.mnemonic;
@@ -656,6 +660,8 @@ abstract class SWB {
           .firstWhere((element) => element.name == walletbackup['coinName']);
       String walletName = walletbackup['name'] as String;
       final walletId = oldToNewWalletIdMap[walletbackup["id"] as String]!;
+      final walletType = WalletType.values.byName(
+          walletbackup["walletType"] as String? ?? WalletType.normal.name);
 
       // TODO: use these for monero and possibly other coins later on?
       // final List<String> txidList = List<String>.from(walletbackup['txidList'] as List? ?? []);
@@ -671,6 +677,7 @@ abstract class SWB {
         name: walletName,
         walletId: walletId,
         coin: coin,
+        type: walletType,
         shouldNotifyListeners: false,
       );
 

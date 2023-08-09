@@ -127,6 +127,7 @@ import 'package:stackfrost/pages_desktop_specific/settings/settings_menu/syncing
 import 'package:stackfrost/services/coins/manager.dart';
 import 'package:stackfrost/services/event_bus/events/global/node_connection_status_changed_event.dart';
 import 'package:stackfrost/services/event_bus/events/global/wallet_sync_status_changed_event.dart';
+import 'package:stackfrost/services/wallets_service.dart';
 import 'package:stackfrost/utilities/enums/add_wallet_type_enum.dart';
 import 'package:stackfrost/utilities/enums/coin_enum.dart';
 import 'package:stackfrost/widgets/choose_coin_view.dart';
@@ -731,12 +732,17 @@ class RouteGenerator {
         return _routeError("${settings.name} invalid args: ${args.toString()}");
 
       case NameYourWalletView.routeName:
-        if (args is Tuple2<AddWalletType, Coin>) {
+        if (args is ({
+          AddWalletType addWalletType,
+          Coin coin,
+          WalletType walletType
+        })) {
           return getRoute(
             shouldUseMaterialRoute: useMaterialPageRoute,
             builder: (_) => NameYourWalletView(
-              addWalletType: args.item1,
-              coin: args.item2,
+              addWalletType: args.addWalletType,
+              coin: args.coin,
+              walletType: args.walletType,
             ),
             settings: RouteSettings(
               name: settings.name,

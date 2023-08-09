@@ -21,6 +21,7 @@ import 'package:stackfrost/providers/providers.dart';
 import 'package:stackfrost/services/coins/coin_service.dart';
 import 'package:stackfrost/services/coins/manager.dart';
 import 'package:stackfrost/services/transaction_notification_tracker.dart';
+import 'package:stackfrost/services/wallets_service.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/utilities/assets.dart';
 import 'package:stackfrost/utilities/constants.dart';
@@ -457,6 +458,7 @@ class _NewWalletRecoveryPhraseWarningViewState
                                         await walletsService.addNewWallet(
                                       name: walletName,
                                       coin: coin,
+                                      type: WalletType.normal,
                                       shouldNotifyListeners: false,
                                     );
 
