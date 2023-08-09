@@ -19,6 +19,9 @@ import 'package:stackfrost/models/paynym/paynym_account_lite.dart';
 import 'package:stackfrost/models/send_view_auto_fill_data.dart';
 import 'package:stackfrost/pages/add_wallet_views/add_wallet_view/add_wallet_view.dart';
 import 'package:stackfrost/pages/add_wallet_views/create_or_restore_wallet_view/create_or_restore_wallet_view.dart';
+import 'package:stackfrost/pages/add_wallet_views/frost_ms/new_frost_ms_wallet_view.dart';
+import 'package:stackfrost/pages/add_wallet_views/frost_ms/restore_frost_ms_wallet_view.dart';
+import 'package:stackfrost/pages/add_wallet_views/frost_ms/share_new_multisig_config_view.dart';
 import 'package:stackfrost/pages/add_wallet_views/name_your_wallet_view/name_your_wallet_view.dart';
 import 'package:stackfrost/pages/add_wallet_views/new_wallet_recovery_phrase_view/new_wallet_recovery_phrase_view.dart';
 import 'package:stackfrost/pages/add_wallet_views/new_wallet_recovery_phrase_warning_view/new_wallet_recovery_phrase_warning_view.dart';
@@ -743,6 +746,60 @@ class RouteGenerator {
               addWalletType: args.addWalletType,
               coin: args.coin,
               walletType: args.walletType,
+            ),
+            settings: RouteSettings(
+              name: settings.name,
+            ),
+          );
+        }
+        return _routeError("${settings.name} invalid args: ${args.toString()}");
+
+      case NewFrostMsWalletView.routeName:
+        if (args is ({
+          String walletName,
+          Coin coin,
+        })) {
+          return getRoute(
+            shouldUseMaterialRoute: useMaterialPageRoute,
+            builder: (_) => NewFrostMsWalletView(
+              walletName: args.walletName,
+              coin: args.coin,
+            ),
+            settings: RouteSettings(
+              name: settings.name,
+            ),
+          );
+        }
+        return _routeError("${settings.name} invalid args: ${args.toString()}");
+
+      case RestoreFrostMsWalletView.routeName:
+        if (args is ({
+          String walletName,
+          Coin coin,
+        })) {
+          return getRoute(
+            shouldUseMaterialRoute: useMaterialPageRoute,
+            builder: (_) => RestoreFrostMsWalletView(
+              walletName: args.walletName,
+              coin: args.coin,
+            ),
+            settings: RouteSettings(
+              name: settings.name,
+            ),
+          );
+        }
+        return _routeError("${settings.name} invalid args: ${args.toString()}");
+
+      case ShareNewMultisigConfigView.routeName:
+        if (args is ({
+          String config,
+          List<String> participants,
+        })) {
+          return getRoute(
+            shouldUseMaterialRoute: useMaterialPageRoute,
+            builder: (_) => ShareNewMultisigConfigView(
+              config: args.config,
+              participants: args.participants,
             ),
             settings: RouteSettings(
               name: settings.name,

@@ -14,6 +14,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stackfrost/notifications/show_flush_bar.dart';
 import 'package:stackfrost/pages/add_wallet_views/create_or_restore_wallet_view/sub_widgets/coin_image.dart';
+import 'package:stackfrost/pages/add_wallet_views/frost_ms/new_frost_ms_wallet_view.dart';
+import 'package:stackfrost/pages/add_wallet_views/frost_ms/restore_frost_ms_wallet_view.dart';
 import 'package:stackfrost/pages/add_wallet_views/new_wallet_recovery_phrase_warning_view/new_wallet_recovery_phrase_warning_view.dart';
 import 'package:stackfrost/pages/add_wallet_views/restore_wallet_view/restore_options_view/restore_options_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
@@ -32,6 +34,8 @@ import 'package:stackfrost/widgets/background.dart';
 import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackfrost/widgets/desktop/desktop_app_bar.dart';
 import 'package:stackfrost/widgets/desktop/desktop_scaffold.dart';
+import 'package:stackfrost/widgets/desktop/primary_button.dart';
+import 'package:stackfrost/widgets/desktop/secondary_button.dart';
 import 'package:stackfrost/widgets/icon_widgets/dice_icon.dart';
 import 'package:stackfrost/widgets/icon_widgets/x_icon.dart';
 import 'package:stackfrost/widgets/rounded_white_container.dart';
@@ -106,10 +110,6 @@ class _NameYourWalletViewState extends ConsumerState<NameYourWalletView> {
 
   @override
   Widget build(BuildContext context) {
-    //todo: check if print needed
-    // debugPrint(
-    //     "BUILD: NameYourWalletView with ${coin.name} ${addWalletType.name}");
-
     if (isDesktop) {
       return DesktopScaffold(
         appBar: const DesktopAppBar(
@@ -188,7 +188,9 @@ class _NameYourWalletViewState extends ConsumerState<NameYourWalletView> {
             height: isDesktop ? 0 : 16,
           ),
           Text(
-            "Name your ${coin.prettyName} wallet",
+            "Name your ${coin.prettyName} "
+            "${widget.walletType == WalletType.frostMS ? "FROST multisig " : ""}"
+            "wallet",
             textAlign: TextAlign.center,
             style: isDesktop
                 ? STextStyles.desktopH2(context)
@@ -327,17 +329,85 @@ class _NameYourWalletViewState extends ConsumerState<NameYourWalletView> {
             const SizedBox(
               height: 32,
             ),
-          ConstrainedBox(
-            constraints: BoxConstraints(
-              minWidth: isDesktop ? 480 : 0,
-              minHeight: isDesktop ? 70 : 0,
-            ),
-            child: TextButton(
-              onPressed: _nextEnabled
-                  ? () async {
-                      final walletsService =
-                          ref.read(walletsServiceChangeNotifierProvider);
-                      final name = textEditingController.text;
+          widget.walletType == WalletType.frostMS
+              ? Column(
+                  children: [
+                    PrimaryButton(
+                      label: "Create config",
+                      enabled: _nextEnabled,
+                      onPressed: () async {
+                        final walletsService =
+                            ref.read(walletsServiceChangeNotifierProvider);
+                        final name = textEditingController.text;
+
+                        if (await walletsService.checkForDuplicate(name)) {
+                          if (mounted) {
+                            unawaited(
+                              showFloatingFlushBar(
+                                type: FlushBarType.warning,
+                                message: "Wallet name already in use.",
+                                iconAsset: Assets.svg.circleAlert,
+                                context: context,
+                              ),
+                            );
+                          }
+                        } else if (mounted) {
+                          await Navigator.of(context).pushNamed(
+                            NewFrostMsWalletView.routeName,
+                            arguments: (
+                              walletName: name,
+                              coin: coin,
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                    const SizedBox(
+                      height: 12,
+                    ),
+                    SecondaryButton(
+                      label: "Import config",
+                      enabled: _nextEnabled,
+                      onPressed: () async {
+                        final walletsService =
+                            ref.read(walletsServiceChangeNotifierProvider);
+                        final name = textEditingController.text;
+
+                        if (await walletsService.checkForDuplicate(name)) {
+                          if (mounted) {
+                            unawaited(
+                              showFloatingFlushBar(
+                                type: FlushBarType.warning,
+                                message: "Wallet name already in use.",
+                                iconAsset: Assets.svg.circleAlert,
+                                context: context,
+                              ),
+                            );
+                          }
+                        } else if (mounted) {
+                          await Navigator.of(context).pushNamed(
+                            RestoreFrostMsWalletView.routeName,
+                            arguments: (
+                              walletName: name,
+                              coin: coin,
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                  ],
+                )
+              : ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minWidth: isDesktop ? 480 : 0,
+                    minHeight: isDesktop ? 70 : 0,
+                  ),
+                  child: TextButton(
+                    onPressed: _nextEnabled
+                        ? () async {
+                            final walletsService =
+                                ref.read(walletsServiceChangeNotifierProvider);
+                            final name = textEditingController.text;
 
                             if (await walletsService.checkForDuplicate(name)) {
                               if (mounted) {
