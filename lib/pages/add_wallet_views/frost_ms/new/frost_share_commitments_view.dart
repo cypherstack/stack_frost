@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
 import 'package:stackfrost/services/frost.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/logger.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
 import 'package:stackfrost/widgets/background.dart';
 import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackfrost/widgets/desktop/primary_button.dart';
+import 'package:stackfrost/widgets/stack_dialog.dart';
 
 class FrostShareCommitmentsView extends ConsumerStatefulWidget {
   const FrostShareCommitmentsView({
@@ -82,6 +85,25 @@ class _StartKeyGenMsViewState extends ConsumerState<FrostShareCommitmentsView> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          SizedBox(
+                            height: 220,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                QrImageView(
+                                  data: commitment,
+                                  size: 220,
+                                  backgroundColor: Theme.of(context)
+                                      .extension<StackColors>()!
+                                      .background,
+                                  foregroundColor: Theme.of(context)
+                                      .extension<StackColors>()!
+                                      .accentColorDark,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const _Div(),
                           _Item(
                             label: "My name",
                             detail: ref.watch(pFrostMyName.state).state!,
@@ -131,6 +153,52 @@ class _StartKeyGenMsViewState extends ConsumerState<FrostShareCommitmentsView> {
                           PrimaryButton(
                             label: "Generate",
                             onPressed: () async {
+                              // check for empty commitments
+                              if (controllers.map((e) => e.text.isEmpty).reduce(
+                                  (value, element) => value |= element)) {
+                                return await showDialog<void>(
+                                  context: context,
+                                  builder: (_) => const StackOkDialog(
+                                    title: "Missing commitments",
+                                  ),
+                                );
+                              }
+
+                              try {
+                                ref
+                                    .read(pFrostSecretSharesData.notifier)
+                                    .state = Frost.generateSecretShares(
+                                  multisigConfigWithNamePtr: ref
+                                      .read(pFrostStartKeyGenData.state)
+                                      .state!
+                                      .multisigConfigWithNamePtr,
+                                  mySeed: ref
+                                      .read(pFrostStartKeyGenData.state)
+                                      .state!
+                                      .seed,
+                                  secretShareMachineWrapperPtr: ref
+                                      .read(pFrostStartKeyGenData.state)
+                                      .state!
+                                      .secretShareMachineWrapperPtr,
+                                  commitments:
+                                      controllers.map((e) => e.text).toList(),
+                                );
+                              } catch (e, s) {
+                                Logging.instance.log(
+                                  "$e\n$s",
+                                  level: LogLevel.Fatal,
+                                );
+                                return await showDialog<void>(
+                                  context: context,
+                                  builder: (_) => const StackOkDialog(
+                                    title: "Failed to generate shares",
+                                  ),
+                                );
+                              }
+
+                              print(
+                                  "AAAAAAAAAAAAAAAAAAAAAAAAAAAA: ${ref.read(pFrostSecretSharesData.notifier).state?.share}");
+
                               // final config = configFieldController.text;
                               //
                               // if (!Frost.validateEncodedMultisigConfig(

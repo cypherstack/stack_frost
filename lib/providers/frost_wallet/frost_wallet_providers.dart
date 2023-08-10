@@ -13,3 +13,9 @@ final pFrostStartKeyGenData = StateProvider<
       Pointer<MultisigConfigWithName> multisigConfigWithNamePtr,
       Pointer<SecretShareMachineWrapper> secretShareMachineWrapperPtr,
     })?>((_) => null);
+
+final pFrostSecretSharesData = StateProvider<
+    ({
+      String share,
+      Pointer<SecretSharesRes> secretSharesResPtr,
+    })?>((ref) => null);
