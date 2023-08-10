@@ -186,8 +186,9 @@ class _StartKeyGenMsViewState extends ConsumerState<FrostShareCommitmentsView> {
                     .reduce((value, element) => value |= element)) {
                   return await showDialog<void>(
                     context: context,
-                    builder: (_) => const StackOkDialog(
+                    builder: (_) => StackOkDialog(
                       title: "Missing commitments",
+                      desktopPopRootNavigator: Util.isDesktop,
                     ),
                   );
                 }
@@ -211,10 +212,12 @@ class _StartKeyGenMsViewState extends ConsumerState<FrostShareCommitmentsView> {
                     "$e\n$s",
                     level: LogLevel.Fatal,
                   );
+
                   return await showDialog<void>(
                     context: context,
-                    builder: (_) => const StackOkDialog(
+                    builder: (_) => StackOkDialog(
                       title: "Failed to generate shares",
+                      desktopPopRootNavigator: Util.isDesktop,
                     ),
                   );
                 }

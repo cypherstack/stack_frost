@@ -126,8 +126,7 @@ class _ImportNewFrostMsWalletViewState
             const SizedBox(
               height: 16,
             ),
-            if(!Util.isDesktop)
-            const Spacer(),
+            if (!Util.isDesktop) const Spacer(),
             const SizedBox(
               height: 16,
             ),
@@ -146,8 +145,9 @@ class _ImportNewFrostMsWalletViewState
                     encodedConfig: config)) {
                   return await showDialog<void>(
                     context: context,
-                    builder: (_) => const StackOkDialog(
+                    builder: (_) => StackOkDialog(
                       title: "Invalid config",
+                      desktopPopRootNavigator: Util.isDesktop,
                     ),
                   );
                 }
@@ -156,8 +156,9 @@ class _ImportNewFrostMsWalletViewState
                     .contains(myNameFieldController.text)) {
                   return await showDialog<void>(
                     context: context,
-                    builder: (_) => const StackOkDialog(
+                    builder: (_) => StackOkDialog(
                       title: "My name not found in config participants",
+                      desktopPopRootNavigator: Util.isDesktop,
                     ),
                   );
                 }

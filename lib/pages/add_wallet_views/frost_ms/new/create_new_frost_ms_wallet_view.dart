@@ -237,6 +237,7 @@ class _NewFrostMsWalletViewState
                     context: context,
                     builder: (_) => StackOkDialog(
                       title: validationMessage,
+                      desktopPopRootNavigator: Util.isDesktop,
                     ),
                   );
                 }
