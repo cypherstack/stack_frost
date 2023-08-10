@@ -8,7 +8,6 @@ import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/utilities/enums/coin_enum.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
 import 'package:stackfrost/widgets/background.dart';
-import 'package:stackfrost/widgets/conditional_parent.dart';
 import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackfrost/widgets/desktop/primary_button.dart';
 import 'package:stackfrost/widgets/stack_dialog.dart';
@@ -166,19 +165,25 @@ class _NewFrostMsWalletViewState
                           ),
                           if (controllers.isNotEmpty)
                             Text(
-                              "Participants",
+                              "My name",
                               style: STextStyles.label(context),
                             ),
+                          if (controllers.isNotEmpty)
+                            TextField(
+                              controller: controllers.first,
+                            ),
+                          if (controllers.length > 1)
+                            if (controllers.length > 1)
+                              Text(
+                                "Remaining participants",
+                                style: STextStyles.label(context),
+                              ),
                           Column(
                             children: [
-                              for (int i = 0; i < controllers.length; i++)
-                                ConditionalParent(
-                                  condition: controllers.length > 1,
-                                  builder: (child) => Padding(
-                                    padding: const EdgeInsets.only(
-                                      top: 10,
-                                    ),
-                                    child: child,
+                              for (int i = 1; i < controllers.length; i++)
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    top: 10,
                                   ),
                                   child: TextField(
                                     controller: controllers[i],
@@ -193,6 +198,10 @@ class _NewFrostMsWalletViewState
                           PrimaryButton(
                             label: "Generate",
                             onPressed: () async {
+                              if (FocusScope.of(context).hasFocus) {
+                                FocusScope.of(context).unfocus();
+                              }
+
                               final validationMessage = _validateInputData();
 
                               if (validationMessage != "valid") {

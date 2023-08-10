@@ -100,7 +100,13 @@ class _ImportNewFrostMsWalletViewState
                           ),
                           PrimaryButton(
                             label: "Start key generation",
+                            enabled: configFieldController.text.isNotEmpty &&
+                                myNameFieldController.text.isNotEmpty,
                             onPressed: () async {
+                              if (FocusScope.of(context).hasFocus) {
+                                FocusScope.of(context).unfocus();
+                              }
+
                               final config = configFieldController.text;
 
                               if (!Frost.validateEncodedMultisigConfig(
