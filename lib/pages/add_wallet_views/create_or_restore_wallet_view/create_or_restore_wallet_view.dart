@@ -32,6 +32,16 @@ class CreateOrRestoreWalletView extends StatelessWidget {
 
   final AddWalletListEntity entity;
 
+  // return ConditionalParent(
+  // condition: Util.isDesktop,
+  // builder: (child) => Container(),
+  // child: ConditionalParent(
+  // condition: !Util.isDesktop,
+  // builder: (child) => Container(),
+  // child: Container(),
+  // ),
+  // );
+
   @override
   Widget build(BuildContext context) {
     debugPrint("BUILD: $runtimeType");

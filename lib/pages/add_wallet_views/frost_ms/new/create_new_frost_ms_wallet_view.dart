@@ -2,13 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stackfrost/pages/add_wallet_views/frost_ms/new/share_new_multisig_config_view.dart';
+import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
 import 'package:stackfrost/services/frost.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/utilities/enums/coin_enum.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/utilities/util.dart';
 import 'package:stackfrost/widgets/background.dart';
+import 'package:stackfrost/widgets/conditional_parent.dart';
 import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
+import 'package:stackfrost/widgets/desktop/desktop_app_bar.dart';
+import 'package:stackfrost/widgets/desktop/desktop_scaffold.dart';
 import 'package:stackfrost/widgets/desktop/primary_button.dart';
 import 'package:stackfrost/widgets/stack_dialog.dart';
 
@@ -106,142 +111,155 @@ class _NewFrostMsWalletViewState
 
   @override
   Widget build(BuildContext context) {
-    return Background(
-      child: Scaffold(
-        backgroundColor: Theme.of(context).extension<StackColors>()!.background,
-        appBar: AppBar(
-          leading: AppBarBackButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-          title: Text(
-            "New FROST multisig config",
-            style: STextStyles.navBarTitle(context),
-          ),
+    return ConditionalParent(
+      condition: Util.isDesktop,
+      builder: (child) => DesktopScaffold(
+        background: Theme.of(context).extension<StackColors>()!.background,
+        appBar: const DesktopAppBar(
+          isCompactHeight: false,
+          leading: AppBarBackButton(),
+          trailing: ExitToMyStackButton(),
         ),
-        body: SafeArea(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return SingleChildScrollView(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight,
-                  ),
-                  child: IntrinsicHeight(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Threshold",
-                            style: STextStyles.label(context),
-                          ),
-                          TextField(
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly
-                            ],
-                            controller: _thresholdController,
-                          ),
-                          const SizedBox(
-                            height: 16,
-                          ),
-                          Text(
-                            "Number of participants",
-                            style: STextStyles.label(context),
-                          ),
-                          TextField(
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly
-                            ],
-                            controller: _participantsController,
-                            onChanged: _participantsCountChanged,
-                          ),
-                          const SizedBox(
-                            height: 16,
-                          ),
-                          if (controllers.isNotEmpty)
-                            Text(
-                              "My name",
-                              style: STextStyles.label(context),
-                            ),
-                          if (controllers.isNotEmpty)
-                            TextField(
-                              controller: controllers.first,
-                            ),
-                          if (controllers.length > 1)
-                            if (controllers.length > 1)
-                              Text(
-                                "Remaining participants",
-                                style: STextStyles.label(context),
-                              ),
-                          Column(
-                            children: [
-                              for (int i = 1; i < controllers.length; i++)
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                    top: 10,
-                                  ),
-                                  child: TextField(
-                                    controller: controllers[i],
-                                  ),
-                                ),
-                            ],
-                          ),
-                          const Spacer(),
-                          const SizedBox(
-                            height: 16,
-                          ),
-                          PrimaryButton(
-                            label: "Generate",
-                            onPressed: () async {
-                              if (FocusScope.of(context).hasFocus) {
-                                FocusScope.of(context).unfocus();
-                              }
-
-                              final validationMessage = _validateInputData();
-
-                              if (validationMessage != "valid") {
-                                return await showDialog<void>(
-                                  context: context,
-                                  builder: (_) => StackOkDialog(
-                                    title: validationMessage,
-                                  ),
-                                );
-                              }
-
-                              final config = Frost.createMultisigConfig(
-                                name: controllers.first.text,
-                                threshold: int.parse(_thresholdController.text),
-                                participants:
-                                    controllers.map((e) => e.text).toList(),
-                              );
-
-                              ref.read(pFrostMyName.notifier).state =
-                                  controllers.first.text;
-                              ref.read(pFrostMultisigConfig.notifier).state =
-                                  config;
-
-                              await Navigator.of(context).pushNamed(
-                                ShareNewMultisigConfigView.routeName,
-                                arguments: (
-                                  walletName: widget.walletName,
-                                  coin: widget.coin,
-                                ),
-                              );
-                            },
-                          ),
-                        ],
+        body: SizedBox(
+          width: 480,
+          child: child,
+        ),
+      ),
+      child: ConditionalParent(
+        condition: !Util.isDesktop,
+        builder: (child) => Background(
+          child: Scaffold(
+            backgroundColor:
+                Theme.of(context).extension<StackColors>()!.background,
+            appBar: AppBar(
+              leading: AppBarBackButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              title: Text(
+                "New FROST multisig config",
+                style: STextStyles.navBarTitle(context),
+              ),
+            ),
+            body: SafeArea(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: constraints.maxHeight,
+                      ),
+                      child: IntrinsicHeight(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: child,
+                        ),
                       ),
                     ),
-                  ),
-                ),
-              );
-            },
+                  );
+                },
+              ),
+            ),
           ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Threshold",
+              style: STextStyles.label(context),
+            ),
+            TextField(
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              controller: _thresholdController,
+            ),
+            const SizedBox(
+              height: 16,
+            ),
+            Text(
+              "Number of participants",
+              style: STextStyles.label(context),
+            ),
+            TextField(
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              controller: _participantsController,
+              onChanged: _participantsCountChanged,
+            ),
+            const SizedBox(
+              height: 16,
+            ),
+            if (controllers.isNotEmpty)
+              Text(
+                "My name",
+                style: STextStyles.label(context),
+              ),
+            if (controllers.isNotEmpty)
+              TextField(
+                controller: controllers.first,
+              ),
+            if (controllers.length > 1)
+              if (controllers.length > 1)
+                Text(
+                  "Remaining participants",
+                  style: STextStyles.label(context),
+                ),
+            Column(
+              children: [
+                for (int i = 1; i < controllers.length; i++)
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      top: 10,
+                    ),
+                    child: TextField(
+                      controller: controllers[i],
+                    ),
+                  ),
+              ],
+            ),
+            if (!Util.isDesktop) const Spacer(),
+            const SizedBox(
+              height: 16,
+            ),
+            PrimaryButton(
+              label: "Generate",
+              onPressed: () async {
+                if (FocusScope.of(context).hasFocus) {
+                  FocusScope.of(context).unfocus();
+                }
+
+                final validationMessage = _validateInputData();
+
+                if (validationMessage != "valid") {
+                  return await showDialog<void>(
+                    context: context,
+                    builder: (_) => StackOkDialog(
+                      title: validationMessage,
+                    ),
+                  );
+                }
+
+                final config = Frost.createMultisigConfig(
+                  name: controllers.first.text,
+                  threshold: int.parse(_thresholdController.text),
+                  participants: controllers.map((e) => e.text).toList(),
+                );
+
+                ref.read(pFrostMyName.notifier).state = controllers.first.text;
+                ref.read(pFrostMultisigConfig.notifier).state = config;
+
+                await Navigator.of(context).pushNamed(
+                  ShareNewMultisigConfigView.routeName,
+                  arguments: (
+                    walletName: widget.walletName,
+                    coin: widget.coin,
+                  ),
+                );
+              },
+            ),
+          ],
         ),
       ),
     );

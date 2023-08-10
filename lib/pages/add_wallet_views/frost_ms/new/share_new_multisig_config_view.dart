@@ -7,6 +7,7 @@ import 'package:stackfrost/services/frost.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/utilities/enums/coin_enum.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/utilities/util.dart';
 import 'package:stackfrost/widgets/background.dart';
 import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackfrost/widgets/desktop/primary_button.dart';
@@ -59,7 +60,7 @@ class _ShareNewMultisigConfigViewState
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       children: [
-                        const Spacer(),
+                        if (!Util.isDesktop) const Spacer(),
                         SizedBox(
                           height: 220,
                           child: Row(
@@ -89,9 +90,10 @@ class _ShareNewMultisigConfigViewState
                             style: STextStyles.itemSubtitle(context),
                           ),
                         ),
-                        const Spacer(
-                          flex: 2,
-                        ),
+                        if (!Util.isDesktop)
+                          const Spacer(
+                            flex: 2,
+                          ),
                         PrimaryButton(
                           label: "Start key generation",
                           onPressed: () async {
