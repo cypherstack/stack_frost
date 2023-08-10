@@ -19,9 +19,11 @@ import 'package:stackfrost/models/paynym/paynym_account_lite.dart';
 import 'package:stackfrost/models/send_view_auto_fill_data.dart';
 import 'package:stackfrost/pages/add_wallet_views/add_wallet_view/add_wallet_view.dart';
 import 'package:stackfrost/pages/add_wallet_views/create_or_restore_wallet_view/create_or_restore_wallet_view.dart';
-import 'package:stackfrost/pages/add_wallet_views/frost_ms/new_frost_ms_wallet_view.dart';
-import 'package:stackfrost/pages/add_wallet_views/frost_ms/restore_frost_ms_wallet_view.dart';
-import 'package:stackfrost/pages/add_wallet_views/frost_ms/share_new_multisig_config_view.dart';
+import 'package:stackfrost/pages/add_wallet_views/frost_ms/new/create_new_frost_ms_wallet_view.dart';
+import 'package:stackfrost/pages/add_wallet_views/frost_ms/new/frost_share_commitments_view.dart';
+import 'package:stackfrost/pages/add_wallet_views/frost_ms/new/import_new_frost_ms_wallet_view.dart';
+import 'package:stackfrost/pages/add_wallet_views/frost_ms/new/share_new_multisig_config_view.dart';
+import 'package:stackfrost/pages/add_wallet_views/frost_ms/restore/restore_frost_ms_wallet_view.dart';
 import 'package:stackfrost/pages/add_wallet_views/name_your_wallet_view/name_your_wallet_view.dart';
 import 'package:stackfrost/pages/add_wallet_views/new_wallet_recovery_phrase_view/new_wallet_recovery_phrase_view.dart';
 import 'package:stackfrost/pages/add_wallet_views/new_wallet_recovery_phrase_warning_view/new_wallet_recovery_phrase_warning_view.dart';
@@ -754,14 +756,14 @@ class RouteGenerator {
         }
         return _routeError("${settings.name} invalid args: ${args.toString()}");
 
-      case NewFrostMsWalletView.routeName:
+      case CreateNewFrostMsWalletView.routeName:
         if (args is ({
           String walletName,
           Coin coin,
         })) {
           return getRoute(
             shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => NewFrostMsWalletView(
+            builder: (_) => CreateNewFrostMsWalletView(
               walletName: args.walletName,
               coin: args.coin,
             ),
@@ -791,13 +793,58 @@ class RouteGenerator {
         return _routeError("${settings.name} invalid args: ${args.toString()}");
 
       case ShareNewMultisigConfigView.routeName:
-        return getRoute(
-          shouldUseMaterialRoute: useMaterialPageRoute,
-          builder: (_) => const ShareNewMultisigConfigView(),
-          settings: RouteSettings(
-            name: settings.name,
-          ),
-        );
+        if (args is ({
+          String walletName,
+          Coin coin,
+        })) {
+          return getRoute(
+            shouldUseMaterialRoute: useMaterialPageRoute,
+            builder: (_) => ShareNewMultisigConfigView(
+              walletName: args.walletName,
+              coin: args.coin,
+            ),
+            settings: RouteSettings(
+              name: settings.name,
+            ),
+          );
+        }
+        return _routeError("${settings.name} invalid args: ${args.toString()}");
+
+      case ImportNewFrostMsWalletView.routeName:
+        if (args is ({
+          String walletName,
+          Coin coin,
+        })) {
+          return getRoute(
+            shouldUseMaterialRoute: useMaterialPageRoute,
+            builder: (_) => ImportNewFrostMsWalletView(
+              walletName: args.walletName,
+              coin: args.coin,
+            ),
+            settings: RouteSettings(
+              name: settings.name,
+            ),
+          );
+        }
+        return _routeError("${settings.name} invalid args: ${args.toString()}");
+
+      case FrostShareCommitmentsView.routeName:
+        if (args is ({
+          String walletName,
+          Coin coin,
+        })) {
+          return getRoute(
+            shouldUseMaterialRoute: useMaterialPageRoute,
+            builder: (_) => FrostShareCommitmentsView(
+              walletName: args.walletName,
+              coin: args.coin,
+            ),
+            settings: RouteSettings(
+              name: settings.name,
+            ),
+          );
+        }
+        return _routeError("${settings.name} invalid args: ${args.toString()}");
 
       case NewWalletRecoveryPhraseWarningView.routeName:
         if (args is Tuple2<String, Coin>) {

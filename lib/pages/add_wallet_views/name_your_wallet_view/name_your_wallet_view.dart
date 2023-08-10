@@ -14,8 +14,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stackfrost/notifications/show_flush_bar.dart';
 import 'package:stackfrost/pages/add_wallet_views/create_or_restore_wallet_view/sub_widgets/coin_image.dart';
-import 'package:stackfrost/pages/add_wallet_views/frost_ms/new_frost_ms_wallet_view.dart';
-import 'package:stackfrost/pages/add_wallet_views/frost_ms/restore_frost_ms_wallet_view.dart';
+import 'package:stackfrost/pages/add_wallet_views/frost_ms/new/create_new_frost_ms_wallet_view.dart';
+import 'package:stackfrost/pages/add_wallet_views/frost_ms/new/import_new_frost_ms_wallet_view.dart';
 import 'package:stackfrost/pages/add_wallet_views/new_wallet_recovery_phrase_warning_view/new_wallet_recovery_phrase_warning_view.dart';
 import 'package:stackfrost/pages/add_wallet_views/restore_wallet_view/restore_options_view/restore_options_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
@@ -353,7 +353,7 @@ class _NameYourWalletViewState extends ConsumerState<NameYourWalletView> {
                           }
                         } else if (mounted) {
                           await Navigator.of(context).pushNamed(
-                            NewFrostMsWalletView.routeName,
+                            CreateNewFrostMsWalletView.routeName,
                             arguments: (
                               walletName: name,
                               coin: coin,
@@ -386,7 +386,7 @@ class _NameYourWalletViewState extends ConsumerState<NameYourWalletView> {
                           }
                         } else if (mounted) {
                           await Navigator.of(context).pushNamed(
-                            RestoreFrostMsWalletView.routeName,
+                            ImportNewFrostMsWalletView.routeName,
                             arguments: (
                               walletName: name,
                               coin: coin,

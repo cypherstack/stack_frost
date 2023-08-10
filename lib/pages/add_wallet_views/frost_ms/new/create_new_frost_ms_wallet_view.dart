@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackfrost/pages/add_wallet_views/frost_ms/share_new_multisig_config_view.dart';
+import 'package:stackfrost/pages/add_wallet_views/frost_ms/new/share_new_multisig_config_view.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
 import 'package:stackfrost/services/frost.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
@@ -13,24 +13,25 @@ import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackfrost/widgets/desktop/primary_button.dart';
 import 'package:stackfrost/widgets/stack_dialog.dart';
 
-class NewFrostMsWalletView extends ConsumerStatefulWidget {
-  const NewFrostMsWalletView({
+class CreateNewFrostMsWalletView extends ConsumerStatefulWidget {
+  const CreateNewFrostMsWalletView({
     super.key,
     required this.walletName,
     required this.coin,
   });
 
-  static const String routeName = "/newFrostMsWalletView";
+  static const String routeName = "/createNewFrostMsWalletView";
 
   final String walletName;
   final Coin coin;
 
   @override
-  ConsumerState<NewFrostMsWalletView> createState() =>
+  ConsumerState<CreateNewFrostMsWalletView> createState() =>
       _NewFrostMsWalletViewState();
 }
 
-class _NewFrostMsWalletViewState extends ConsumerState<NewFrostMsWalletView> {
+class _NewFrostMsWalletViewState
+    extends ConsumerState<CreateNewFrostMsWalletView> {
   final _thresholdController = TextEditingController();
   final _participantsController = TextEditingController();
 
@@ -92,6 +93,16 @@ class _NewFrostMsWalletViewState extends ConsumerState<NewFrostMsWalletView> {
         setState(() {});
       }
     }
+  }
+
+  @override
+  void dispose() {
+    _thresholdController.dispose();
+    _participantsController.dispose();
+    for (final e in controllers) {
+      e.dispose();
+    }
+    super.dispose();
   }
 
   @override
@@ -180,7 +191,7 @@ class _NewFrostMsWalletViewState extends ConsumerState<NewFrostMsWalletView> {
                             height: 16,
                           ),
                           PrimaryButton(
-                            label: "Create config",
+                            label: "Generate",
                             onPressed: () async {
                               final validationMessage = _validateInputData();
 
@@ -195,17 +206,22 @@ class _NewFrostMsWalletViewState extends ConsumerState<NewFrostMsWalletView> {
 
                               final config = Frost.createMultisigConfig(
                                 name: controllers.first.text,
-                                threshold:
-                                    int.parse(_participantsController.text),
+                                threshold: int.parse(_thresholdController.text),
                                 participants:
                                     controllers.map((e) => e.text).toList(),
                               );
 
-                              ref.read(pCurrentMultisigConfig.notifier).state =
+                              ref.read(pFrostMyName.notifier).state =
+                                  controllers.first.text;
+                              ref.read(pFrostMultisigConfig.notifier).state =
                                   config;
 
                               await Navigator.of(context).pushNamed(
                                 ShareNewMultisigConfigView.routeName,
+                                arguments: (
+                                  walletName: widget.walletName,
+                                  coin: widget.coin,
+                                ),
                               );
                             },
                           ),

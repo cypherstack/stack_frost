@@ -60,6 +60,19 @@ abstract class Frost {
     }
   }
 
+  static bool validateEncodedMultisigConfig({required String encodedConfig}) {
+    try {
+      decodeMultisigConfig(multisigConfig: encodedConfig);
+      return true;
+    } catch (e, s) {
+      Logging.instance.log(
+        "validateEncodedMultisigConfig failed: $e\n$s",
+        level: LogLevel.Fatal,
+      );
+      return false;
+    }
+  }
+
   //==================== wallet creation =======================================
 
   static String createMultisigConfig({
