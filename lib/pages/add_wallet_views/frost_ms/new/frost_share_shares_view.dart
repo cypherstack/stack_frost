@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:stackfrost/pages/add_wallet_views/frost_ms/new/frost_share_shares_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
 import 'package:stackfrost/services/frost.dart';
@@ -27,30 +26,29 @@ import 'package:stackfrost/widgets/stack_dialog.dart';
 import 'package:stackfrost/widgets/stack_text_field.dart';
 import 'package:stackfrost/widgets/textfield_icon_button.dart';
 
-class FrostShareCommitmentsView extends ConsumerStatefulWidget {
-  const FrostShareCommitmentsView({
+class FrostShareSharesView extends ConsumerStatefulWidget {
+  const FrostShareSharesView({
     super.key,
     required this.walletName,
     required this.coin,
   });
 
-  static const String routeName = "/frostShareCommitmentsView";
+  static const String routeName = "/frostShareSharesView";
 
   final String walletName;
   final Coin coin;
 
   @override
-  ConsumerState<FrostShareCommitmentsView> createState() =>
-      _FrostShareCommitmentsViewState();
+  ConsumerState<FrostShareSharesView> createState() =>
+      _FrostShareSharesViewState();
 }
 
-class _FrostShareCommitmentsViewState
-    extends ConsumerState<FrostShareCommitmentsView> {
+class _FrostShareSharesViewState extends ConsumerState<FrostShareSharesView> {
   final List<TextEditingController> controllers = [];
   final List<FocusNode> focusNodes = [];
 
   late final List<String> participants;
-  late final String myCommitment;
+  late final String myShare;
   late final int myIndex;
 
   final List<bool> fieldIsEmptyFlags = [];
@@ -61,7 +59,7 @@ class _FrostShareCommitmentsViewState
       multisigConfig: ref.read(pFrostMultisigConfig.state).state!,
     );
     myIndex = participants.indexOf(ref.read(pFrostMyName.state).state!);
-    myCommitment = ref.read(pFrostStartKeyGenData.state).state!.commitments;
+    myShare = ref.read(pFrostSecretSharesData.state).state!.share;
 
     // temporarily remove my name
     participants.removeAt(myIndex);
@@ -114,7 +112,7 @@ class _FrostShareCommitmentsViewState
                 },
               ),
               title: Text(
-                "Commitments",
+                "Generate shares",
                 style: STextStyles.navBarTitle(context),
               ),
             ),
@@ -148,7 +146,7 @@ class _FrostShareCommitmentsViewState
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   QrImageView(
-                    data: myCommitment,
+                    data: myShare,
                     size: 220,
                     backgroundColor:
                         Theme.of(context).extension<StackColors>()!.background,
@@ -171,15 +169,15 @@ class _FrostShareCommitmentsViewState
                   ),
                   const _Div(),
                   _Item(
-                    label: "My commitment",
-                    detail: myCommitment,
+                    label: "My share",
+                    detail: myShare,
                     detailSelectable: true,
                   ),
                 ],
               ),
             ),
             const _Div(),
-            Text("Enter remaining participant's commitments:"),
+            Text("Enter remaining participant's shares:"),
             Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -196,7 +194,7 @@ class _FrostShareCommitmentsViewState
                             Constants.size.circularBorderRadius,
                           ),
                           child: TextField(
-                            key: Key("frostCommitmentsTextFieldKey_$i"),
+                            key: Key("frSharesTextFieldKey_$i"),
                             controller: controllers[i],
                             focusNode: focusNodes[i],
                             readOnly: false,
@@ -204,7 +202,7 @@ class _FrostShareCommitmentsViewState
                             enableSuggestions: false,
                             style: STextStyles.field(context),
                             decoration: standardInputDecoration(
-                              "Enter ${participants[i]}'s commitment",
+                              "Enter ${participants[i]}'s share",
                               focusNodes[i],
                               context,
                             ).copyWith(
@@ -228,7 +226,7 @@ class _FrostShareCommitmentsViewState
                                               semanticsLabel:
                                                   "Clear Button. Clears The Commitment Field Input.",
                                               key: Key(
-                                                  "frostCommitmentsClearButtonKey_$i"),
+                                                  "frSharesClearButtonKey_$i"),
                                               onTap: () {
                                                 controllers[i].text = "";
 
@@ -242,7 +240,7 @@ class _FrostShareCommitmentsViewState
                                               semanticsLabel:
                                                   "Paste Button. Pastes From Clipboard To Commitment Field Input.",
                                               key: Key(
-                                                  "frostCommitmentsPasteButtonKey_$i"),
+                                                  "frSharesPasteButtonKey_$i"),
                                               onTap: () async {
                                                 final ClipboardData? data =
                                                     await Clipboard.getData(
@@ -268,8 +266,8 @@ class _FrostShareCommitmentsViewState
                                         TextFieldIconButton(
                                           semanticsLabel:
                                               "Scan QR Button. Opens Camera For Scanning QR Code.",
-                                          key: Key(
-                                              "frostCommitmentsScanQrButtonKey_$i"),
+                                          key:
+                                              Key("frSharesScanQrButtonKey_$i"),
                                           onTap: () async {
                                             try {
                                               if (FocusScope.of(context)
@@ -315,7 +313,7 @@ class _FrostShareCommitmentsViewState
             if (!Util.isDesktop) const Spacer(),
             const _Div(),
             PrimaryButton(
-              label: "Generate shares",
+              label: "Generate",
               onPressed: () async {
                 // check for empty commitments
                 if (controllers
@@ -331,30 +329,20 @@ class _FrostShareCommitmentsViewState
                 }
 
                 // collect commitment strings and insert my own at the correct index
-                final commitments = controllers.map((e) => e.text).toList();
-                commitments.insert(myIndex, myCommitment);
+                final shares = controllers.map((e) => e.text).toList();
+                shares.insert(myIndex, myShare);
 
                 try {
-                  ref.read(pFrostSecretSharesData.notifier).state =
-                      Frost.generateSecretShares(
+                  final completed = Frost.completeKeyGeneration(
                     multisigConfigWithNamePtr: ref
                         .read(pFrostStartKeyGenData.state)
                         .state!
                         .multisigConfigWithNamePtr,
-                    mySeed: ref.read(pFrostStartKeyGenData.state).state!.seed,
-                    secretShareMachineWrapperPtr: ref
-                        .read(pFrostStartKeyGenData.state)
+                    secretSharesResPtr: ref
+                        .read(pFrostSecretSharesData.state)
                         .state!
-                        .secretShareMachineWrapperPtr,
-                    commitments: commitments,
-                  );
-
-                  await Navigator.of(context).pushNamed(
-                    FrostShareSharesView.routeName,
-                    arguments: (
-                      walletName: widget.walletName,
-                      coin: widget.coin,
-                    ),
+                        .secretSharesResPtr,
+                    shares: shares,
                   );
                 } catch (e, s) {
                   Logging.instance.log(
@@ -365,7 +353,7 @@ class _FrostShareCommitmentsViewState
                   return await showDialog<void>(
                     context: context,
                     builder: (_) => StackOkDialog(
-                      title: "Failed to generate shares",
+                      title: "Failed to complete key generation",
                       desktopPopRootNavigator: Util.isDesktop,
                     ),
                   );

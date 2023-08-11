@@ -21,6 +21,7 @@ import 'package:stackfrost/pages/add_wallet_views/add_wallet_view/add_wallet_vie
 import 'package:stackfrost/pages/add_wallet_views/create_or_restore_wallet_view/create_or_restore_wallet_view.dart';
 import 'package:stackfrost/pages/add_wallet_views/frost_ms/new/create_new_frost_ms_wallet_view.dart';
 import 'package:stackfrost/pages/add_wallet_views/frost_ms/new/frost_share_commitments_view.dart';
+import 'package:stackfrost/pages/add_wallet_views/frost_ms/new/frost_share_shares_view.dart';
 import 'package:stackfrost/pages/add_wallet_views/frost_ms/new/import_new_frost_ms_wallet_view.dart';
 import 'package:stackfrost/pages/add_wallet_views/frost_ms/new/share_new_multisig_config_view.dart';
 import 'package:stackfrost/pages/add_wallet_views/frost_ms/restore/restore_frost_ms_wallet_view.dart';
@@ -836,6 +837,24 @@ class RouteGenerator {
           return getRoute(
             shouldUseMaterialRoute: useMaterialPageRoute,
             builder: (_) => FrostShareCommitmentsView(
+              walletName: args.walletName,
+              coin: args.coin,
+            ),
+            settings: RouteSettings(
+              name: settings.name,
+            ),
+          );
+        }
+        return _routeError("${settings.name} invalid args: ${args.toString()}");
+
+      case FrostShareSharesView.routeName:
+        if (args is ({
+          String walletName,
+          Coin coin,
+        })) {
+          return getRoute(
+            shouldUseMaterialRoute: useMaterialPageRoute,
+            builder: (_) => FrostShareSharesView(
               walletName: args.walletName,
               coin: args.coin,
             ),
