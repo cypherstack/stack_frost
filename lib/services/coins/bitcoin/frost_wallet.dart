@@ -34,6 +34,7 @@ import 'package:stackfrost/utilities/constants.dart';
 import 'package:stackfrost/utilities/default_nodes.dart';
 import 'package:stackfrost/utilities/enums/coin_enum.dart';
 import 'package:stackfrost/utilities/flutter_secure_storage_interface.dart';
+import 'package:stackfrost/utilities/format.dart';
 import 'package:stackfrost/utilities/logger.dart';
 import 'package:stackfrost/utilities/prefs.dart';
 import 'package:stackfrost/widgets/crypto_notifications.dart';
@@ -235,8 +236,8 @@ class FrostWallet extends CoinServiceAPI
       }
     }
 
-    final serializedKeys = _serializedKeys!;
-    final keys = frost.deserializeKeys(keys: serializedKeys);
+    final serializedKeys = await _serializedKeys;
+    final keys = frost.deserializeKeys(keys: serializedKeys!);
 
     final int network =
         coin == Coin.bitcoin ? Network.Mainnet : Network.Testnet;
@@ -268,11 +269,12 @@ class FrostWallet extends CoinServiceAPI
   }) async {
     final int network =
         coin == Coin.bitcoin ? Network.Mainnet : Network.Testnet;
+    final serializedKeys = await _serializedKeys;
 
     return Frost.attemptSignConfig(
       network: network,
       config: config,
-      serializedKeys: _serializedKeys!,
+      serializedKeys: serializedKeys!,
     );
   }
 
@@ -491,33 +493,37 @@ class FrostWallet extends CoinServiceAPI
     }
   }
 
-  String? get _serializedKeys =>
-      DB.instance.get(boxName: walletId, key: "_serializedFROSTKeys")
-          as String?;
+  Future<String?> get _serializedKeys async => await _secureStore.read(
+        key: "{$walletId}_serializedFROSTKeys",
+      );
   Future<void> _saveSerializedKeys(String keys) async =>
-      await DB.instance.put<dynamic>(
-        boxName: walletId,
-        key: "_serializedFROSTKeys",
+      await _secureStore.write(
+        key: "{$walletId}_serializedFROSTKeys",
         value: keys,
       );
 
-  List<int>? get _multisigId =>
-      DB.instance.get<dynamic>(boxName: walletId, key: "_multisigIdFROST")
-          as List<int>?;
-  Future<void> _saveMultisigId(List<int> id) async =>
-      await DB.instance.put<dynamic>(
-        boxName: walletId,
-        key: "_multisigIdFROST",
-        value: id,
+  Future<Uint8List?> get _multisigId async {
+    final id = await _secureStore.read(
+      key: "{$walletId}_multisigIdFROST",
+    );
+    if (id == null) {
+      return null;
+    } else {
+      return Format.stringToUint8List(id);
+    }
+  }
+
+  Future<void> _saveMultisigId(Uint8List id) async => await _secureStore.write(
+        key: "{$walletId}_multisigIdFROST",
+        value: Format.uint8listToString(id),
       );
 
-  String? get _recoveryString =>
-      DB.instance.get<dynamic>(boxName: walletId, key: "_recoveryStringFROST")
-          as String?;
+  Future<String?> get _recoveryString async => await _secureStore.read(
+        key: "{$walletId}_recoveryStringFROST",
+      );
   Future<void> _saveRecoveryString(String recoveryString) async =>
-      await DB.instance.put<dynamic>(
-        boxName: walletId,
-        key: "_recoveryStringFROST",
+      await _secureStore.write(
+        key: "{$walletId}_recoveryStringFROST",
         value: recoveryString,
       );
 
@@ -573,12 +579,12 @@ class FrostWallet extends CoinServiceAPI
     await db.deleteWalletBlockchainData(walletId);
 
     try {
-      final keys = _serializedKeys!;
+      final keys = await _serializedKeys;
       final _mnemonic = await mnemonicString;
       final _mnemonicPassphrase = await mnemonicPassphrase;
 
       await recoverFromSerializedKeys(
-        serializedKeys: keys,
+        serializedKeys: keys!,
         mnemonic: _mnemonic!,
         mnemonicPassphrase: _mnemonicPassphrase!,
         isRescan: true,
@@ -662,7 +668,7 @@ class FrostWallet extends CoinServiceAPI
           key: '${_walletId}_mnemonicPassphrase', value: "");
       await _saveSerializedKeys(serializedKeys);
       await _saveRecoveryString(recoveryString);
-      await _saveMultisigId(multisigId.toList(growable: false));
+      await _saveMultisigId(multisigId);
       await _saveMyName(myName);
       await _updateParticipants(participants);
 
