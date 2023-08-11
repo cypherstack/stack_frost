@@ -11,7 +11,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stackfrost/db/hive/db.dart';
+import 'package:stackfrost/electrumx_rpc/cached_electrumx.dart';
+import 'package:stackfrost/electrumx_rpc/electrumx.dart';
 import 'package:stackfrost/models/node_model.dart';
+import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
 import 'package:stackfrost/services/coins/coin_service.dart';
 import 'package:stackfrost/services/coins/manager.dart';
 import 'package:stackfrost/services/node_service.dart';
@@ -240,16 +243,52 @@ class Wallets extends ChangeNotifier {
             final failovers = nodeService.failoverNodesFor(coin: coin);
 
             // load wallet
-            final wallet = CoinServiceAPI.from(
-              coin,
-              walletId,
-              entry.value.name,
-              nodeService.secureStorageInterface,
-              node,
-              txTracker,
-              prefs,
-              failovers,
-            );
+            final CoinServiceAPI wallet;
+            if (entry.value.type == WalletType.normal) {
+              wallet = CoinServiceAPI.from(
+                coin,
+                walletId,
+                entry.value.name,
+                nodeService.secureStorageInterface,
+                node,
+                txTracker,
+                prefs,
+                failovers,
+              );
+            } else {
+              final electrumxNode = ElectrumXNode(
+                address: node.host,
+                port: node.port,
+                name: node.name,
+                id: node.id,
+                useSSL: node.useSSL,
+              );
+              final client = ElectrumX.from(
+                  node: electrumxNode,
+                  failovers: failovers
+                      .map((e) => ElectrumXNode(
+                            address: e.host,
+                            port: e.port,
+                            name: e.name,
+                            id: e.id,
+                            useSSL: e.useSSL,
+                          ))
+                      .toList(),
+                  prefs: prefs);
+              final cachedClient = CachedElectrumX.from(
+                electrumXClient: client,
+              );
+
+              wallet = FrostWallet(
+                walletId: walletId,
+                walletName: entry.value.name,
+                coin: coin,
+                client: client,
+                cachedClient: cachedClient,
+                tracker: txTracker,
+                secureStore: nodeService.secureStorageInterface,
+              );
+            }
 
             final manager = Manager(wallet);
 

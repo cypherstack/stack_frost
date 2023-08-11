@@ -9,6 +9,7 @@
  */
 
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:bitcoindart/bitcoindart.dart';
 import 'package:crypto/crypto.dart';
@@ -31,21 +32,25 @@ class AddressUtils {
     try {
       final output =
           Address.addressToOutputScript(address, network, overridePrefix);
-      final hash = sha256.convert(output.toList(growable: false)).toString();
-
-      final chars = hash.split("");
-      final reversedPairs = <String>[];
-      // TODO find a better/faster way to do this?
-      var i = chars.length - 1;
-      while (i > 0) {
-        reversedPairs.add(chars[i - 1]);
-        reversedPairs.add(chars[i]);
-        i -= 2;
-      }
-      return reversedPairs.join("");
+      return convertBytesToScriptHash(output);
     } catch (e) {
       rethrow;
     }
+  }
+
+  static String convertBytesToScriptHash(Uint8List bytes) {
+    final hash = sha256.convert(bytes.toList(growable: false)).toString();
+
+    final chars = hash.split("");
+    final reversedPairs = <String>[];
+    // TODO find a better/faster way to do this?
+    var i = chars.length - 1;
+    while (i > 0) {
+      reversedPairs.add(chars[i - 1]);
+      reversedPairs.add(chars[i]);
+      i -= 2;
+    }
+    return reversedPairs.join("");
   }
 
   static bool validateAddress(String address, Coin coin) {

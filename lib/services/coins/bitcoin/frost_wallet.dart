@@ -755,10 +755,13 @@ class FrostWallet extends CoinServiceAPI
         if (batches[batchNumber] == null) {
           batches[batchNumber] = {};
         }
-        final scripthash =
-            AddressUtils.convertToScriptHash(allAddresses[i].value, _network);
+        final scriptHash = AddressUtils.convertBytesToScriptHash(
+          Uint8List.fromList(
+            allAddresses[i].publicKey!,
+          ),
+        );
         batches[batchNumber]!.addAll({
-          scripthash: [scripthash]
+          scriptHash: [scriptHash]
         });
         if (i % batchSizeMax == batchSizeMax - 1) {
           batchNumber++;
@@ -992,7 +995,8 @@ class FrostWallet extends CoinServiceAPI
       if (!needsRefresh) {
         final allOwnAddresses = [await _currentReceivingAddress];
         List<Map<String, dynamic>> allTxs = await _fetchHistory(
-            allOwnAddresses.map((e) => e.value).toList(growable: false));
+          allOwnAddresses,
+        );
         for (Map<String, dynamic> transaction in allTxs) {
           final txid = transaction['tx_hash'] as String;
           if ((await db
@@ -1030,8 +1034,7 @@ class FrostWallet extends CoinServiceAPI
     ];
 
     final Set<Map<String, dynamic>> allTxHashes =
-        (await _fetchHistory(allAddresses.map((e) => e.value).toList()))
-            .toSet();
+        (await _fetchHistory(allAddresses)).toSet();
 
     List<Map<String, dynamic>> allTransactions = [];
 
@@ -1094,9 +1097,11 @@ class FrostWallet extends CoinServiceAPI
   }
 
   Future<List<Map<String, dynamic>>> _fetchHistory(
-      List<String> allAddresses) async {
+      List<isar_models.Address> addresses) async {
     try {
       List<Map<String, dynamic>> allTxHashes = [];
+
+      final allAddresses = addresses.map((e) => e.value).toList();
 
       final Map<int, Map<String, List<dynamic>>> batches = {};
       final Map<String, String> requestIdToAddressMap = {};
@@ -1106,12 +1111,15 @@ class FrostWallet extends CoinServiceAPI
         if (batches[batchNumber] == null) {
           batches[batchNumber] = {};
         }
-        final scripthash =
-            AddressUtils.convertToScriptHash(allAddresses[i], _network);
+        final scriptHash = AddressUtils.convertBytesToScriptHash(
+          Uint8List.fromList(
+            addresses[i].publicKey!,
+          ),
+        );
         final id = Logger.isTestEnv ? "$i" : const Uuid().v1();
         requestIdToAddressMap[id] = allAddresses[i];
         batches[batchNumber]!.addAll({
-          id: [scripthash]
+          id: [scriptHash]
         });
         if (i % batchSizeMax == batchSizeMax - 1) {
           batchNumber++;

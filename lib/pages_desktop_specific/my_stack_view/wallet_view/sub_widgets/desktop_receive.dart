@@ -14,11 +14,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:stackfrost/notifications/show_flush_bar.dart';
 import 'package:stackfrost/pages/receive_view/generate_receiving_uri_qr_code_view.dart';
 import 'package:stackfrost/providers/providers.dart';
 import 'package:stackfrost/route_generator.dart';
+import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/address_utils.dart';
 import 'package:stackfrost/utilities/assets.dart';
 import 'package:stackfrost/utilities/clipboard_interface.dart';
 import 'package:stackfrost/utilities/constants.dart';
@@ -119,9 +122,7 @@ class _DesktopReceiveState extends ConsumerState<DesktopReceive> {
             .getManagerProvider(walletId)
             .select((value) => value.currentReceivingAddress),
         (previous, next) {
-      if (next is Future<String>) {
-        next.then((value) => setState(() => receivingAddress = value));
-      }
+      next.then((value) => setState(() => receivingAddress = value));
     });
 
     return Column(
@@ -212,27 +213,29 @@ class _DesktopReceiveState extends ConsumerState<DesktopReceive> {
         const SizedBox(
           height: 20,
         ),
-        SecondaryButton(
-          buttonHeight: ButtonHeight.l,
-          onPressed: generateNewAddress,
-          label: "Generate new address",
-        ),
+        if (ref.watch(walletsChangeNotifierProvider
+                .select((value) => value.getManager(widget.walletId).wallet))
+            is! FrostWallet)
+          SecondaryButton(
+            buttonHeight: ButtonHeight.l,
+            onPressed: generateNewAddress,
+            label: "Generate new address",
+          ),
         const SizedBox(
           height: 32,
         ),
-        // TODO: address utils #stackFrost
-        // Center(
-        //   child: QrImageView(
-        //     data: AddressUtils.buildUriString(
-        //       coin,
-        //       receivingAddress,
-        //       {},
-        //     ),
-        //     size: 200,
-        //     foregroundColor:
-        //         Theme.of(context).extension<StackColors>()!.accentColorDark,
-        //   ),
-        // ),
+        Center(
+          child: QrImageView(
+            data: AddressUtils.buildUriString(
+              coin,
+              receivingAddress,
+              {},
+            ),
+            size: 200,
+            foregroundColor:
+                Theme.of(context).extension<StackColors>()!.accentColorDark,
+          ),
+        ),
         const SizedBox(
           height: 32,
         ),

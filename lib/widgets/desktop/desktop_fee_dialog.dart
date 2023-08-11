@@ -312,7 +312,7 @@ class _DesktopFeeItemState extends ConsumerState<DesktopFeeItem> {
                             indicatePrecisionLoss: false,
                           )})";
 
-                  estimatedTimeToBeIncludedInNextBlock(
+                  timeString = estimatedTimeToBeIncludedInNextBlock(
                     Constants.targetBlockTimeInSeconds(manager.coin),
                     widget.feeRateType == FeeRateType.fast
                         ? widget.feeObject!.numberOfBlocksFast
