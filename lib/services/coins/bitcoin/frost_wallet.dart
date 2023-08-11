@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ffi';
 import 'dart:typed_data';
 
 import 'package:bitcoindart/bitcoindart.dart';
@@ -20,6 +21,7 @@ import 'package:stackfrost/services/event_bus/events/global/refresh_percent_chan
 import 'package:stackfrost/services/event_bus/events/global/updated_in_background_event.dart';
 import 'package:stackfrost/services/event_bus/events/global/wallet_sync_status_changed_event.dart';
 import 'package:stackfrost/services/event_bus/global_event_bus.dart';
+import 'package:stackfrost/services/frost.dart';
 import 'package:stackfrost/services/mixins/coin_control_interface.dart';
 import 'package:stackfrost/services/mixins/electrum_x_parsing.dart';
 import 'package:stackfrost/services/mixins/wallet_cache.dart';
@@ -205,18 +207,89 @@ class FrostWallet extends CoinServiceAPI
   Coin get coin => _coin;
   late final Coin _coin;
 
+  Future<String> frostCreateSignConfig({
+    required List<({String address, Amount amount})> outputs,
+    required String changeAddress,
+    required int feePerWeight,
+  }) async {
+    if (outputs.map((e) => e.amount).reduce((value, e) => value += e) >
+        balance.spendable) {
+      throw Exception("Insufficient available funds");
+    }
+
+    List<isar_models.UTXO> utxos =
+        await db.getUTXOs(walletId).filter().isBlockedEqualTo(false).findAll();
+
+    if (utxos.isEmpty) {
+      throw Exception("No UTXOs found");
+    } else {
+      final currentHeight = await chainHeight;
+      utxos.removeWhere(
+        (e) => !e.isConfirmed(
+          currentHeight,
+          MINIMUM_CONFIRMATIONS,
+        ),
+      );
+      if (utxos.isEmpty) {
+        throw Exception("No confirmed UTXOs found");
+      }
+    }
+
+    final serializedKeys = _serializedKeys!;
+    final keys = frost.deserializeKeys(keys: serializedKeys);
+
+    final int network =
+        coin == Coin.bitcoin ? Network.Mainnet : Network.Testnet;
+
+    final publicKey = frost.scriptPubKeyForKeys(keys: keys);
+
+    final config = Frost.createSignConfig(
+      network: network,
+      inputs: utxos
+          .map((e) => (
+                utxo: e,
+                scriptPubKey: publicKey,
+              ))
+          .toList(),
+      outputs: outputs,
+      changeAddress: (await _currentReceivingAddress).value,
+      feePerWeight: feePerWeight,
+    );
+
+    return config;
+  }
+
+  Future<
+      ({
+        Pointer<TransactionSignMachineWrapper> machinePtr,
+        String preprocess,
+      })> frostAttemptSignConfig({
+    required String config,
+  }) async {
+    final int network =
+        coin == Coin.bitcoin ? Network.Mainnet : Network.Testnet;
+
+    return Frost.attemptSignConfig(
+      network: network,
+      config: config,
+      serializedKeys: _serializedKeys!,
+    );
+  }
+
   @override
   Future<Map<String, dynamic>> prepareSend({
     required String address,
     required Amount amount,
     Map<String, dynamic>? args,
-  }) {
-    // TODO: implement prepareSend
+  }) async {
+    // not used in frost ms
     throw UnimplementedError();
   }
 
   @override
-  Future<String> confirmSend({required Map<String, dynamic> txData}) {
+  Future<String> confirmSend({
+    required Map<String, dynamic> txData,
+  }) {
     // TODO: implement confirmSend
     throw UnimplementedError();
   }

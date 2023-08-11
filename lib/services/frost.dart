@@ -3,7 +3,11 @@ import 'dart:typed_data';
 
 import 'package:frostdart/frostdart.dart';
 import 'package:frostdart/frostdart_bindings_generated.dart';
+import 'package:frostdart/output.dart';
 import 'package:frostdart/util.dart';
+import 'package:stackfrost/models/isar/models/isar_models.dart' as isar_models;
+import 'package:stackfrost/utilities/amount/amount.dart';
+import 'package:stackfrost/utilities/format.dart';
 import 'package:stackfrost/utilities/logger.dart';
 
 abstract class Frost {
@@ -204,5 +208,121 @@ abstract class Frost {
     }
   }
 
-  //=================== transaction creation =====================================
+  //=================== transaction creation ===================================
+
+  static String createSignConfig({
+    required int network,
+    required List<({isar_models.UTXO utxo, Uint8List scriptPubKey})> inputs,
+    required List<({String address, Amount amount})> outputs,
+    required String changeAddress,
+    required int feePerWeight,
+  }) {
+    try {
+      final signConfigRes = newSignConfig(
+        network: network,
+        outputs: inputs
+            .map(
+              (e) => Output(
+                hash: Format.stringToUint8List(e.utxo.txid),
+                vout: e.utxo.vout,
+                value: e.utxo.value,
+                scriptPubKey: e.scriptPubKey,
+              ),
+            )
+            .toList(),
+        paymentAddresses: outputs.map((e) => e.address).toList(),
+        paymentAmounts: outputs.map((e) => e.amount.raw.toInt()).toList(),
+        change: changeAddress,
+        feePerWeight: feePerWeight,
+      );
+
+      return signConfigRes.ref.encoded.toDartString();
+    } catch (e, s) {
+      Logging.instance.log(
+        "createSignConfig failed: $e\n$s",
+        level: LogLevel.Fatal,
+      );
+      rethrow;
+    }
+  }
+
+  static ({
+    Pointer<TransactionSignMachineWrapper> machinePtr,
+    String preprocess,
+  }) attemptSignConfig({
+    required int network,
+    required String config,
+    required String serializedKeys,
+  }) {
+    try {
+      final signConfigRes = decodeSignConfig(
+        network: network,
+        encodedSignConfig: config,
+      );
+
+      final keys = deserializeKeys(keys: serializedKeys);
+
+      final attemptSignRes = attemptSign(
+        thresholdKeysWrapperPointer: keys,
+        signConfigPointer: signConfigRes,
+      );
+
+      return (
+        preprocess: attemptSignRes.ref.preprocess.toDartString(),
+        machinePtr: attemptSignRes.ref.machine,
+      );
+    } catch (e, s) {
+      Logging.instance.log(
+        "attemptSignConfig failed: $e\n$s",
+        level: LogLevel.Fatal,
+      );
+      rethrow;
+    }
+  }
+
+  static ({
+    Pointer<TransactionSignatureMachineWrapper> machinePtr,
+    String share,
+  }) continueSigning({
+    required Pointer<TransactionSignMachineWrapper> machinePtr,
+    required List<String> preprocesses,
+  }) {
+    try {
+      final continueSignRes = continueSign(
+        machine: machinePtr,
+        preprocesses: preprocesses,
+      );
+
+      return (
+        share: continueSignRes.ref.preprocess.toDartString(),
+        machinePtr: continueSignRes.ref.machine,
+      );
+    } catch (e, s) {
+      Logging.instance.log(
+        "continueSigning failed: $e\n$s",
+        level: LogLevel.Fatal,
+      );
+      rethrow;
+    }
+  }
+
+  static String completeSigning({
+    required Pointer<TransactionSignatureMachineWrapper> machinePtr,
+    required List<String> shares,
+  }) {
+    try {
+      final rawTransaction = completeSign(
+        machine: machinePtr,
+        shares: shares,
+      );
+
+      return rawTransaction;
+    } catch (e, s) {
+      Logging.instance.log(
+        "completeSigning failed: $e\n$s",
+        level: LogLevel.Fatal,
+      );
+      rethrow;
+    }
+  }
 }
