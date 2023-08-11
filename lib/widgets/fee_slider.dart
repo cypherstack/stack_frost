@@ -34,7 +34,7 @@ class _FeeSliderState extends State<FeeSlider> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              "sat/vByte",
+              "Fees (sat/vByte)",
               style: STextStyles.smallMed12(context),
             ),
             Text(

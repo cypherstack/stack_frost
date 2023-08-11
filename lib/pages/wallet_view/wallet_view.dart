@@ -15,9 +15,11 @@ import 'package:event_bus/event_bus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:stackfrost/pages/coin_control/coin_control_view.dart';
 import 'package:stackfrost/pages/home_view/home_view.dart';
 import 'package:stackfrost/pages/notification_views/notifications_view.dart';
 import 'package:stackfrost/pages/receive_view/receive_view.dart';
+import 'package:stackfrost/pages/send_view/frost_ms/frost_send_view.dart';
 import 'package:stackfrost/pages/send_view/send_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_network_settings_view/wallet_network_settings_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_settings_view.dart';
@@ -51,6 +53,7 @@ import 'package:stackfrost/widgets/custom_buttons/blue_text_button.dart';
 import 'package:stackfrost/widgets/custom_loading_overlay.dart';
 import 'package:stackfrost/widgets/desktop/secondary_button.dart';
 import 'package:stackfrost/widgets/stack_dialog.dart';
+import 'package:stackfrost/widgets/wallet_navigation_bar/components/icons/coin_control_nav_icon.dart';
 import 'package:stackfrost/widgets/wallet_navigation_bar/components/icons/receive_nav_icon.dart';
 import 'package:stackfrost/widgets/wallet_navigation_bar/components/icons/send_nav_icon.dart';
 import 'package:stackfrost/widgets/wallet_navigation_bar/components/wallet_navigation_bar_item.dart';
@@ -94,7 +97,6 @@ class _WalletViewState extends ConsumerState<WalletView> {
   late StreamSubscription<dynamic> _nodeStatusSubscription;
 
   bool _rescanningOnOpen = false;
-  bool _lelantusRescanRecovery = false;
 
   @override
   void initState() {
@@ -188,7 +190,7 @@ class _WalletViewState extends ConsumerState<WalletView> {
   DateTime? _cachedTime;
 
   Future<bool> _onWillPop() async {
-    if (_rescanningOnOpen || _lelantusRescanRecovery) {
+    if (_rescanningOnOpen) {
       return false;
     }
 
@@ -326,37 +328,33 @@ class _WalletViewState extends ConsumerState<WalletView> {
                   eventBus: null,
                   textColor:
                       Theme.of(context).extension<StackColors>()!.textDark,
-                  actionButton: _lelantusRescanRecovery
-                      ? null
-                      : SecondaryButton(
-                          label: "Cancel",
-                          onPressed: () async {
-                            await showDialog<void>(
-                              context: context,
-                              builder: (context) => StackDialog(
-                                title: "Warning!",
-                                message: "Skipping this process can completely"
-                                    " break your wallet. It is only meant to be done in"
-                                    " emergency situations where the migration fails"
-                                    " and will not let you continue. Still skip?",
-                                leftButton: SecondaryButton(
-                                  label: "Cancel",
-                                  onPressed:
-                                      Navigator.of(context, rootNavigator: true)
-                                          .pop,
-                                ),
-                                rightButton: SecondaryButton(
-                                  label: "Ok",
-                                  onPressed: () {
-                                    Navigator.of(context, rootNavigator: true)
-                                        .pop();
-                                    setState(() => _rescanningOnOpen = false);
-                                  },
-                                ),
-                              ),
-                            );
-                          },
+                  actionButton: SecondaryButton(
+                    label: "Cancel",
+                    onPressed: () async {
+                      await showDialog<void>(
+                        context: context,
+                        builder: (context) => StackDialog(
+                          title: "Warning!",
+                          message: "Skipping this process can completely"
+                              " break your wallet. It is only meant to be done in"
+                              " emergency situations where the migration fails"
+                              " and will not let you continue. Still skip?",
+                          leftButton: SecondaryButton(
+                            label: "Cancel",
+                            onPressed:
+                                Navigator.of(context, rootNavigator: true).pop,
+                          ),
+                          rightButton: SecondaryButton(
+                            label: "Ok",
+                            onPressed: () {
+                              Navigator.of(context, rootNavigator: true).pop();
+                              setState(() => _rescanningOnOpen = false);
+                            },
+                          ),
                         ),
+                      );
+                    },
+                  ),
                 ),
               )
             ],
@@ -715,42 +713,45 @@ class _WalletViewState extends ConsumerState<WalletView> {
                               .state = "Private";
                           break;
                       }
+
                       Navigator.of(context).pushNamed(
-                        SendView.routeName,
-                        arguments: Tuple2(
-                          walletId,
-                          coin,
+                        ref.read(managerProvider).isFrostMS
+                            ? FrostSendView.routeName
+                            : SendView.routeName,
+                        arguments: (
+                          walletId: walletId,
+                          coin: coin,
                         ),
                       );
                     },
                   ),
                 ],
                 moreItems: [
-                  // if (ref.watch(
-                  //       walletsChangeNotifierProvider.select(
-                  //         (value) => value
-                  //             .getManager(widget.walletId)
-                  //             .hasCoinControlSupport,
-                  //       ),
-                  //     ) &&
-                  //     ref.watch(
-                  //       prefsChangeNotifierProvider.select(
-                  //         (value) => value.enableCoinControl,
-                  //       ),
-                  //     ))
-                  //   WalletNavigationBarItemData(
-                  //     label: "Coin control",
-                  //     icon: const CoinControlNavIcon(),
-                  //     onTap: () {
-                  //       Navigator.of(context).pushNamed(
-                  //         CoinControlView.routeName,
-                  //         arguments: Tuple2(
-                  //           widget.walletId,
-                  //           CoinControlViewType.manage,
-                  //         ),
-                  //       );
-                  //     },
-                  //   ),
+                  if (ref.watch(
+                        walletsChangeNotifierProvider.select(
+                          (value) => value
+                              .getManager(widget.walletId)
+                              .hasCoinControlSupport,
+                        ),
+                      ) &&
+                      ref.watch(
+                        prefsChangeNotifierProvider.select(
+                          (value) => value.enableCoinControl,
+                        ),
+                      ))
+                    WalletNavigationBarItemData(
+                      label: "Coin control",
+                      icon: const CoinControlNavIcon(),
+                      onTap: () {
+                        Navigator.of(context).pushNamed(
+                          CoinControlView.routeName,
+                          arguments: Tuple2(
+                            widget.walletId,
+                            CoinControlViewType.manage,
+                          ),
+                        );
+                      },
+                    ),
                 ],
               ),
             ],

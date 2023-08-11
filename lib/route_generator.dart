@@ -52,6 +52,7 @@ import 'package:stackfrost/pages/receive_view/addresses/wallet_addresses_view.da
 import 'package:stackfrost/pages/receive_view/generate_receiving_uri_qr_code_view.dart';
 import 'package:stackfrost/pages/receive_view/receive_view.dart';
 import 'package:stackfrost/pages/send_view/confirm_transaction_view.dart';
+import 'package:stackfrost/pages/send_view/frost_ms/frost_send_view.dart';
 import 'package:stackfrost/pages/send_view/send_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/about_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/advanced_views/advanced_settings_view.dart';
@@ -914,6 +915,24 @@ class RouteGenerator {
         }
         return _routeError("${settings.name} invalid args: ${args.toString()}");
 
+      case FrostSendView.routeName:
+        if (args is ({
+          String walletId,
+          Coin coin,
+        })) {
+          return getRoute(
+            shouldUseMaterialRoute: useMaterialPageRoute,
+            builder: (_) => FrostSendView(
+              walletId: args.walletId,
+              coin: args.coin,
+            ),
+            settings: RouteSettings(
+              name: settings.name,
+            ),
+          );
+        }
+        return _routeError("${settings.name} invalid args: ${args.toString()}");
+
       case NewWalletRecoveryPhraseWarningView.routeName:
         if (args is Tuple2<String, Coin>) {
           return getRoute(
@@ -1099,12 +1118,15 @@ class RouteGenerator {
         return _routeError("${settings.name} invalid args: ${args.toString()}");
 
       case SendView.routeName:
-        if (args is Tuple2<String, Coin>) {
+        if (args is ({
+          String walletId,
+          Coin coin,
+        })) {
           return getRoute(
             shouldUseMaterialRoute: useMaterialPageRoute,
             builder: (_) => SendView(
-              walletId: args.item1,
-              coin: args.item2,
+              walletId: args.walletId,
+              coin: args.coin,
             ),
             settings: RouteSettings(
               name: settings.name,

@@ -16,6 +16,7 @@ import 'package:stackfrost/db/hive/db.dart';
 import 'package:stackfrost/models/balance.dart';
 import 'package:stackfrost/models/isar/models/isar_models.dart' as isar_models;
 import 'package:stackfrost/models/models.dart';
+import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
 import 'package:stackfrost/services/coins/coin_service.dart';
 import 'package:stackfrost/services/event_bus/events/global/node_connection_status_changed_event.dart';
 import 'package:stackfrost/services/event_bus/events/global/updated_in_background_event.dart';
@@ -240,6 +241,8 @@ class Manager with ChangeNotifier {
   int get currentHeight => _currentWallet.storedChainHeight;
 
   bool get hasCoinControlSupport => _currentWallet is CoinControlInterface;
+
+  bool get isFrostMS => _currentWallet is FrostWallet;
 
   bool get hasWhirlpoolSupport => false;
 
