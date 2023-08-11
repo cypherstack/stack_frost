@@ -19,6 +19,7 @@ import 'package:stackfrost/pages/receive_view/addresses/wallet_addresses_view.da
 import 'package:stackfrost/pages/receive_view/generate_receiving_uri_qr_code_view.dart';
 import 'package:stackfrost/providers/providers.dart';
 import 'package:stackfrost/route_generator.dart';
+import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/utilities/assets.dart';
 import 'package:stackfrost/utilities/clipboard_interface.dart';
@@ -302,19 +303,22 @@ class _ReceiveViewState extends ConsumerState<ReceiveView> {
                   const SizedBox(
                     height: 12,
                   ),
-                  TextButton(
-                    onPressed: generateNewAddress,
-                    style: Theme.of(context)
-                        .extension<StackColors>()!
-                        .getSecondaryEnabledButtonStyle(context),
-                    child: Text(
-                      "Generate new address",
-                      style: STextStyles.button(context).copyWith(
-                          color: Theme.of(context)
-                              .extension<StackColors>()!
-                              .accentColorDark),
+                  if (ref.watch(walletsChangeNotifierProvider.select(
+                          (value) => value.getManager(widget.walletId).wallet))
+                      is! FrostWallet)
+                    TextButton(
+                      onPressed: generateNewAddress,
+                      style: Theme.of(context)
+                          .extension<StackColors>()!
+                          .getSecondaryEnabledButtonStyle(context),
+                      child: Text(
+                        "Generate new address",
+                        style: STextStyles.button(context).copyWith(
+                            color: Theme.of(context)
+                                .extension<StackColors>()!
+                                .accentColorDark),
+                      ),
                     ),
-                  ),
                   const SizedBox(
                     height: 30,
                   ),
