@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:bitcoindart/bitcoindart.dart';
 import 'package:frostdart/frostdart.dart' as frost;
@@ -227,7 +228,7 @@ class FrostWallet extends CoinServiceAPI
   Future<isar_models.Address> get _currentReceivingAddress async => (await db
       .getAddresses(walletId)
       .filter()
-      .typeEqualTo(isar_models.AddressType.p2wpkh)
+      .typeEqualTo(isar_models.AddressType.unknown)
       .subTypeEqualTo(isar_models.AddressSubType.receiving)
       .sortByDerivationIndexDesc()
       .findFirst())!;
@@ -420,10 +421,31 @@ class FrostWallet extends CoinServiceAPI
   String? get _serializedKeys =>
       DB.instance.get(boxName: walletId, key: "_serializedFROSTKeys")
           as String?;
-  Future<void> _saveSerializedKeys(String keys) async => await DB.instance.put(
+  Future<void> _saveSerializedKeys(String keys) async =>
+      await DB.instance.put<dynamic>(
         boxName: walletId,
         key: "_serializedFROSTKeys",
         value: keys,
+      );
+
+  List<int>? get _multisigId =>
+      DB.instance.get<dynamic>(boxName: walletId, key: "_multisigIdFROST")
+          as List<int>?;
+  Future<void> _saveMultisigId(List<int> id) async =>
+      await DB.instance.put<dynamic>(
+        boxName: walletId,
+        key: "_multisigIdFROST",
+        value: id,
+      );
+
+  String? get _recoveryString =>
+      DB.instance.get<dynamic>(boxName: walletId, key: "_recoveryStringFROST")
+          as String?;
+  Future<void> _saveRecoveryString(String recoveryString) async =>
+      await DB.instance.put<dynamic>(
+        boxName: walletId,
+        key: "_recoveryStringFROST",
+        value: recoveryString,
       );
 
   @override
@@ -512,8 +534,12 @@ class FrostWallet extends CoinServiceAPI
     await _prefs.init();
   }
 
-  @override
-  Future<void> initializeNew() async {
+  Future<void> initializeNewFrost({
+    required String mnemonic,
+    required String recoveryString,
+    required String serializedKeys,
+    required Uint8List multisigId,
+  }) async {
     Logging.instance.log("Generating new ${coin.prettyName} FROST wallet.",
         level: LogLevel.Info);
 
@@ -525,10 +551,39 @@ class FrostWallet extends CoinServiceAPI
 
     await _prefs.init();
     try {
-      // await _generateNewWallet();
+      await _secureStore.write(
+        key: '${_walletId}_mnemonic',
+        value: mnemonic,
+      );
+      await _secureStore.write(
+          key: '${_walletId}_mnemonicPassphrase', value: "");
+      await _saveSerializedKeys(serializedKeys);
+      await _saveRecoveryString(recoveryString);
+      await _saveMultisigId(multisigId.toList(growable: false));
+
+      final keys = frost.deserializeKeys(keys: serializedKeys);
+
+      final addressString = frost.addressForKeys(
+        network: coin == Coin.bitcoin ? Network.Mainnet : Network.Testnet,
+        keys: keys,
+      );
+
+      final publicKey = frost.scriptPubKeyForKeys(keys: keys);
+
+      final address = isar_models.Address(
+        walletId: walletId,
+        value: addressString,
+        publicKey: publicKey,
+        derivationIndex: 0,
+        derivationPath: null,
+        subType: isar_models.AddressSubType.receiving,
+        type: isar_models.AddressType.unknown,
+      );
+
+      await db.putAddresses([address]);
     } catch (e, s) {
       Logging.instance.log(
-        "Exception rethrown from initializeNew(): $e\n$s",
+        "Exception rethrown from initializeNewFrost(): $e\n$s",
         level: LogLevel.Fatal,
       );
       rethrow;
@@ -537,6 +592,13 @@ class FrostWallet extends CoinServiceAPI
       updateCachedId(walletId),
       updateCachedIsFavorite(false),
     ]);
+  }
+
+  @override
+  Future<void> initializeNew() async {
+    throw Exception(
+      "Attempted to initialize a new frost wallet with the wrong function",
+    );
   }
 
   @override

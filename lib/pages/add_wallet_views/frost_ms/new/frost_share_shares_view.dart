@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:stackfrost/pages/add_wallet_views/frost_ms/confirm_new_frost_ms_wallet_creation_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
 import 'package:stackfrost/services/frost.dart';
@@ -333,7 +334,8 @@ class _FrostShareSharesViewState extends ConsumerState<FrostShareSharesView> {
                 shares.insert(myIndex, myShare);
 
                 try {
-                  final completed = Frost.completeKeyGeneration(
+                  ref.read(pFrostCompletedKeyGenData.notifier).state =
+                      Frost.completeKeyGeneration(
                     multisigConfigWithNamePtr: ref
                         .read(pFrostStartKeyGenData.state)
                         .state!
@@ -343,6 +345,13 @@ class _FrostShareSharesViewState extends ConsumerState<FrostShareSharesView> {
                         .state!
                         .secretSharesResPtr,
                     shares: shares,
+                  );
+                  await Navigator.of(context).pushNamed(
+                    ConfirmNewFrostMSWalletCreationView.routeName,
+                    arguments: (
+                      walletName: widget.walletName,
+                      coin: widget.coin,
+                    ),
                   );
                 } catch (e, s) {
                   Logging.instance.log(
