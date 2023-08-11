@@ -18,6 +18,7 @@ import 'package:stackfrost/providers/global/wallets_provider.dart';
 import 'package:stackfrost/providers/global/wallets_service_provider.dart';
 import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
 import 'package:stackfrost/services/coins/manager.dart';
+import 'package:stackfrost/services/frost.dart';
 import 'package:stackfrost/services/transaction_notification_tracker.dart';
 import 'package:stackfrost/services/wallets_service.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
@@ -242,6 +243,11 @@ class _ConfirmNewFrostMSWalletCreationViewState
                     recoveryString: recoveryString,
                     serializedKeys: serializedKeys,
                     multisigId: multisigId,
+                    myName: ref.read(pFrostMyName.state).state!,
+                    participants: Frost.getParticipants(
+                      multisigConfig:
+                          ref.read(pFrostMultisigConfig.state).state!,
+                    ),
                   );
 
                   final manager = Manager(wallet);

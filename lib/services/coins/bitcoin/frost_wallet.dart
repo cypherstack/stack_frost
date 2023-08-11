@@ -521,6 +521,34 @@ class FrostWallet extends CoinServiceAPI
         value: recoveryString,
       );
 
+  List<String> get participants {
+    final list = DB.instance.get<dynamic>(
+          boxName: walletId,
+          key: "_frostParticipants",
+        ) as List? ??
+        [];
+    return List<String>.from(list);
+  }
+
+  Future<void> _updateParticipants(List<String> participants) async {
+    await DB.instance.put<dynamic>(
+      boxName: walletId,
+      key: "_frostParticipants",
+      value: participants,
+    );
+  }
+
+  String get myName => DB.instance.get<dynamic>(
+        boxName: walletId,
+        key: "_frostMyName",
+      ) as String;
+  Future<void> _saveMyName(String myName) async =>
+      await DB.instance.put<dynamic>(
+        boxName: walletId,
+        key: "_frostMyName",
+        value: myName,
+      );
+
   @override
   Future<void> fullRescan(
     int maxUnusedAddressGap,
@@ -612,6 +640,8 @@ class FrostWallet extends CoinServiceAPI
     required String recoveryString,
     required String serializedKeys,
     required Uint8List multisigId,
+    required String myName,
+    required List<String> participants,
   }) async {
     Logging.instance.log("Generating new ${coin.prettyName} FROST wallet.",
         level: LogLevel.Info);
@@ -633,6 +663,8 @@ class FrostWallet extends CoinServiceAPI
       await _saveSerializedKeys(serializedKeys);
       await _saveRecoveryString(recoveryString);
       await _saveMultisigId(multisigId.toList(growable: false));
+      await _saveMyName(myName);
+      await _updateParticipants(participants);
 
       final keys = frost.deserializeKeys(keys: serializedKeys);
 
