@@ -19,6 +19,7 @@ import 'package:stackfrost/pages/pinpad_views/lock_screen_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/advanced_views/debug_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/syncing_preferences_views/syncing_preferences_view.dart';
 import 'package:stackfrost/pages/settings_views/sub_widgets/settings_list_button.dart';
+import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/frost_ms_options_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_backup_views/wallet_backup_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_network_settings_view/wallet_network_settings_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_settings_wallet_settings/wallet_settings_wallet_settings_view.dart';
@@ -26,6 +27,7 @@ import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_sett
 import 'package:stackfrost/providers/global/wallets_provider.dart';
 import 'package:stackfrost/providers/ui/transaction_filter_provider.dart';
 import 'package:stackfrost/route_generator.dart';
+import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
 import 'package:stackfrost/services/event_bus/events/global/node_connection_status_changed_event.dart';
 import 'package:stackfrost/services/event_bus/events/global/wallet_sync_status_changed_event.dart';
 import 'package:stackfrost/services/event_bus/global_event_bus.dart';
@@ -196,6 +198,28 @@ class _WalletSettingsViewState extends ConsumerState<WalletSettingsView> {
                                 const SizedBox(
                                   height: 8,
                                 ),
+                                if (ref.watch(walletsChangeNotifierProvider
+                                    .select((value) => value
+                                        .getManager(widget.walletId)
+                                        .wallet)) is FrostWallet)
+                                  SettingsListButton(
+                                    iconAssetName: Assets.svg.addressBook,
+                                    iconSize: 16,
+                                    title: "FROST Multisig options",
+                                    onPressed: () {
+                                      Navigator.of(context).pushNamed(
+                                        FrostMSWalletOptionsView.routeName,
+                                        arguments: walletId,
+                                      );
+                                    },
+                                  ),
+                                if (ref.watch(walletsChangeNotifierProvider
+                                    .select((value) => value
+                                        .getManager(widget.walletId)
+                                        .wallet)) is FrostWallet)
+                                  const SizedBox(
+                                    height: 8,
+                                  ),
                                 SettingsListButton(
                                   iconAssetName: Assets.svg.node,
                                   iconSize: 16,
