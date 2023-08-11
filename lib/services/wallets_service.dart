@@ -218,7 +218,7 @@ class WalletsService extends ChangeNotifier {
       "id": walletId,
       "coin": coin.name,
       "name": name,
-      "type": type,
+      "type": type.name,
     };
 
     await DB.instance.put<dynamic>(
@@ -272,7 +272,7 @@ class WalletsService extends ChangeNotifier {
       "id": id,
       "coin": coin.name,
       "name": name,
-      "type": type,
+      "type": type.name,
     };
 
     await DB.instance.put<dynamic>(
