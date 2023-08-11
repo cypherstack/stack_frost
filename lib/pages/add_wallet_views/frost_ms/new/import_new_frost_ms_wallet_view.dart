@@ -38,6 +38,8 @@ class _ImportNewFrostMsWalletViewState
   late final TextEditingController configFieldController;
   late final TextEditingController myNameFieldController;
 
+  bool _enableButton = false;
+
   @override
   void initState() {
     myNameFieldController = TextEditingController();
@@ -115,6 +117,12 @@ class _ImportNewFrostMsWalletViewState
             Text("My name"),
             TextField(
               controller: myNameFieldController,
+              onChanged: (_) {
+                setState(() {
+                  _enableButton = configFieldController.text.isNotEmpty &&
+                      myNameFieldController.text.isNotEmpty;
+                });
+              },
             ),
             const SizedBox(
               height: 16,
@@ -122,6 +130,12 @@ class _ImportNewFrostMsWalletViewState
             Text("Config"),
             TextField(
               controller: configFieldController,
+              onChanged: (_) {
+                setState(() {
+                  _enableButton = configFieldController.text.isNotEmpty &&
+                      myNameFieldController.text.isNotEmpty;
+                });
+              },
             ),
             const SizedBox(
               height: 16,
@@ -132,8 +146,7 @@ class _ImportNewFrostMsWalletViewState
             ),
             PrimaryButton(
               label: "Start key generation",
-              enabled: configFieldController.text.isNotEmpty &&
-                  myNameFieldController.text.isNotEmpty,
+              enabled: _enableButton,
               onPressed: () async {
                 if (FocusScope.of(context).hasFocus) {
                   FocusScope.of(context).unfocus();

@@ -1,10 +1,13 @@
+import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
 import 'package:stackfrost/services/frost.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/constants.dart';
 import 'package:stackfrost/utilities/enums/coin_enum.dart';
 import 'package:stackfrost/utilities/logger.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
@@ -15,7 +18,13 @@ import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackfrost/widgets/desktop/desktop_app_bar.dart';
 import 'package:stackfrost/widgets/desktop/desktop_scaffold.dart';
 import 'package:stackfrost/widgets/desktop/primary_button.dart';
+import 'package:stackfrost/widgets/icon_widgets/clipboard_icon.dart';
+import 'package:stackfrost/widgets/icon_widgets/qrcode_icon.dart';
+import 'package:stackfrost/widgets/icon_widgets/x_icon.dart';
+import 'package:stackfrost/widgets/rounded_white_container.dart';
 import 'package:stackfrost/widgets/stack_dialog.dart';
+import 'package:stackfrost/widgets/stack_text_field.dart';
+import 'package:stackfrost/widgets/textfield_icon_button.dart';
 
 class FrostShareCommitmentsView extends ConsumerStatefulWidget {
   const FrostShareCommitmentsView({
@@ -36,18 +45,29 @@ class FrostShareCommitmentsView extends ConsumerStatefulWidget {
 
 class _StartKeyGenMsViewState extends ConsumerState<FrostShareCommitmentsView> {
   final List<TextEditingController> controllers = [];
+  final List<FocusNode> focusNodes = [];
 
   late final List<String> participants;
-  late final String commitment;
+  late final String myCommitment;
+  late final int myIndex;
+
+  final List<bool> fieldIsEmptyFlags = [];
 
   @override
   void initState() {
     participants = Frost.getParticipants(
       multisigConfig: ref.read(pFrostMultisigConfig.state).state!,
     );
-    commitment = ref.read(pFrostStartKeyGenData.state).state!.commitments;
+    myIndex = participants.indexOf(ref.read(pFrostMyName.state).state!);
+    myCommitment = ref.read(pFrostStartKeyGenData.state).state!.commitments;
+
+    // temporarily remove my name
+    participants.removeAt(myIndex);
+
     for (int i = 0; i < participants.length; i++) {
       controllers.add(TextEditingController());
+      focusNodes.add(FocusNode());
+      fieldIsEmptyFlags.add(true);
     }
     super.initState();
   }
@@ -56,6 +76,9 @@ class _StartKeyGenMsViewState extends ConsumerState<FrostShareCommitmentsView> {
   void dispose() {
     for (int i = 0; i < controllers.length; i++) {
       controllers[i].dispose();
+    }
+    for (int i = 0; i < focusNodes.length; i++) {
+      focusNodes[i].dispose();
     }
     super.dispose();
   }
@@ -123,7 +146,7 @@ class _StartKeyGenMsViewState extends ConsumerState<FrostShareCommitmentsView> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   QrImageView(
-                    data: commitment,
+                    data: myCommitment,
                     size: 220,
                     backgroundColor:
                         Theme.of(context).extension<StackColors>()!.background,
@@ -135,14 +158,21 @@ class _StartKeyGenMsViewState extends ConsumerState<FrostShareCommitmentsView> {
               ),
             ),
             const _Div(),
-            _Item(
-              label: "My name",
-              detail: ref.watch(pFrostMyName.state).state!,
-            ),
-            const _Div(),
-            _Item(
-              label: "My commitment",
-              detail: commitment,
+            RoundedWhiteContainer(
+              child: Column(
+                children: [
+                  _Item(
+                    label: "My name",
+                    detail: ref.watch(pFrostMyName.state).state!,
+                  ),
+                  const _Div(),
+                  _Item(
+                    label: "My commitment",
+                    detail: myCommitment,
+                    detailSelectable: true,
+                  ),
+                ],
+              ),
             ),
             const _Div(),
             Text("Enter remaining participant's commitments:"),
@@ -151,27 +181,126 @@ class _StartKeyGenMsViewState extends ConsumerState<FrostShareCommitmentsView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 for (int i = 0; i < participants.length; i++)
-                  Builder(
-                    builder: (_) {
-                      final name = participants[i];
-
-                      if (name == ref.read(pFrostMyName.state).state!) {
-                        controllers[i].text = commitment;
-                      }
-
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(name),
-                          TextField(
-                            enabled:
-                                name != ref.read(pFrostMyName.state).state!,
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(
+                            Constants.size.circularBorderRadius,
+                          ),
+                          child: TextField(
+                            key: Key("frTextFieldKey_$i"),
                             controller: controllers[i],
-                          )
-                        ],
-                      );
-                    },
+                            focusNode: focusNodes[i],
+                            readOnly: false,
+                            autocorrect: false,
+                            enableSuggestions: false,
+                            style: STextStyles.field(context),
+                            decoration: standardInputDecoration(
+                              "Enter ${participants[i]}'s commitment",
+                              focusNodes[i],
+                              context,
+                            ).copyWith(
+                              contentPadding: const EdgeInsets.only(
+                                left: 16,
+                                top: 6,
+                                bottom: 8,
+                                right: 5,
+                              ),
+                              suffixIcon: Padding(
+                                padding: fieldIsEmptyFlags[i]
+                                    ? const EdgeInsets.only(right: 8)
+                                    : const EdgeInsets.only(right: 0),
+                                child: UnconstrainedBox(
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    children: [
+                                      !fieldIsEmptyFlags[i]
+                                          ? TextFieldIconButton(
+                                              semanticsLabel:
+                                                  "Clear Button. Clears The Commitment Field Input.",
+                                              key: Key("frClearButtonKey_$i"),
+                                              onTap: () {
+                                                controllers[i].text = "";
+
+                                                setState(() {
+                                                  fieldIsEmptyFlags[i] = true;
+                                                });
+                                              },
+                                              child: const XIcon(),
+                                            )
+                                          : TextFieldIconButton(
+                                              semanticsLabel:
+                                                  "Paste Button. Pastes From Clipboard To Commitment Field Input.",
+                                              key: Key("frPasteButtonKey_$i"),
+                                              onTap: () async {
+                                                final ClipboardData? data =
+                                                    await Clipboard.getData(
+                                                        Clipboard.kTextPlain);
+                                                if (data?.text != null &&
+                                                    data!.text!.isNotEmpty) {
+                                                  controllers[i].text =
+                                                      data.text!.trim();
+                                                }
+
+                                                setState(() {
+                                                  fieldIsEmptyFlags[i] =
+                                                      controllers[i]
+                                                          .text
+                                                          .isEmpty;
+                                                });
+                                              },
+                                              child: fieldIsEmptyFlags[i]
+                                                  ? const ClipboardIcon()
+                                                  : const XIcon(),
+                                            ),
+                                      if (fieldIsEmptyFlags[i])
+                                        TextFieldIconButton(
+                                          semanticsLabel:
+                                              "Scan QR Button. Opens Camera For Scanning QR Code.",
+                                          key: Key("frScanQrButtonKey_$i"),
+                                          onTap: () async {
+                                            try {
+                                              if (FocusScope.of(context)
+                                                  .hasFocus) {
+                                                FocusScope.of(context)
+                                                    .unfocus();
+                                                await Future<void>.delayed(
+                                                    const Duration(
+                                                        milliseconds: 75));
+                                              }
+
+                                              final qrResult =
+                                                  await BarcodeScanner.scan();
+
+                                              controllers[i].text =
+                                                  qrResult.rawContent;
+
+                                              setState(() {
+                                                fieldIsEmptyFlags[i] =
+                                                    controllers[i].text.isEmpty;
+                                              });
+                                            } on PlatformException catch (e, s) {
+                                              Logging.instance.log(
+                                                  "Failed to get camera permissions while trying to scan qr code: $e\n$s",
+                                                  level: LogLevel.Warning);
+                                            }
+                                          },
+                                          child: const QrCodeIcon(),
+                                        )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
               ],
             ),
@@ -193,6 +322,10 @@ class _StartKeyGenMsViewState extends ConsumerState<FrostShareCommitmentsView> {
                   );
                 }
 
+                // collect commitment strings and insert my own at the correct index
+                final commitments = controllers.map((e) => e.text).toList();
+                commitments.insert(myIndex, myCommitment);
+
                 try {
                   ref.read(pFrostSecretSharesData.notifier).state =
                       Frost.generateSecretShares(
@@ -205,7 +338,7 @@ class _StartKeyGenMsViewState extends ConsumerState<FrostShareCommitmentsView> {
                         .read(pFrostStartKeyGenData.state)
                         .state!
                         .secretShareMachineWrapperPtr,
-                    commitments: controllers.map((e) => e.text).toList(),
+                    commitments: commitments,
                   );
                 } catch (e, s) {
                   Logging.instance.log(
@@ -221,29 +354,6 @@ class _StartKeyGenMsViewState extends ConsumerState<FrostShareCommitmentsView> {
                     ),
                   );
                 }
-
-                print(
-                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAA: ${ref.read(pFrostSecretSharesData.notifier).state?.share}");
-
-                // final config = configFieldController.text;
-                //
-                // if (!Frost.validateEncodedMultisigConfig(
-                //     encodedConfig: config)) {
-                //   return await showDialog<void>(
-                //     context: context,
-                //     builder: (_) => const StackOkDialog(
-                //       title: "Invalid config",
-                //     ),
-                //   );
-                // }
-                //
-                // ref.read(pCurrentMultisigConfig.notifier).state =
-                //     config;
-
-                // await Navigator.of(context).pushNamed(
-                //   ShareNewMultisigConfigView.routeName,
-                //   arguments: (walletName: widget.walletName, coin: widget.coin,),
-                // );
               },
             ),
           ],
@@ -269,10 +379,12 @@ class _Item extends StatelessWidget {
     super.key,
     required this.label,
     required this.detail,
+    this.detailSelectable = false,
   });
 
   final String label;
   final String detail;
+  final bool detailSelectable;
 
   @override
   Widget build(BuildContext context) {
@@ -281,7 +393,7 @@ class _Item extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label),
-        Text(detail),
+        detailSelectable ? SelectableText(detail) : Text(detail),
       ],
     );
   }
