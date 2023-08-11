@@ -257,6 +257,12 @@ class _ConfirmNewFrostMSWalletCreationViewState
                         manager: manager,
                       );
 
+                  ref.read(pFrostMultisigConfig.state).state = null;
+                  ref.read(pFrostMyName.state).state = null;
+                  ref.read(pFrostStartKeyGenData.state).state = null;
+                  ref.read(pFrostSecretSharesData.state).state = null;
+                  ref.read(pFrostCompletedKeyGenData.state).state = null;
+
                   // pop progress dialog
                   if (mounted) {
                     Navigator.pop(context);

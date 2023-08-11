@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frostdart/frostdart_bindings_generated.dart';
 
+// =================== wallet creation =========================================
 final pFrostMultisigConfig = StateProvider<String?>((ref) => null);
 final pFrostMyName = StateProvider<String?>((ref) => null);
 
