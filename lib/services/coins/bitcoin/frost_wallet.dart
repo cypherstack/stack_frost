@@ -236,7 +236,7 @@ class FrostWallet extends CoinServiceAPI
       }
     }
 
-    final serializedKeys = await _serializedKeys;
+    final serializedKeys = await getSerializedKeys;
     final keys = frost.deserializeKeys(keys: serializedKeys!);
 
     final int network =
@@ -269,7 +269,7 @@ class FrostWallet extends CoinServiceAPI
   }) async {
     final int network =
         coin == Coin.bitcoin ? Network.Mainnet : Network.Testnet;
-    final serializedKeys = await _serializedKeys;
+    final serializedKeys = await getSerializedKeys;
 
     return Frost.attemptSignConfig(
       network: network,
@@ -493,7 +493,7 @@ class FrostWallet extends CoinServiceAPI
     }
   }
 
-  Future<String?> get _serializedKeys async => await _secureStore.read(
+  Future<String?> get getSerializedKeys async => await _secureStore.read(
         key: "{$walletId}_serializedFROSTKeys",
       );
   Future<void> _saveSerializedKeys(String keys) async =>
@@ -502,7 +502,7 @@ class FrostWallet extends CoinServiceAPI
         value: keys,
       );
 
-  Future<Uint8List?> get _multisigId async {
+  Future<Uint8List?> get multisigId async {
     final id = await _secureStore.read(
       key: "{$walletId}_multisigIdFROST",
     );
@@ -513,15 +513,15 @@ class FrostWallet extends CoinServiceAPI
     }
   }
 
-  Future<void> _saveMultisigId(Uint8List id) async => await _secureStore.write(
+  Future<void> saveMultisigId(Uint8List id) async => await _secureStore.write(
         key: "{$walletId}_multisigIdFROST",
         value: Format.uint8listToString(id),
       );
 
-  Future<String?> get _recoveryString async => await _secureStore.read(
+  Future<String?> get recoveryString async => await _secureStore.read(
         key: "{$walletId}_recoveryStringFROST",
       );
-  Future<void> _saveRecoveryString(String recoveryString) async =>
+  Future<void> saveRecoveryString(String recoveryString) async =>
       await _secureStore.write(
         key: "{$walletId}_recoveryStringFROST",
         value: recoveryString,
@@ -536,7 +536,7 @@ class FrostWallet extends CoinServiceAPI
     return List<String>.from(list);
   }
 
-  Future<void> _updateParticipants(List<String> participants) async {
+  Future<void> updateParticipants(List<String> participants) async {
     await DB.instance.put<dynamic>(
       boxName: walletId,
       key: "_frostParticipants",
@@ -548,7 +548,7 @@ class FrostWallet extends CoinServiceAPI
         boxName: walletId,
         key: "_frostMyName",
       ) as String;
-  Future<void> _saveMyName(String myName) async =>
+  Future<void> saveMyName(String myName) async =>
       await DB.instance.put<dynamic>(
         boxName: walletId,
         key: "_frostMyName",
@@ -579,7 +579,7 @@ class FrostWallet extends CoinServiceAPI
     await db.deleteWalletBlockchainData(walletId);
 
     try {
-      final keys = await _serializedKeys;
+      final keys = await getSerializedKeys;
       final _mnemonic = await mnemonicString;
       final _mnemonicPassphrase = await mnemonicPassphrase;
 
@@ -667,10 +667,10 @@ class FrostWallet extends CoinServiceAPI
       await _secureStore.write(
           key: '${_walletId}_mnemonicPassphrase', value: "");
       await _saveSerializedKeys(serializedKeys);
-      await _saveRecoveryString(recoveryString);
-      await _saveMultisigId(multisigId);
-      await _saveMyName(myName);
-      await _updateParticipants(participants);
+      await saveRecoveryString(recoveryString);
+      await saveMultisigId(multisigId);
+      await saveMyName(myName);
+      await updateParticipants(participants);
 
       final keys = frost.deserializeKeys(keys: serializedKeys);
 

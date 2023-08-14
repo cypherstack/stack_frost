@@ -1,6 +1,6 @@
-/* 
+/*
  * This file is part of Stack Wallet.
- * 
+ *
  * Copyright (c) 2023 Cypher Stack
  * All Rights Reserved.
  * The code is distributed under GPLv3 license, see LICENSE file for details.
@@ -15,6 +15,8 @@ import 'dart:typed_data';
 
 import 'package:stack_wallet_backup/stack_wallet_backup.dart';
 import 'package:stackfrost/db/hive/db.dart';
+import 'package:stackfrost/electrumx_rpc/cached_electrumx.dart';
+import 'package:stackfrost/electrumx_rpc/electrumx.dart';
 import 'package:stackfrost/models/exchange/response_objects/trade.dart';
 import 'package:stackfrost/models/isar/models/contact_entry.dart';
 import 'package:stackfrost/models/node_model.dart';
@@ -22,6 +24,7 @@ import 'package:stackfrost/models/stack_restoring_ui_state.dart';
 import 'package:stackfrost/models/trade_wallet_lookup.dart';
 import 'package:stackfrost/models/wallet_restore_state.dart';
 import 'package:stackfrost/services/address_book_service.dart';
+import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
 import 'package:stackfrost/services/coins/coin_service.dart';
 import 'package:stackfrost/services/coins/manager.dart';
 import 'package:stackfrost/services/node_service.dart';
@@ -299,6 +302,19 @@ abstract class SWB {
         backupWallet['storedChainHeight'] = DB.instance
             .get<dynamic>(boxName: manager.walletId, key: 'storedChainHeight');
 
+        if (manager.wallet is FrostWallet) {
+          final wallet = manager.wallet as FrostWallet;
+
+          backupWallet["serializedKeysFROST"] = await wallet.getSerializedKeys;
+          backupWallet["recoveryStringFROST"] = await wallet.recoveryString;
+          backupWallet["participantsFROST"] = wallet.participants;
+          backupWallet["myNameFROST"] = wallet.myName;
+          final mID = await wallet.multisigId;
+          if (mID != null) {
+            backupWallet["multisigIdFROST"] = Format.uint8listToString(mID);
+          }
+        }
+
         backupWallet['txidList'] = DB.instance.get<dynamic>(
             boxName: manager.walletId, key: "cachedTxids") as List?;
         // the following can cause a deadlock
@@ -411,17 +427,40 @@ abstract class SWB {
         return false;
       }
 
-      // TODO GUI option to set maxUnusedAddressGap?
-      // default is 20 but it may miss some transactions if
-      // the previous wallet software generated many addresses
-      // without using them
-      await manager.recoverFromMnemonic(
-        mnemonic: mnemonic,
-        mnemonicPassphrase: mnemonicPassphrase,
-        maxUnusedAddressGap: 20,
-        maxNumberOfIndexesToCheck: 1000,
-        height: restoreHeight,
-      );
+      if (manager.wallet is FrostWallet) {
+        final wallet = manager.wallet as FrostWallet;
+
+        await wallet.saveMyName(walletbackup["myNameFROST"] as String);
+        await wallet
+            .saveRecoveryString(walletbackup["recoveryStringFROST"] as String);
+        await wallet.saveMultisigId(
+          Format.stringToUint8List(
+            walletbackup["multisigIdFROST"] as String,
+          ),
+        );
+
+        final partsList = walletbackup["participantsFROST"] as List;
+        await wallet.updateParticipants(List<String>.from(partsList));
+
+        await wallet.recoverFromSerializedKeys(
+          serializedKeys: walletbackup["serializedKeysFROST"] as String,
+          mnemonic: mnemonic,
+          mnemonicPassphrase: mnemonicPassphrase,
+          isRescan: false,
+        );
+      } else {
+        // TODO GUI option to set maxUnusedAddressGap?
+        // default is 20 but it may miss some transactions if
+        // the previous wallet software generated many addresses
+        // without using them
+        await manager.recoverFromMnemonic(
+          mnemonic: mnemonic,
+          mnemonicPassphrase: mnemonicPassphrase,
+          maxUnusedAddressGap: 20,
+          maxNumberOfIndexesToCheck: 1000,
+          height: restoreHeight,
+        );
+      }
 
       if (_shouldCancelRestore) {
         return false;
@@ -700,16 +739,54 @@ abstract class SWB {
         return false;
       }
 
-      final wallet = CoinServiceAPI.from(
-        coin,
-        walletId,
-        walletName,
-        secureStorageInterface,
-        node,
-        txTracker,
-        _prefs,
-        failovers,
-      );
+      final CoinServiceAPI wallet;
+
+      if (walletType == WalletType.frostMS) {
+        final electrumxNode = ElectrumXNode(
+          address: node.host,
+          port: node.port,
+          name: node.name,
+          id: node.id,
+          useSSL: node.useSSL,
+        );
+        final client = ElectrumX.from(
+          node: electrumxNode,
+          failovers: failovers
+              .map((e) => ElectrumXNode(
+                    address: e.host,
+                    port: e.port,
+                    name: e.name,
+                    id: e.id,
+                    useSSL: e.useSSL,
+                  ))
+              .toList(),
+          prefs: _prefs,
+        );
+        final cachedClient = CachedElectrumX.from(
+          electrumXClient: client,
+        );
+
+        wallet = FrostWallet(
+          walletId: walletId,
+          walletName: walletName,
+          coin: coin,
+          client: client,
+          cachedClient: cachedClient,
+          tracker: txTracker,
+          secureStore: secureStorageInterface,
+        );
+      } else {
+        wallet = CoinServiceAPI.from(
+          coin,
+          walletId,
+          walletName,
+          secureStorageInterface,
+          node,
+          txTracker,
+          _prefs,
+          failovers,
+        );
+      }
 
       final manager = Manager(wallet);
 
