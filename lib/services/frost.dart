@@ -77,6 +77,26 @@ abstract class Frost {
     }
   }
 
+  static int getThreshold({
+    required String multisigConfig,
+  }) {
+    try {
+      final threshold = multisigThreshold(
+        multisigConfigPointer: decodeMultisigConfig(
+          multisigConfig: multisigConfig,
+        ),
+      );
+
+      return threshold;
+    } catch (e, s) {
+      Logging.instance.log(
+        "getThreshold failed: $e\n$s",
+        level: LogLevel.Fatal,
+      );
+      rethrow;
+    }
+  }
+
   //==================== wallet creation =======================================
 
   static String createMultisigConfig({

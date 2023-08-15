@@ -201,24 +201,24 @@ class _NewFrostMsWalletViewState
                 controller: controllers.first,
               ),
             if (controllers.length > 1)
-              if (controllers.length > 1)
-                Text(
-                  "Remaining participants",
-                  style: STextStyles.label(context),
-                ),
-            Column(
-              children: [
-                for (int i = 1; i < controllers.length; i++)
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      top: 10,
+              Text(
+                "Remaining participants",
+                style: STextStyles.label(context),
+              ),
+            if (controllers.length > 1)
+              Column(
+                children: [
+                  for (int i = 1; i < controllers.length; i++)
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        top: 10,
+                      ),
+                      child: TextField(
+                        controller: controllers[i],
+                      ),
                     ),
-                    child: TextField(
-                      controller: controllers[i],
-                    ),
-                  ),
-              ],
-            ),
+                ],
+              ),
             if (!Util.isDesktop) const Spacer(),
             const SizedBox(
               height: 16,

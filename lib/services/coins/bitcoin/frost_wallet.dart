@@ -242,7 +242,11 @@ class FrostWallet extends CoinServiceAPI
     final int network =
         coin == Coin.bitcoin ? Network.Mainnet : Network.Testnet;
 
-    final publicKey = frost.scriptPubKeyForKeys(keys: keys);
+    final publicKey = Format.stringToUint8List(
+      frost.scriptPubKeyForKeys(
+        keys: keys,
+      ),
+    );
 
     final config = Frost.createSignConfig(
       network: network,
@@ -461,7 +465,7 @@ class FrostWallet extends CoinServiceAPI
       final address = isar_models.Address(
         walletId: walletId,
         value: addressString,
-        publicKey: publicKey,
+        publicKey: Format.stringToUint8List(publicKey),
         derivationIndex: 0,
         derivationPath: null,
         subType: isar_models.AddressSubType.receiving,
@@ -555,6 +559,17 @@ class FrostWallet extends CoinServiceAPI
         value: myName,
       );
 
+  int get threshold => DB.instance.get<dynamic>(
+        boxName: walletId,
+        key: "_frostThreshold",
+      ) as int;
+  Future<void> saveThreshold(int threshold) async =>
+      await DB.instance.put<dynamic>(
+        boxName: walletId,
+        key: "_frostThreshold",
+        value: threshold,
+      );
+
   @override
   Future<void> fullRescan(
     int maxUnusedAddressGap,
@@ -572,9 +587,6 @@ class FrostWallet extends CoinServiceAPI
 
     // clear cache
     await _cachedElectrumXClient.clearSharedTransactionCache(coin: coin);
-
-    // back up data
-    // await _rescanBackup();
 
     await db.deleteWalletBlockchainData(walletId);
 
@@ -648,6 +660,7 @@ class FrostWallet extends CoinServiceAPI
     required Uint8List multisigId,
     required String myName,
     required List<String> participants,
+    required int threshold,
   }) async {
     Logging.instance.log("Generating new ${coin.prettyName} FROST wallet.",
         level: LogLevel.Info);
@@ -671,6 +684,7 @@ class FrostWallet extends CoinServiceAPI
       await saveMultisigId(multisigId);
       await saveMyName(myName);
       await updateParticipants(participants);
+      await saveThreshold(threshold);
 
       final keys = frost.deserializeKeys(keys: serializedKeys);
 
@@ -684,7 +698,7 @@ class FrostWallet extends CoinServiceAPI
       final address = isar_models.Address(
         walletId: walletId,
         value: addressString,
-        publicKey: publicKey,
+        publicKey: Format.stringToUint8List(publicKey),
         derivationIndex: 0,
         derivationPath: null,
         subType: isar_models.AddressSubType.receiving,
@@ -723,8 +737,9 @@ class FrostWallet extends CoinServiceAPI
   Future<List<String>> get mnemonic => _getMnemonicList();
 
   @override
-  // TODO: implement mnemonicPassphrase
-  Future<String?> get mnemonicPassphrase => throw UnimplementedError();
+  Future<String?> get mnemonicPassphrase async => await _secureStore.read(
+        key: '${_walletId}_mnemonicPassphrase',
+      );
 
   @override
   Future<String?> get mnemonicString async => (await mnemonic).join(" ");
@@ -1312,7 +1327,9 @@ class FrostWallet extends CoinServiceAPI
   }
 
   Future<List<String>> _getMnemonicList() async {
-    final _mnemonicString = await mnemonicString;
+    final _mnemonicString = await _secureStore.read(
+      key: '${_walletId}_mnemonic',
+    );
     if (_mnemonicString == null) {
       return [];
     }

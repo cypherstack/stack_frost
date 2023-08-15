@@ -11,6 +11,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/frost_participants_view.dart';
+import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/modify_participants_view.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/utilities/constants.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
@@ -67,15 +68,13 @@ class FrostMSWalletOptionsView extends ConsumerWidget {
                   height: 8,
                 ),
                 _OptionButton(
-                  label: "Add participant",
-                  onPressed: () {},
-                ),
-                const SizedBox(
-                  height: 8,
-                ),
-                _OptionButton(
-                  label: "Remove participant",
-                  onPressed: () {},
+                  label: "Modify participants",
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(
+                      ModifyParticipantsView.routeName,
+                      arguments: walletId,
+                    );
+                  },
                 ),
               ],
             ),

@@ -309,6 +309,7 @@ abstract class SWB {
           backupWallet["recoveryStringFROST"] = await wallet.recoveryString;
           backupWallet["participantsFROST"] = wallet.participants;
           backupWallet["myNameFROST"] = wallet.myName;
+          backupWallet["thresholdFROST"] = wallet.threshold;
           final mID = await wallet.multisigId;
           if (mID != null) {
             backupWallet["multisigIdFROST"] = Format.uint8listToString(mID);
@@ -431,6 +432,7 @@ abstract class SWB {
         final wallet = manager.wallet as FrostWallet;
 
         await wallet.saveMyName(walletbackup["myNameFROST"] as String);
+        await wallet.saveThreshold(walletbackup["thresholdFROST"] as int);
         await wallet
             .saveRecoveryString(walletbackup["recoveryStringFROST"] as String);
         await wallet.saveMultisigId(

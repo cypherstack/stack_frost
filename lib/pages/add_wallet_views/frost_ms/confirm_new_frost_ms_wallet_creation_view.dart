@@ -248,6 +248,10 @@ class _ConfirmNewFrostMSWalletCreationViewState
                       multisigConfig:
                           ref.read(pFrostMultisigConfig.state).state!,
                     ),
+                    threshold: Frost.getThreshold(
+                      multisigConfig:
+                          ref.read(pFrostMultisigConfig.state).state!,
+                    ),
                   );
 
                   final manager = Manager(wallet);
@@ -264,7 +268,6 @@ class _ConfirmNewFrostMSWalletCreationViewState
                       );
 
                   ref.read(pFrostMultisigConfig.state).state = null;
-                  ref.read(pFrostMyName.state).state = null;
                   ref.read(pFrostStartKeyGenData.state).state = null;
                   ref.read(pFrostSecretSharesData.state).state = null;
                   ref.read(pFrostCompletedKeyGenData.state).state = null;
