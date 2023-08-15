@@ -162,7 +162,7 @@ class _RecipientState extends ConsumerState<Recipient> {
             ),
             child: TextField(
               key: const Key("sendViewAddressFieldKey"),
-              controller: amountController,
+              controller: addressController,
               readOnly: false,
               autocorrect: false,
               enableSuggestions: false,
