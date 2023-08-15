@@ -28,3 +28,6 @@ final pFrostCompletedKeyGenData = StateProvider<
       String recoveryString,
       String serializedKeys,
     })?>((ref) => null);
+
+// ================= transaction creation ======================================
+final pFrostSignConfig = StateProvider<String?>((ref) => null);

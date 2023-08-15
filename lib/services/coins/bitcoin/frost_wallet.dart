@@ -213,55 +213,59 @@ class FrostWallet extends CoinServiceAPI
     required String changeAddress,
     required int feePerWeight,
   }) async {
-    if (outputs.map((e) => e.amount).reduce((value, e) => value += e) >
-        balance.spendable) {
-      throw Exception("Insufficient available funds");
-    }
+    try {
+      if (outputs.map((e) => e.amount).reduce((value, e) => value += e) >
+          balance.spendable) {
+        throw Exception("Insufficient available funds");
+      }
 
-    List<isar_models.UTXO> utxos =
-        await db.getUTXOs(walletId).filter().isBlockedEqualTo(false).findAll();
+      List<isar_models.UTXO> utxos =
+      await db.getUTXOs(walletId).filter().isBlockedEqualTo(false).findAll();
 
-    if (utxos.isEmpty) {
-      throw Exception("No UTXOs found");
-    } else {
-      final currentHeight = await chainHeight;
-      utxos.removeWhere(
-        (e) => !e.isConfirmed(
-          currentHeight,
-          MINIMUM_CONFIRMATIONS,
+      if (utxos.isEmpty) {
+        throw Exception("No UTXOs found");
+      } else {
+        final currentHeight = await chainHeight;
+        utxos.removeWhere(
+              (e) => !e.isConfirmed(
+            currentHeight,
+            MINIMUM_CONFIRMATIONS,
+          ),
+        );
+        if (utxos.isEmpty) {
+          throw Exception("No confirmed UTXOs found");
+        }
+      }
+
+      final serializedKeys = await getSerializedKeys;
+      final keys = frost.deserializeKeys(keys: serializedKeys!);
+
+      final int network =
+      coin == Coin.bitcoin ? Network.Mainnet : Network.Testnet;
+
+      final publicKey = Format.stringToUint8List(
+        frost.scriptPubKeyForKeys(
+          keys: keys,
         ),
       );
-      if (utxos.isEmpty) {
-        throw Exception("No confirmed UTXOs found");
-      }
+
+      final config = Frost.createSignConfig(
+        network: network,
+        inputs: utxos
+            .map((e) => (
+        utxo: e,
+        scriptPubKey: publicKey,
+        ))
+            .toList(),
+        outputs: outputs,
+        changeAddress: (await _currentReceivingAddress).value,
+        feePerWeight: feePerWeight,
+      );
+
+      return config;
+    } catch (_) {
+      rethrow;
     }
-
-    final serializedKeys = await getSerializedKeys;
-    final keys = frost.deserializeKeys(keys: serializedKeys!);
-
-    final int network =
-        coin == Coin.bitcoin ? Network.Mainnet : Network.Testnet;
-
-    final publicKey = Format.stringToUint8List(
-      frost.scriptPubKeyForKeys(
-        keys: keys,
-      ),
-    );
-
-    final config = Frost.createSignConfig(
-      network: network,
-      inputs: utxos
-          .map((e) => (
-                utxo: e,
-                scriptPubKey: publicKey,
-              ))
-          .toList(),
-      outputs: outputs,
-      changeAddress: (await _currentReceivingAddress).value,
-      feePerWeight: feePerWeight,
-    );
-
-    return config;
   }
 
   Future<

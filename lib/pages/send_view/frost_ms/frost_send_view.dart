@@ -16,15 +16,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:stackfrost/models/isar/models/isar_models.dart';
 import 'package:stackfrost/pages/coin_control/coin_control_view.dart';
+import 'package:stackfrost/pages/send_view/frost_ms/frost_create_sign_config_view.dart';
 import 'package:stackfrost/pages/send_view/frost_ms/recipient.dart';
+import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
 import 'package:stackfrost/providers/providers.dart';
 import 'package:stackfrost/providers/ui/preview_tx_button_state_provider.dart';
+import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
 import 'package:stackfrost/themes/coin_icon_provider.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/utilities/amount/amount.dart';
 import 'package:stackfrost/utilities/amount/amount_formatter.dart';
 import 'package:stackfrost/utilities/constants.dart';
 import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/show_loading.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
 import 'package:stackfrost/utilities/util.dart';
 import 'package:stackfrost/widgets/background.dart';
@@ -34,6 +38,7 @@ import 'package:stackfrost/widgets/custom_buttons/blue_text_button.dart';
 import 'package:stackfrost/widgets/fee_slider.dart';
 import 'package:stackfrost/widgets/icon_widgets/x_icon.dart';
 import 'package:stackfrost/widgets/rounded_white_container.dart';
+import 'package:stackfrost/widgets/stack_dialog.dart';
 import 'package:stackfrost/widgets/stack_text_field.dart';
 import 'package:stackfrost/widgets/textfield_icon_button.dart';
 import 'package:tuple/tuple.dart';
@@ -68,19 +73,110 @@ class _FrostSendViewState extends ConsumerState<FrostSendView> {
 
   Set<UTXO> selectedUTXOs = {};
 
-  Future<void> _previewTransaction() async {
-    // wait for keyboard to disappear
-    FocusScope.of(context).unfocus();
-    await Future<void>.delayed(
-      const Duration(milliseconds: 100),
-    );
-    final manager =
-        ref.read(walletsChangeNotifierProvider).getManager(walletId);
+  bool _createSignLock = false;
 
-    //
+  Future<String> _loadingFuture() async {
+    final wallet = ref
+        .read(walletsChangeNotifierProvider)
+        .getManager(walletId)
+        .wallet as FrostWallet;
+
+    final recipients = recipientWidgetIndexes
+        .map((i) => ref.read(pRecipient(i).state).state)
+        .map((e) => (address: e!.address, amount: e!.amount!))
+        .toList(growable: false);
+
+    final signConfig = await wallet.frostCreateSignConfig(
+      outputs: recipients,
+      changeAddress: (await wallet.currentReceivingAddress),
+      feePerWeight: customFeeRate,
+    );
+
+    return signConfig;
+  }
+
+  Future<void> _createSignConfig() async {
+    if (_createSignLock) {
+      return;
+    }
+    _createSignLock = true;
+
+    try {
+      // wait for keyboard to disappear
+      FocusScope.of(context).unfocus();
+      await Future<void>.delayed(
+        const Duration(milliseconds: 100),
+      );
+
+      String? config;
+      if (mounted) {
+        config = await showLoading<String>(
+          whileFuture: _loadingFuture(),
+          context: context,
+          message: "Generating sign config",
+          onException: (e) {
+            throw e;
+          },
+        );
+      }
+
+      if (mounted && config != null) {
+        ref.read(pFrostSignConfig.notifier).state = config;
+
+        await Navigator.of(context).pushNamed(
+          FrostCreateSignConfigView.routeName,
+          arguments: widget.walletId,
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        unawaited(
+          showDialog<dynamic>(
+            context: context,
+            useSafeArea: false,
+            barrierDismissible: true,
+            builder: (context) {
+              return StackDialog(
+                title: "Create sign config failed",
+                message: e.toString(),
+                rightButton: TextButton(
+                  style: Theme.of(context)
+                      .extension<StackColors>()!
+                      .getSecondaryEnabledButtonStyle(context),
+                  child: Text(
+                    "Ok",
+                    style: STextStyles.button(context).copyWith(
+                        color: Theme.of(context)
+                            .extension<StackColors>()!
+                            .accentColorDark),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              );
+            },
+          ),
+        );
+      }
+    } finally {
+      _createSignLock = false;
+    }
   }
 
   int customFeeRate = 1;
+
+  void _validateRecipientFormStates() {
+    for (final i in recipientWidgetIndexes) {
+      final state = ref.read(pRecipient(i).state).state;
+      if (state?.amount == null || state?.address == null) {
+        ref.read(previewTxButtonStateProvider.notifier).state = false;
+        return;
+      }
+    }
+    ref.read(previewTxButtonStateProvider.notifier).state = true;
+    return;
+  }
 
   @override
   void initState() {
@@ -309,6 +405,9 @@ class _FrostSendViewState extends ConsumerState<FrostSendView> {
                                     ),
                                     index: recipientWidgetIndexes[i],
                                     coin: coin,
+                                    onChanged: () {
+                                      _validateRecipientFormStates();
+                                    },
                                     remove: i == 0 &&
                                             recipientWidgetIndexes.length == 1
                                         ? null
@@ -456,7 +555,7 @@ class _FrostSendViewState extends ConsumerState<FrostSendView> {
                             onPressed: ref
                                     .watch(previewTxButtonStateProvider.state)
                                     .state
-                                ? _previewTransaction
+                                ? _createSignConfig
                                 : null,
                             style: ref
                                     .watch(previewTxButtonStateProvider.state)

@@ -51,12 +51,14 @@ class Recipient extends ConsumerStatefulWidget {
     required this.index,
     required this.coin,
     this.remove,
+    this.onChanged,
   });
 
   final int index;
   final Coin coin;
 
   final VoidCallback? remove;
+  final VoidCallback? onChanged;
 
   @override
   ConsumerState<Recipient> createState() => _RecipientState();
@@ -80,6 +82,7 @@ class _RecipientState extends ConsumerState<Recipient> {
       address: address,
       amount: amount,
     );
+    widget.onChanged?.call();
   }
 
   void _cryptoAmountChanged() async {

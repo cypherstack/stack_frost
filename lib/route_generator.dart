@@ -52,6 +52,7 @@ import 'package:stackfrost/pages/receive_view/addresses/wallet_addresses_view.da
 import 'package:stackfrost/pages/receive_view/generate_receiving_uri_qr_code_view.dart';
 import 'package:stackfrost/pages/receive_view/receive_view.dart';
 import 'package:stackfrost/pages/send_view/confirm_transaction_view.dart';
+import 'package:stackfrost/pages/send_view/frost_ms/frost_create_sign_config_view.dart';
 import 'package:stackfrost/pages/send_view/frost_ms/frost_send_view.dart';
 import 'package:stackfrost/pages/send_view/send_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/about_view.dart';
@@ -895,6 +896,20 @@ class RouteGenerator {
             builder: (_) => ConfirmNewFrostMSWalletCreationView(
               walletName: args.walletName,
               coin: args.coin,
+            ),
+            settings: RouteSettings(
+              name: settings.name,
+            ),
+          );
+        }
+        return _routeError("${settings.name} invalid args: ${args.toString()}");
+
+      case FrostCreateSignConfigView.routeName:
+        if (args is String) {
+          return getRoute(
+            shouldUseMaterialRoute: useMaterialPageRoute,
+            builder: (_) => FrostCreateSignConfigView(
+              walletId: args,
             ),
             settings: RouteSettings(
               name: settings.name,
