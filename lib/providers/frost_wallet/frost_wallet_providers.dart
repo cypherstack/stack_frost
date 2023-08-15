@@ -31,3 +31,17 @@ final pFrostCompletedKeyGenData = StateProvider<
 
 // ================= transaction creation ======================================
 final pFrostSignConfig = StateProvider<String?>((ref) => null);
+
+final pFrostAttemptSignData = StateProvider<
+    ({
+      Pointer<TransactionSignMachineWrapper> machinePtr,
+      String preprocess,
+    })?>((ref) => null);
+
+final pFrostContinueSignData = StateProvider<
+    ({
+      Pointer<TransactionSignatureMachineWrapper> machinePtr,
+      String share,
+    })?>((ref) => null);
+
+final pFrostCompleteSignRawTx = StateProvider<String?>((ref) => null);

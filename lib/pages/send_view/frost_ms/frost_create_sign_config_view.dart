@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:stackfrost/pages/send_view/frost_ms/frost_attempt_sign_config_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
+import 'package:stackfrost/providers/global/wallets_provider.dart';
+import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/logger.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
 import 'package:stackfrost/utilities/util.dart';
 import 'package:stackfrost/widgets/background.dart';
@@ -31,6 +35,41 @@ class FrostCreateSignConfigView extends ConsumerStatefulWidget {
 
 class _FrostCreateSignConfigViewState
     extends ConsumerState<FrostCreateSignConfigView> {
+  bool _attemptSignLock = false;
+
+  Future<void> _attemptSign() async {
+    if (_attemptSignLock) {
+      return;
+    }
+
+    _attemptSignLock = true;
+
+    try {
+      final wallet = ref
+          .read(walletsChangeNotifierProvider)
+          .getManager(widget.walletId)
+          .wallet as FrostWallet;
+
+      final attemptSignRes = await wallet.frostAttemptSignConfig(
+        config: ref.read(pFrostSignConfig.state).state!,
+      );
+
+      ref.read(pFrostAttemptSignData.notifier).state = attemptSignRes;
+
+      await Navigator.of(context).pushNamed(
+        FrostAttemptSignConfigView.routeName,
+        arguments: widget.walletId,
+      );
+    } catch (e, s) {
+      Logging.instance.log(
+        "$e\n$s",
+        level: LogLevel.Error,
+      );
+    } finally {
+      _attemptSignLock = false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ConditionalParent(
@@ -123,22 +162,8 @@ class _FrostCreateSignConfigViewState
               ),
             PrimaryButton(
               label: "Attempt sign",
-              onPressed: () async {
-                // ref.read(pFrostStartKeyGenData.notifier).state =
-                //     Frost.startKeyGeneration(
-                //   multisigConfig: ref.watch(pFrostMultisigConfig.state).state!,
-                //   myName: Frost.getName(
-                //       multisigConfig:
-                //           ref.read(pFrostMultisigConfig.state).state!),
-                // );
-
-                // await Navigator.of(context).pushNamed(
-                //   FrostShareCommitmentsView.routeName,
-                //   arguments: (
-                //     walletName: widget.walletName,
-                //     coin: widget.coin,
-                //   ),
-                // );
+              onPressed: () {
+                _attemptSign();
               },
             ),
           ],
