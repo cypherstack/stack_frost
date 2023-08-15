@@ -90,6 +90,8 @@ import 'package:stackfrost/pages/settings_views/global_settings_view/syncing_pre
 import 'package:stackfrost/pages/settings_views/global_settings_view/syncing_preferences_views/wallet_syncing_options_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/frost_ms_options_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/frost_participants_view.dart';
+import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/modify_participants_view.dart';
+import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/reshare_ms_config_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_backup_views/wallet_backup_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_network_settings_view/wallet_network_settings_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_settings_view.dart';
@@ -815,6 +817,20 @@ class RouteGenerator {
         }
         return _routeError("${settings.name} invalid args: ${args.toString()}");
 
+      case ReshareMultisigConfigView.routeName:
+        if (args is String) {
+          return getRoute(
+            shouldUseMaterialRoute: useMaterialPageRoute,
+            builder: (_) => ReshareMultisigConfigView(
+              walletId: args,
+            ),
+            settings: RouteSettings(
+              name: settings.name,
+            ),
+          );
+        }
+        return _routeError("${settings.name} invalid args: ${args.toString()}");
+
       case ImportNewFrostMsWalletView.routeName:
         if (args is ({
           String walletName,
@@ -906,6 +922,20 @@ class RouteGenerator {
           return getRoute(
             shouldUseMaterialRoute: useMaterialPageRoute,
             builder: (_) => FrostParticipantsView(
+              walletId: args,
+            ),
+            settings: RouteSettings(
+              name: settings.name,
+            ),
+          );
+        }
+        return _routeError("${settings.name} invalid args: ${args.toString()}");
+
+      case ModifyParticipantsView.routeName:
+        if (args is String) {
+          return getRoute(
+            shouldUseMaterialRoute: useMaterialPageRoute,
+            builder: (_) => ModifyParticipantsView(
               walletId: args,
             ),
             settings: RouteSettings(
