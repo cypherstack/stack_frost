@@ -17,6 +17,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stackfrost/models/isar/models/contact_entry.dart';
 import 'package:stackfrost/models/paynym/paynym_account_lite.dart';
 import 'package:stackfrost/models/send_view_auto_fill_data.dart';
+import 'package:stackfrost/models/tx_data.dart';
 import 'package:stackfrost/pages/send_view/confirm_transaction_view.dart';
 import 'package:stackfrost/pages/send_view/sub_widgets/building_transaction_dialog.dart';
 import 'package:stackfrost/pages/send_view/sub_widgets/transaction_fee_selection_sheet.dart';
@@ -266,21 +267,23 @@ class _DesktopSendState extends ConsumerState<DesktopSend> {
         ),
       );
 
-      Map<String, dynamic> txData;
-      Future<Map<String, dynamic>> txDataFuture;
+      Future<TxData> txDataFuture;
+
+      TxData txData = TxData(
+        recipients: [
+          (address: _address!, amount: amount),
+        ],
+        feeRateType: ref.read(feeRateTypeStateProvider),
+        satsPerVByte: isCustomFee ? customFeeRate : null,
+        utxos: (manager.hasCoinControlSupport &&
+                coinControlEnabled &&
+                ref.read(desktopUseUTXOs).isNotEmpty)
+            ? ref.read(desktopUseUTXOs)
+            : null,
+      );
 
       txDataFuture = manager.prepareSend(
-        address: _address!,
-        amount: amount,
-        args: {
-          "feeRate": ref.read(feeRateTypeStateProvider),
-          "satsPerVByte": isCustomFee ? customFeeRate : null,
-          "UTXOs": (manager.hasCoinControlSupport &&
-                  coinControlEnabled &&
-                  ref.read(desktopUseUTXOs).isNotEmpty)
-              ? ref.read(desktopUseUTXOs)
-              : null,
-        },
+        txData: txData,
       );
 
       final results = await Future.wait([
@@ -288,11 +291,10 @@ class _DesktopSendState extends ConsumerState<DesktopSend> {
         time,
       ]);
 
-      txData = results.first as Map<String, dynamic>;
+      txData = results.first as TxData;
 
       if (!wasCancelled && mounted) {
-        txData["address"] = _address;
-        txData["note"] = _note ?? "";
+        txData = txData.copyWith(note: _note ?? "");
         // pop building dialog
         Navigator.of(
           context,

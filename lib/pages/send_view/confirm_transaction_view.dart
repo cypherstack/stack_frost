@@ -15,6 +15,7 @@ import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:stackfrost/models/tx_data.dart';
 import 'package:stackfrost/notifications/show_flush_bar.dart';
 import 'package:stackfrost/pages/pinpad_views/lock_screen_view.dart';
 import 'package:stackfrost/pages/send_view/sub_widgets/sending_transaction_dialog.dart';
@@ -56,7 +57,7 @@ class ConfirmTransactionView extends ConsumerStatefulWidget {
 
   static const String routeName = "/confirmTransactionView";
 
-  final Map<String, dynamic> transactionInfo;
+  final TxData transactionInfo;
   final String walletId;
   final String routeOnSuccessName;
   final bool isTradeTransaction;
@@ -69,7 +70,7 @@ class ConfirmTransactionView extends ConsumerStatefulWidget {
 
 class _ConfirmTransactionViewState
     extends ConsumerState<ConfirmTransactionView> {
-  late final Map<String, dynamic> transactionInfo;
+  late final TxData transactionInfo;
   late final String walletId;
   late final String routeOnSuccessName;
   late final bool isDesktop;
@@ -226,12 +227,11 @@ class _ConfirmTransactionViewState
     routeOnSuccessName = widget.routeOnSuccessName;
     _noteFocusNode = FocusNode();
     noteController = TextEditingController();
-    noteController.text = transactionInfo["note"] as String? ?? "";
+    noteController.text = transactionInfo.note ?? "";
 
     _onChainNoteFocusNode = FocusNode();
     onChainNoteController = TextEditingController();
-    onChainNoteController.text =
-        transactionInfo["onChainNote"] as String? ?? "";
+    onChainNoteController.text = transactionInfo.noteOnChain ?? "";
 
     super.initState();
   }
@@ -358,7 +358,7 @@ class _ConfirmTransactionViewState
                           height: 4,
                         ),
                         Text(
-                          "${transactionInfo["address"] ?? "ERROR"}",
+                          transactionInfo.recipients?.first.address ?? "ERROR",
                           style: STextStyles.itemSubtitle12(context),
                         ),
                       ],
@@ -377,7 +377,7 @@ class _ConfirmTransactionViewState
                         ),
                         Text(
                           ref.watch(pAmountFormatter(coin)).format(
-                                transactionInfo["recipientAmt"] as Amount,
+                                transactionInfo.amount!,
                               ),
                           style: STextStyles.itemSubtitle12(context),
                           textAlign: TextAlign.right,
@@ -397,31 +397,20 @@ class _ConfirmTransactionViewState
                           style: STextStyles.smallMed12(context),
                         ),
                         Text(
-                          ref.watch(pAmountFormatter(coin)).format(
-                                (transactionInfo["fee"] is Amount
-                                    ? transactionInfo["fee"] as Amount
-                                    : (transactionInfo["fee"] as int)
-                                        .toAmountAsRaw(
-                                        fractionDigits: ref.watch(
-                                          managerProvider.select(
-                                            (value) => value.coin.decimals,
-                                          ),
-                                        ),
-                                      )),
-                              ),
+                          ref
+                              .watch(pAmountFormatter(coin))
+                              .format(transactionInfo.fee!),
                           style: STextStyles.itemSubtitle12(context),
                           textAlign: TextAlign.right,
                         ),
                       ],
                     ),
                   ),
-                  if (transactionInfo["fee"] is int &&
-                      transactionInfo["vSize"] is int)
+                  if (transactionInfo.estimatedSatsPerVByte != null)
                     const SizedBox(
                       height: 12,
                     ),
-                  if (transactionInfo["fee"] is int &&
-                      transactionInfo["vSize"] is int)
+                  if (transactionInfo.estimatedSatsPerVByte != null)
                     RoundedWhiteContainer(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -434,17 +423,19 @@ class _ConfirmTransactionViewState
                             height: 4,
                           ),
                           Text(
-                            "~${(transactionInfo["fee"] / transactionInfo["vSize"]).toInt()}",
+                            "~${transactionInfo.estimatedSatsPerVByte!}",
                             style: STextStyles.itemSubtitle12(context),
                           ),
                         ],
                       ),
                     ),
-                  if ((transactionInfo["onChainNote"] as String).isNotEmpty)
+                  if (transactionInfo.noteOnChain != null &&
+                      transactionInfo.noteOnChain!.isNotEmpty)
                     const SizedBox(
                       height: 12,
                     ),
-                  if ((transactionInfo["onChainNote"] as String).isNotEmpty)
+                  if (transactionInfo.noteOnChain != null &&
+                      transactionInfo.noteOnChain!.isNotEmpty)
                     RoundedWhiteContainer(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -457,17 +448,19 @@ class _ConfirmTransactionViewState
                             height: 4,
                           ),
                           Text(
-                            transactionInfo["onChainNote"] as String,
+                            transactionInfo.noteOnChain!,
                             style: STextStyles.itemSubtitle12(context),
                           ),
                         ],
                       ),
                     ),
-                  if ((transactionInfo["note"] as String).isNotEmpty)
+                  if (transactionInfo.note != null &&
+                      transactionInfo.note!.isNotEmpty)
                     const SizedBox(
                       height: 12,
                     ),
-                  if ((transactionInfo["note"] as String).isNotEmpty)
+                  if (transactionInfo.note != null &&
+                      transactionInfo.note!.isNotEmpty)
                     RoundedWhiteContainer(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -480,7 +473,7 @@ class _ConfirmTransactionViewState
                             height: 4,
                           ),
                           Text(
-                            transactionInfo["note"] as String,
+                            transactionInfo.note!,
                             style: STextStyles.itemSubtitle12(context),
                           ),
                         ],
@@ -568,8 +561,7 @@ class _ConfirmTransactionViewState
                                     (value) => value.coin,
                                   ),
                                 );
-                                final amount =
-                                    transactionInfo["recipientAmt"] as Amount;
+                                final amount = transactionInfo.amount!;
                                 final externalCalls = ref.watch(
                                     prefsChangeNotifierProvider.select(
                                         (value) => value.externalCalls));
@@ -651,7 +643,8 @@ class _ConfirmTransactionViewState
                               height: 2,
                             ),
                             Text(
-                              "${transactionInfo["address"] ?? "ERROR"}",
+                              transactionInfo.recipients?.first.address ??
+                                  "ERROR",
                               style: STextStyles.desktopTextExtraExtraSmall(
                                       context)
                                   .copyWith(
@@ -814,11 +807,7 @@ class _ConfirmTransactionViewState
                               .select((value) => value.getManager(walletId)))
                           .coin;
 
-                      final fee = transactionInfo["fee"] is Amount
-                          ? transactionInfo["fee"] as Amount
-                          : (transactionInfo["fee"] as int).toAmountAsRaw(
-                              fractionDigits: coin.decimals,
-                            );
+                      final fee = transactionInfo.fee!;
 
                       return Text(
                         ref.watch(pAmountFormatter(coin)).format(fee),
@@ -828,9 +817,7 @@ class _ConfirmTransactionViewState
                   ),
                 ),
               ),
-            if (isDesktop &&
-                transactionInfo["fee"] is int &&
-                transactionInfo["vSize"] is int)
+            if (isDesktop && transactionInfo.estimatedSatsPerVByte != null)
               Padding(
                 padding: const EdgeInsets.only(
                   left: 32,
@@ -840,9 +827,7 @@ class _ConfirmTransactionViewState
                   style: STextStyles.desktopTextExtraExtraSmall(context),
                 ),
               ),
-            if (isDesktop &&
-                transactionInfo["fee"] is int &&
-                transactionInfo["vSize"] is int)
+            if (isDesktop && transactionInfo.estimatedSatsPerVByte != null)
               Padding(
                 padding: const EdgeInsets.only(
                   top: 10,
@@ -858,7 +843,7 @@ class _ConfirmTransactionViewState
                       .extension<StackColors>()!
                       .textFieldDefaultBG,
                   child: Text(
-                    "~${(transactionInfo["fee"] / transactionInfo["vSize"]).toInt()}",
+                    "~${transactionInfo.estimatedSatsPerVByte!}",
                     style: STextStyles.itemSubtitle(context),
                   ),
                 ),
@@ -904,12 +889,9 @@ class _ConfirmTransactionViewState
                     Builder(builder: (context) {
                       final coin = ref.watch(walletsChangeNotifierProvider
                           .select((value) => value.getManager(walletId).coin));
-                      final fee = transactionInfo["fee"] is Amount
-                          ? transactionInfo["fee"] as Amount
-                          : (transactionInfo["fee"] as int)
-                              .toAmountAsRaw(fractionDigits: coin.decimals);
+                      final fee = transactionInfo.fee!;
 
-                      final amount = transactionInfo["recipientAmt"] as Amount;
+                      final amount = transactionInfo.amount!;
                       return Text(
                         ref.watch(pAmountFormatter(coin)).format(amount + fee),
                         style: isDesktop
@@ -960,9 +942,9 @@ class _ConfirmTransactionViewState
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Row(
+                            const Row(
                               mainAxisAlignment: MainAxisAlignment.end,
-                              children: const [
+                              children: [
                                 DesktopDialogCloseButton(),
                               ],
                             ),

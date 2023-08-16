@@ -17,6 +17,7 @@ import 'package:stackfrost/models/isar/models/contact_entry.dart';
 import 'package:stackfrost/models/isar/models/isar_models.dart';
 import 'package:stackfrost/models/paynym/paynym_account_lite.dart';
 import 'package:stackfrost/models/send_view_auto_fill_data.dart';
+import 'package:stackfrost/models/tx_data.dart';
 import 'package:stackfrost/pages/add_wallet_views/add_wallet_view/add_wallet_view.dart';
 import 'package:stackfrost/pages/add_wallet_views/create_or_restore_wallet_view/create_or_restore_wallet_view.dart';
 import 'package:stackfrost/pages/add_wallet_views/frost_ms/confirm_new_frost_ms_wallet_creation_view.dart';
@@ -1266,7 +1267,7 @@ class RouteGenerator {
       //   return _routeError("${settings.name} invalid args: ${args.toString()}");
 
       case ConfirmTransactionView.routeName:
-        if (args is Tuple2<Map<String, dynamic>, String>) {
+        if (args is Tuple2<TxData, String>) {
           return getRoute(
             shouldUseMaterialRoute: useMaterialPageRoute,
             builder: (_) => ConfirmTransactionView(

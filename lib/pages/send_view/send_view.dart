@@ -19,6 +19,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:stackfrost/models/isar/models/isar_models.dart';
 import 'package:stackfrost/models/paynym/paynym_account_lite.dart';
 import 'package:stackfrost/models/send_view_auto_fill_data.dart';
+import 'package:stackfrost/models/tx_data.dart';
 import 'package:stackfrost/pages/address_book_views/address_book_view.dart';
 import 'package:stackfrost/pages/send_view/confirm_transaction_view.dart';
 import 'package:stackfrost/pages/send_view/sub_widgets/building_transaction_dialog.dart';
@@ -385,21 +386,23 @@ class _SendViewState extends ConsumerState<SendView> {
         ),
       );
 
-      Map<String, dynamic> txData;
-      Future<Map<String, dynamic>> txDataFuture;
+      Future<TxData> txDataFuture;
+
+      TxData txData = TxData(
+        recipients: [
+          (address: _address!, amount: amount),
+        ],
+        feeRateType: ref.read(feeRateTypeStateProvider),
+        satsPerVByte: isCustomFee ? customFeeRate : null,
+        utxos: (manager.hasCoinControlSupport &&
+                coinControlEnabled &&
+                selectedUTXOs.isNotEmpty)
+            ? selectedUTXOs
+            : null,
+      );
 
       txDataFuture = manager.prepareSend(
-        address: _address!,
-        amount: amount,
-        args: {
-          "feeRate": ref.read(feeRateTypeStateProvider),
-          "satsPerVByte": isCustomFee ? customFeeRate : null,
-          "UTXOs": (manager.hasCoinControlSupport &&
-                  coinControlEnabled &&
-                  selectedUTXOs.isNotEmpty)
-              ? selectedUTXOs
-              : null,
-        },
+        txData: txData,
       );
 
       final results = await Future.wait([
@@ -407,18 +410,21 @@ class _SendViewState extends ConsumerState<SendView> {
         time,
       ]);
 
-      txData = results.first as Map<String, dynamic>;
+      txData = results.first as TxData;
 
       if (!wasCancelled && mounted) {
         // pop building dialog
         Navigator.of(context).pop();
-        txData["note"] = noteController.text;
-        txData["onChainNote"] = onChainNoteController.text;
-        if (isPaynymSend) {
-          txData["paynymAccountLite"] = widget.accountLite!;
-        } else {
-          txData["address"] = _address;
-        }
+
+        txData = txData.copyWith(
+          note: noteController.text,
+          noteOnChain: onChainNoteController.text,
+        );
+        // if (isPaynymSend) {
+        //   txData["paynymAccountLite"] = widget.accountLite!;
+        // } else {
+        //   txData["address"] = _address;
+        // }
 
         unawaited(Navigator.of(context).push(
           RouteGenerator.getRoute(

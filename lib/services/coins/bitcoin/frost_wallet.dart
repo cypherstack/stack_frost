@@ -14,6 +14,7 @@ import 'package:stackfrost/exceptions/electrumx/no_such_transaction.dart';
 import 'package:stackfrost/models/balance.dart';
 import 'package:stackfrost/models/isar/models/isar_models.dart' as isar_models;
 import 'package:stackfrost/models/paymint/fee_object_model.dart';
+import 'package:stackfrost/models/tx_data.dart';
 import 'package:stackfrost/services/coins/bitcoin/bitcoin_wallet.dart';
 import 'package:stackfrost/services/coins/coin_service.dart';
 import 'package:stackfrost/services/event_bus/events/global/node_connection_status_changed_event.dart';
@@ -290,10 +291,8 @@ class FrostWallet extends CoinServiceAPI
   }
 
   @override
-  Future<Map<String, dynamic>> prepareSend({
-    required String address,
-    required Amount amount,
-    Map<String, dynamic>? args,
+  Future<TxData> prepareSend({
+    required TxData txData,
   }) async {
     // not used in frost ms
     throw UnimplementedError();
@@ -301,10 +300,27 @@ class FrostWallet extends CoinServiceAPI
 
   @override
   Future<String> confirmSend({
-    required Map<String, dynamic> txData,
-  }) {
-    // TODO: implement confirmSend
-    throw UnimplementedError();
+    required TxData txData,
+  }) async {
+    try {
+      Logging.instance.log("confirmSend txData: $txData", level: LogLevel.Info);
+
+      final hex = txData.raw!;
+
+      final txHash = await _electrumXClient.broadcastTransaction(rawTx: hex);
+      Logging.instance.log("Sent txHash: $txHash", level: LogLevel.Info);
+
+      final utxos = txData.utxos!;
+
+      // mark utxos as used
+      await db.putUTXOs(utxos.map((e) => e.copyWith(used: true)).toList());
+
+      return txHash;
+    } catch (e, s) {
+      Logging.instance.log("Exception rethrown from confirmSend(): $e\n$s",
+          level: LogLevel.Error);
+      rethrow;
+    }
   }
 
   @override
@@ -1362,17 +1378,17 @@ class FrostWallet extends CoinServiceAPI
   // required based on current app architecture where we don't properly store
   // transactions locally in a good way
   @override
-  Future<void> updateSentCachedTxData(Map<String, dynamic> txData) async {
+  Future<void> updateSentCachedTxData(TxData txData) async {
     final transaction = isar_models.Transaction(
       walletId: walletId,
-      txid: txData["txid"] as String,
+      txid: txData.txid!,
       timestamp: DateTime.now().millisecondsSinceEpoch ~/ 1000,
       type: isar_models.TransactionType.outgoing,
       subType: isar_models.TransactionSubType.none,
       // precision may be lost here hence the following amountString
-      amount: (txData["recipientAmt"] as Amount).raw.toInt(),
-      amountString: (txData["recipientAmt"] as Amount).toJsonString(),
-      fee: txData["fee"] as int,
+      amount: txData.amount!.raw.toInt(),
+      amountString: txData.amount!.toJsonString(),
+      fee: txData.fee!.raw.toInt(),
       height: null,
       isCancelled: false,
       isLelantus: false,
@@ -1384,8 +1400,9 @@ class FrostWallet extends CoinServiceAPI
       numberOfMessages: null,
     );
 
-    final address = txData["address"] is String
-        ? await db.getAddress(walletId, txData["address"] as String)
+    // TODO: Large scale app refactor required for multiple addresses sent to
+    final address = txData.recipients != null && txData.recipients!.isNotEmpty
+        ? await db.getAddress(walletId, txData.recipients!.first.address)
         : null;
 
     await db.addNewTransactionData(

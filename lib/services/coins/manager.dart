@@ -16,6 +16,7 @@ import 'package:stackfrost/db/hive/db.dart';
 import 'package:stackfrost/models/balance.dart';
 import 'package:stackfrost/models/isar/models/isar_models.dart' as isar_models;
 import 'package:stackfrost/models/models.dart';
+import 'package:stackfrost/models/tx_data.dart';
 import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
 import 'package:stackfrost/services/coins/coin_service.dart';
 import 'package:stackfrost/services/event_bus/events/global/node_connection_status_changed_event.dart';
@@ -101,16 +102,12 @@ class Manager with ChangeNotifier {
     super.dispose();
   }
 
-  Future<Map<String, dynamic>> prepareSend({
-    required String address,
-    required Amount amount,
-    Map<String, dynamic>? args,
+  Future<TxData> prepareSend({
+    required TxData txData,
   }) async {
     try {
       final txInfo = await _currentWallet.prepareSend(
-        address: address,
-        amount: amount,
-        args: args,
+        txData: txData,
       );
       // notifyListeners();
       return txInfo;
@@ -120,12 +117,12 @@ class Manager with ChangeNotifier {
     }
   }
 
-  Future<String> confirmSend({required Map<String, dynamic> txData}) async {
+  Future<String> confirmSend({required TxData txData}) async {
     try {
       final txid = await _currentWallet.confirmSend(txData: txData);
 
       try {
-        txData["txid"] = txid;
+        txData = txData.copyWith(txid: txid);
         await _currentWallet.updateSentCachedTxData(txData);
       } catch (e, s) {
         // do not rethrow as that would get handled as a send failure further up

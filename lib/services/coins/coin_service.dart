@@ -14,6 +14,7 @@ import 'package:stackfrost/models/balance.dart';
 import 'package:stackfrost/models/isar/models/isar_models.dart' as isar_models;
 import 'package:stackfrost/models/node_model.dart';
 import 'package:stackfrost/models/paymint/fee_object_model.dart';
+import 'package:stackfrost/models/tx_data.dart';
 import 'package:stackfrost/services/coins/bitcoin/bitcoin_wallet.dart';
 import 'package:stackfrost/services/transaction_notification_tracker.dart';
 import 'package:stackfrost/utilities/amount/amount.dart';
@@ -101,13 +102,11 @@ abstract class CoinServiceAPI {
   bool get isFavorite;
   set isFavorite(bool markFavorite);
 
-  Future<Map<String, dynamic>> prepareSend({
-    required String address,
-    required Amount amount,
-    Map<String, dynamic>? args,
+  Future<TxData> prepareSend({
+    required TxData txData,
   });
 
-  Future<String> confirmSend({required Map<String, dynamic> txData});
+  Future<String> confirmSend({required TxData txData});
 
   Future<FeeObject> get fees;
   Future<int> get maxFee;
@@ -163,7 +162,7 @@ abstract class CoinServiceAPI {
   Future<bool> generateNewAddress();
 
   // used for electrumx coins
-  Future<void> updateSentCachedTxData(Map<String, dynamic> txData);
+  Future<void> updateSentCachedTxData(TxData txData);
 
   int get storedChainHeight;
 
