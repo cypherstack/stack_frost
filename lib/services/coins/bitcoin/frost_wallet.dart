@@ -219,15 +219,18 @@ class FrostWallet extends CoinServiceAPI
         throw Exception("Insufficient available funds");
       }
 
-      List<isar_models.UTXO> utxos =
-      await db.getUTXOs(walletId).filter().isBlockedEqualTo(false).findAll();
+      List<isar_models.UTXO> utxos = await db
+          .getUTXOs(walletId)
+          .filter()
+          .isBlockedEqualTo(false)
+          .findAll();
 
       if (utxos.isEmpty) {
         throw Exception("No UTXOs found");
       } else {
         final currentHeight = await chainHeight;
         utxos.removeWhere(
-              (e) => !e.isConfirmed(
+          (e) => !e.isConfirmed(
             currentHeight,
             MINIMUM_CONFIRMATIONS,
           ),
@@ -241,7 +244,7 @@ class FrostWallet extends CoinServiceAPI
       final keys = frost.deserializeKeys(keys: serializedKeys!);
 
       final int network =
-      coin == Coin.bitcoin ? Network.Mainnet : Network.Testnet;
+          coin == Coin.bitcoin ? Network.Mainnet : Network.Testnet;
 
       final publicKey = Format.stringToUint8List(
         frost.scriptPubKeyForKeys(
@@ -253,9 +256,9 @@ class FrostWallet extends CoinServiceAPI
         network: network,
         inputs: utxos
             .map((e) => (
-        utxo: e,
-        scriptPubKey: publicKey,
-        ))
+                  utxo: e,
+                  scriptPubKey: publicKey,
+                ))
             .toList(),
         outputs: outputs,
         changeAddress: (await _currentReceivingAddress).value,
