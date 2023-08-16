@@ -18,6 +18,7 @@ import 'package:stackfrost/models/isar/models/isar_models.dart';
 import 'package:stackfrost/models/tx_data.dart';
 import 'package:stackfrost/pages/coin_control/coin_control_view.dart';
 import 'package:stackfrost/pages/send_view/frost_ms/frost_create_sign_config_view.dart';
+import 'package:stackfrost/pages/send_view/frost_ms/frost_import_sign_config_view.dart';
 import 'package:stackfrost/pages/send_view/frost_ms/recipient.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
 import 'package:stackfrost/providers/providers.dart';
@@ -27,6 +28,7 @@ import 'package:stackfrost/themes/coin_icon_provider.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/utilities/amount/amount.dart';
 import 'package:stackfrost/utilities/amount/amount_formatter.dart';
+import 'package:stackfrost/utilities/assets.dart';
 import 'package:stackfrost/utilities/constants.dart';
 import 'package:stackfrost/utilities/enums/coin_enum.dart';
 import 'package:stackfrost/utilities/show_loading.dart';
@@ -241,6 +243,40 @@ class _FrostSendViewState extends ConsumerState<FrostSendView> {
               "Send ${coin.ticker}",
               style: STextStyles.navBarTitle(context),
             ),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(
+                  top: 10,
+                  bottom: 10,
+                  right: 10,
+                ),
+                child: AspectRatio(
+                  aspectRatio: 1,
+                  child: AppBarIconButton(
+                    semanticsLabel: "Import sign config Button.",
+                    key: const Key("importSignConfigButtonKey"),
+                    size: 36,
+                    shadows: const [],
+                    color:
+                        Theme.of(context).extension<StackColors>()!.background,
+                    icon: SvgPicture.asset(
+                      Assets.svg.circlePlus,
+                      color: Theme.of(context)
+                          .extension<StackColors>()!
+                          .accentColorDark,
+                      width: 20,
+                      height: 20,
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(
+                        FrostImportSignConfigView.routeName,
+                        arguments: walletId,
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ],
           ),
           body: LayoutBuilder(
             builder: (builderContext, constraints) {

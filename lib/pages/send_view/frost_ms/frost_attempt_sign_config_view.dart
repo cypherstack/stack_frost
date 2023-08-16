@@ -337,9 +337,9 @@ class _FrostAttemptSignConfigViewState
                   );
                 }
 
-                // collect Preprocess strings and insert my own at the correct index
+                // collect Preprocess strings and insert an empty string at my index
                 final preprocesses = controllers.map((e) => e.text).toList();
-                preprocesses.insert(myIndex, myPreprocess);
+                preprocesses.insert(myIndex, "");
 
                 try {
                   ref.read(pFrostContinueSignData.notifier).state =

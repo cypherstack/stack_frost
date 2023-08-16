@@ -225,7 +225,7 @@ class _FrostShareSharesViewState extends ConsumerState<FrostShareSharesView> {
                                       !fieldIsEmptyFlags[i]
                                           ? TextFieldIconButton(
                                               semanticsLabel:
-                                                  "Clear Button. Clears The Commitment Field Input.",
+                                                  "Clear Button. Clears The Share Field Input.",
                                               key: Key(
                                                   "frSharesClearButtonKey_$i"),
                                               onTap: () {
@@ -239,7 +239,7 @@ class _FrostShareSharesViewState extends ConsumerState<FrostShareSharesView> {
                                             )
                                           : TextFieldIconButton(
                                               semanticsLabel:
-                                                  "Paste Button. Pastes From Clipboard To Commitment Field Input.",
+                                                  "Paste Button. Pastes From Clipboard To Share Field Input.",
                                               key: Key(
                                                   "frSharesPasteButtonKey_$i"),
                                               onTap: () async {

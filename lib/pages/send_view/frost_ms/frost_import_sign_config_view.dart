@@ -2,13 +2,21 @@ import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackfrost/pages/add_wallet_views/frost_ms/new/frost_share_commitments_view.dart';
+import 'package:frostdart/frostdart_bindings_generated.dart';
+import 'package:isar/isar.dart';
+import 'package:stackfrost/models/isar/models/isar_models.dart';
+import 'package:stackfrost/models/tx_data.dart';
+import 'package:stackfrost/pages/send_view/frost_ms/frost_attempt_sign_config_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
+import 'package:stackfrost/providers/db/main_db_provider.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
+import 'package:stackfrost/providers/global/wallets_provider.dart';
+import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
 import 'package:stackfrost/services/frost.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/utilities/constants.dart';
 import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/format.dart';
 import 'package:stackfrost/utilities/logger.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
 import 'package:stackfrost/utilities/util.dart';
@@ -25,44 +33,122 @@ import 'package:stackfrost/widgets/stack_dialog.dart';
 import 'package:stackfrost/widgets/stack_text_field.dart';
 import 'package:stackfrost/widgets/textfield_icon_button.dart';
 
-class ImportNewFrostMsWalletView extends ConsumerStatefulWidget {
-  const ImportNewFrostMsWalletView({
+class FrostImportSignConfigView extends ConsumerStatefulWidget {
+  const FrostImportSignConfigView({
     super.key,
-    required this.walletName,
-    required this.coin,
+    required this.walletId,
   });
 
-  static const String routeName = "/importNewFrostMsWalletView";
+  static const String routeName = "/frostImportSignConfigView";
 
-  final String walletName;
-  final Coin coin;
+  final String walletId;
 
   @override
-  ConsumerState<ImportNewFrostMsWalletView> createState() =>
-      _ImportNewFrostMsWalletViewState();
+  ConsumerState<FrostImportSignConfigView> createState() =>
+      _FrostImportSignConfigViewState();
 }
 
-class _ImportNewFrostMsWalletViewState
-    extends ConsumerState<ImportNewFrostMsWalletView> {
-  late final TextEditingController myNameFieldController, configFieldController;
-  late final FocusNode myNameFocusNode, configFocusNode;
+class _FrostImportSignConfigViewState
+    extends ConsumerState<FrostImportSignConfigView> {
+  late final TextEditingController configFieldController;
+  late final FocusNode configFocusNode;
 
-  bool _nameEmpty = true, _configEmpty = true;
+  bool _configEmpty = true;
+
+  bool _attemptSignLock = false;
+
+  Future<void> _attemptSign() async {
+    if (_attemptSignLock) {
+      return;
+    }
+
+    _attemptSignLock = true;
+
+    try {
+      if (FocusScope.of(context).hasFocus) {
+        FocusScope.of(context).unfocus();
+      }
+
+      final config = configFieldController.text;
+      final wallet = ref
+          .read(walletsChangeNotifierProvider)
+          .getManager(widget.walletId)
+          .wallet as FrostWallet;
+
+      final network =
+          wallet.coin == Coin.bitcoin ? Network.Mainnet : Network.Testnet;
+
+      final configPtr = Frost.decodedSignConfig(
+        encodedConfig: config,
+        network: network,
+      );
+
+      final data = Frost.extractDataFromSignConfig(
+        signConfigPointer: configPtr,
+        coin: wallet.coin,
+      );
+
+      final utxos = await ref
+          .read(mainDBProvider)
+          .getUTXOs(wallet.walletId)
+          .filter()
+          .anyOf(
+              data.inputs,
+              (q, e) => q
+                  .txidEqualTo(Format.uint8listToString(e.hash))
+                  .and()
+                  .valueEqualTo(e.value)
+                  .and()
+                  .voutEqualTo(e.vout))
+          .findAll();
+
+      // TODO add more data from 'data' and display to user ?
+      ref.read(pFrostTxData.notifier).state = TxData(
+        frostMSConfig: config,
+        recipients: data.recipients,
+        utxos: utxos.toSet(),
+      );
+
+      final attemptSignRes = await wallet.frostAttemptSignConfig(
+        config: ref.read(pFrostTxData.state).state!.frostMSConfig!,
+      );
+
+      ref.read(pFrostAttemptSignData.notifier).state = attemptSignRes;
+
+      print("--------------------------------data: $data");
+
+      await Navigator.of(context).pushNamed(
+        FrostAttemptSignConfigView.routeName,
+        arguments: widget.walletId,
+      );
+    } catch (e, s) {
+      Logging.instance.log(
+        "$e\n$s",
+        level: LogLevel.Error,
+      );
+      await showDialog<void>(
+        context: context,
+        builder: (_) => StackOkDialog(
+          title: "Import and attempt sign config failed",
+          message: e.toString(),
+          desktopPopRootNavigator: Util.isDesktop,
+        ),
+      );
+    } finally {
+      _attemptSignLock = false;
+    }
+  }
 
   @override
   void initState() {
-    myNameFieldController = TextEditingController();
     configFieldController = TextEditingController();
-    myNameFocusNode = FocusNode();
     configFocusNode = FocusNode();
     super.initState();
   }
 
   @override
   void dispose() {
-    myNameFieldController.dispose();
     configFieldController.dispose();
-    myNameFocusNode.dispose();
     configFocusNode.dispose();
     super.dispose();
   }
@@ -96,7 +182,7 @@ class _ImportNewFrostMsWalletViewState
                 },
               ),
               title: Text(
-                "Import FROST multisig config",
+                "Import FROST sign config",
                 style: STextStyles.navBarTitle(context),
               ),
             ),
@@ -124,89 +210,6 @@ class _ImportNewFrostMsWalletViewState
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(
-              height: 16,
-            ),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(
-                Constants.size.circularBorderRadius,
-              ),
-              child: TextField(
-                key: const Key("frMyNameTextFieldKey"),
-                controller: myNameFieldController,
-                onChanged: (_) {
-                  setState(() {
-                    _nameEmpty = myNameFieldController.text.isEmpty;
-                  });
-                },
-                focusNode: myNameFocusNode,
-                readOnly: false,
-                autocorrect: false,
-                enableSuggestions: false,
-                style: STextStyles.field(context),
-                decoration: standardInputDecoration(
-                  "My name",
-                  myNameFocusNode,
-                  context,
-                ).copyWith(
-                  contentPadding: const EdgeInsets.only(
-                    left: 16,
-                    top: 6,
-                    bottom: 8,
-                    right: 5,
-                  ),
-                  suffixIcon: Padding(
-                    padding: _nameEmpty
-                        ? const EdgeInsets.only(right: 8)
-                        : const EdgeInsets.only(right: 0),
-                    child: UnconstrainedBox(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          !_nameEmpty
-                              ? TextFieldIconButton(
-                                  semanticsLabel:
-                                      "Clear Button. Clears The Config Field.",
-                                  key: const Key("frMyNameClearButtonKey"),
-                                  onTap: () {
-                                    myNameFieldController.text = "";
-
-                                    setState(() {
-                                      _nameEmpty = true;
-                                    });
-                                  },
-                                  child: const XIcon(),
-                                )
-                              : TextFieldIconButton(
-                                  semanticsLabel:
-                                      "Paste Button. Pastes From Clipboard To Name Field.",
-                                  key: const Key("frMyNamePasteButtonKey"),
-                                  onTap: () async {
-                                    final ClipboardData? data =
-                                        await Clipboard.getData(
-                                            Clipboard.kTextPlain);
-                                    if (data?.text != null &&
-                                        data!.text!.isNotEmpty) {
-                                      myNameFieldController.text =
-                                          data.text!.trim();
-                                    }
-
-                                    setState(() {
-                                      _nameEmpty =
-                                          myNameFieldController.text.isEmpty;
-                                    });
-                                  },
-                                  child: _nameEmpty
-                                      ? const ClipboardIcon()
-                                      : const XIcon(),
-                                ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
             const SizedBox(
               height: 16,
             ),
@@ -329,53 +332,10 @@ class _ImportNewFrostMsWalletViewState
               height: 16,
             ),
             PrimaryButton(
-              label: "Start key generation",
-              enabled: !_nameEmpty && !_configEmpty,
-              onPressed: () async {
-                if (FocusScope.of(context).hasFocus) {
-                  FocusScope.of(context).unfocus();
-                }
-
-                final config = configFieldController.text;
-
-                if (!Frost.validateEncodedMultisigConfig(
-                    encodedConfig: config)) {
-                  return await showDialog<void>(
-                    context: context,
-                    builder: (_) => StackOkDialog(
-                      title: "Invalid config",
-                      desktopPopRootNavigator: Util.isDesktop,
-                    ),
-                  );
-                }
-
-                if (!Frost.getParticipants(multisigConfig: config)
-                    .contains(myNameFieldController.text)) {
-                  return await showDialog<void>(
-                    context: context,
-                    builder: (_) => StackOkDialog(
-                      title: "My name not found in config participants",
-                      desktopPopRootNavigator: Util.isDesktop,
-                    ),
-                  );
-                }
-
-                ref.read(pFrostMyName.state).state = myNameFieldController.text;
-                ref.read(pFrostMultisigConfig.notifier).state = config;
-
-                ref.read(pFrostStartKeyGenData.state).state =
-                    Frost.startKeyGeneration(
-                  multisigConfig: ref.read(pFrostMultisigConfig.state).state!,
-                  myName: ref.read(pFrostMyName.state).state!,
-                );
-
-                await Navigator.of(context).pushNamed(
-                  FrostShareCommitmentsView.routeName,
-                  arguments: (
-                    walletName: widget.walletName,
-                    coin: widget.coin,
-                  ),
-                );
+              label: "Start signing",
+              enabled: !_configEmpty,
+              onPressed: () {
+                _attemptSign();
               },
             ),
           ],

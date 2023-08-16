@@ -119,6 +119,7 @@ class _FrostCompleteSignViewState extends ConsumerState<FrostCompleteSignView> {
                   _Item(
                     label: "Raw tx",
                     detail: ref.read(pFrostTxData.state).state!.raw!,
+                    detailSelectable: true,
                   ),
                 ],
               ),

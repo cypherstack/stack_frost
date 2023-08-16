@@ -339,9 +339,9 @@ class _FrostContinueSignViewState extends ConsumerState<FrostContinueSignView> {
                   );
                 }
 
-                // collect Share strings and insert my own at the correct index
+                // collect Share strings and insert an empty string at my index
                 final shares = controllers.map((e) => e.text).toList();
-                shares.insert(myIndex, myShare);
+                shares.insert(myIndex, "");
 
                 try {
                   final rawTx = Frost.completeSigning(

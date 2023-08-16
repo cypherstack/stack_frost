@@ -7,6 +7,7 @@ import 'package:frostdart/output.dart';
 import 'package:frostdart/util.dart';
 import 'package:stackfrost/models/isar/models/isar_models.dart' as isar_models;
 import 'package:stackfrost/utilities/amount/amount.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
 import 'package:stackfrost/utilities/format.dart';
 import 'package:stackfrost/utilities/logger.dart';
 
@@ -91,6 +92,72 @@ abstract class Frost {
     } catch (e, s) {
       Logging.instance.log(
         "getThreshold failed: $e\n$s",
+        level: LogLevel.Fatal,
+      );
+      rethrow;
+    }
+  }
+
+  static ({
+    List<({String address, Amount amount})> recipients,
+    String changeAddress,
+    int feePerWeight,
+    List<Output> inputs,
+  }) extractDataFromSignConfig({
+    required Pointer<SignConfig> signConfigPointer,
+    required Coin coin,
+  }) {
+    try {
+      // get various data from config
+      final feePerWeight =
+          signFeePerWeight(signConfigPointer: signConfigPointer);
+      final changeAddress = signChange(signConfigPointer: signConfigPointer);
+      final recipientsCount = signPayments(
+        signConfigPointer: signConfigPointer,
+      );
+
+      // get tx recipient info
+      final List<({String address, Amount amount})> recipients = [];
+      for (int i = 0; i < recipientsCount; i++) {
+        final String address = signPaymentAddress(
+          signConfigPointer: signConfigPointer,
+          index: i,
+        );
+        final int amount = signPaymentAmount(
+          signConfigPointer: signConfigPointer,
+          index: i,
+        );
+        recipients.add(
+          (
+            address: address,
+            amount: Amount(
+              rawValue: BigInt.from(amount),
+              fractionDigits: coin.decimals,
+            ),
+          ),
+        );
+      }
+
+      // get utxos
+      final count = signInputs(signConfigPointer: signConfigPointer);
+      final List<Output> outputs = [];
+      for (int i = 0; i < count; i++) {
+        final p = signInput(signConfigPointer: signConfigPointer, index: i);
+
+        final output = convertOutput(ownedPortableOutputPointer: p.value);
+
+        outputs.add(output);
+      }
+
+      return (
+        recipients: recipients,
+        changeAddress: changeAddress,
+        feePerWeight: feePerWeight,
+        inputs: outputs,
+      );
+    } catch (e, s) {
+      Logging.instance.log(
+        "extractDataFromSignConfig failed: $e\n$s",
         level: LogLevel.Fatal,
       );
       rethrow;
@@ -340,6 +407,23 @@ abstract class Frost {
     } catch (e, s) {
       Logging.instance.log(
         "completeSigning failed: $e\n$s",
+        level: LogLevel.Fatal,
+      );
+      rethrow;
+    }
+  }
+
+  static Pointer<SignConfig> decodedSignConfig({
+    required String encodedConfig,
+    required int network,
+  }) {
+    try {
+      final configPtr =
+          decodeSignConfig(encodedSignConfig: encodedConfig, network: network);
+      return configPtr;
+    } catch (e, s) {
+      Logging.instance.log(
+        "validateEncodedSignConfig failed: $e\n$s",
         level: LogLevel.Fatal,
       );
       rethrow;
