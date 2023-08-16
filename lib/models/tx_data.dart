@@ -21,6 +21,8 @@ class TxData {
   final List<({String address, Amount amount})>? recipients;
   final Set<UTXO>? utxos;
 
+  final String? frostMSConfig;
+
   TxData({
     this.feeRateType,
     this.feeRateAmount,
@@ -34,6 +36,7 @@ class TxData {
     this.noteOnChain,
     this.recipients,
     this.utxos,
+    this.frostMSConfig,
   });
 
   Amount? get amount => recipients != null && recipients!.isNotEmpty
@@ -59,6 +62,7 @@ class TxData {
     String? noteOnChain,
     Set<UTXO>? utxos,
     List<({String address, Amount amount})>? recipients,
+    String? frostMSConfig,
   }) {
     return TxData(
       feeRateType: feeRateType ?? this.feeRateType,
@@ -73,6 +77,7 @@ class TxData {
       noteOnChain: noteOnChain ?? this.noteOnChain,
       utxos: utxos ?? this.utxos,
       recipients: recipients ?? this.recipients,
+      frostMSConfig: frostMSConfig ?? this.frostMSConfig,
     );
   }
 }

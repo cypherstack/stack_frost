@@ -51,7 +51,7 @@ class _FrostCreateSignConfigViewState
           .wallet as FrostWallet;
 
       final attemptSignRes = await wallet.frostAttemptSignConfig(
-        config: ref.read(pFrostSignConfig.state).state!,
+        config: ref.read(pFrostTxData.state).state!.frostMSConfig!,
       );
 
       ref.read(pFrostAttemptSignData.notifier).state = attemptSignRes;
@@ -133,7 +133,7 @@ class _FrostCreateSignConfigViewState
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   QrImageView(
-                    data: ref.watch(pFrostSignConfig.state).state!,
+                    data: ref.watch(pFrostTxData.state).state!.frostMSConfig!,
                     size: 220,
                     backgroundColor:
                         Theme.of(context).extension<StackColors>()!.background,
@@ -149,7 +149,7 @@ class _FrostCreateSignConfigViewState
             ),
             RoundedWhiteContainer(
               child: SelectableText(
-                ref.watch(pFrostSignConfig.state).state!,
+                ref.watch(pFrostTxData.state).state!.frostMSConfig!,
                 style: STextStyles.itemSubtitle(context),
               ),
             ),

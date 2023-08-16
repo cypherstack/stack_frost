@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frostdart/frostdart_bindings_generated.dart';
+import 'package:stackfrost/models/tx_data.dart';
 
 // =================== wallet creation =========================================
 final pFrostMultisigConfig = StateProvider<String?>((ref) => null);
@@ -30,7 +31,7 @@ final pFrostCompletedKeyGenData = StateProvider<
     })?>((ref) => null);
 
 // ================= transaction creation ======================================
-final pFrostSignConfig = StateProvider<String?>((ref) => null);
+final pFrostTxData = StateProvider<TxData?>((ref) => null);
 
 final pFrostAttemptSignData = StateProvider<
     ({

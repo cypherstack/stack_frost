@@ -209,14 +209,21 @@ class FrostWallet extends CoinServiceAPI
   Coin get coin => _coin;
   late final Coin _coin;
 
-  Future<String> frostCreateSignConfig({
-    required List<({String address, Amount amount})> outputs,
+  Future<TxData> frostCreateSignConfig({
+    required TxData txData,
     required String changeAddress,
     required int feePerWeight,
   }) async {
     try {
-      if (outputs.map((e) => e.amount).reduce((value, e) => value += e) >
-          balance.spendable) {
+      if (txData.recipients == null || txData.recipients!.isEmpty) {
+        throw Exception("No recipients found!");
+      }
+
+      final total = txData.recipients!
+          .map((e) => e.amount)
+          .reduce((value, e) => value += e);
+
+      if (total > balance.spendable) {
         throw Exception("Insufficient available funds");
       }
 
@@ -241,6 +248,22 @@ class FrostWallet extends CoinServiceAPI
         }
       }
 
+      Amount sum = Amount(
+        rawValue: BigInt.zero,
+        fractionDigits: coin.decimals,
+      );
+      final Set<isar_models.UTXO> utxosToUse = {};
+      for (final utxo in utxos) {
+        sum += Amount(
+          rawValue: BigInt.from(utxo.value),
+          fractionDigits: coin.decimals,
+        );
+        utxosToUse.add(utxo);
+        if (sum > total) {
+          break;
+        }
+      }
+
       final serializedKeys = await getSerializedKeys;
       final keys = frost.deserializeKeys(keys: serializedKeys!);
 
@@ -255,18 +278,18 @@ class FrostWallet extends CoinServiceAPI
 
       final config = Frost.createSignConfig(
         network: network,
-        inputs: utxos
+        inputs: utxosToUse
             .map((e) => (
                   utxo: e,
                   scriptPubKey: publicKey,
                 ))
             .toList(),
-        outputs: outputs,
+        outputs: txData.recipients!,
         changeAddress: (await _currentReceivingAddress).value,
         feePerWeight: feePerWeight,
       );
 
-      return config;
+      return txData.copyWith(frostMSConfig: config, utxos: utxosToUse);
     } catch (_) {
       rethrow;
     }

@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:stackfrost/models/isar/models/isar_models.dart';
+import 'package:stackfrost/models/tx_data.dart';
 import 'package:stackfrost/pages/coin_control/coin_control_view.dart';
 import 'package:stackfrost/pages/send_view/frost_ms/frost_create_sign_config_view.dart';
 import 'package:stackfrost/pages/send_view/frost_ms/recipient.dart';
@@ -75,7 +76,7 @@ class _FrostSendViewState extends ConsumerState<FrostSendView> {
 
   bool _createSignLock = false;
 
-  Future<String> _loadingFuture() async {
+  Future<TxData> _loadingFuture() async {
     final wallet = ref
         .read(walletsChangeNotifierProvider)
         .getManager(walletId)
@@ -86,13 +87,13 @@ class _FrostSendViewState extends ConsumerState<FrostSendView> {
         .map((e) => (address: e!.address, amount: e!.amount!))
         .toList(growable: false);
 
-    final signConfig = await wallet.frostCreateSignConfig(
-      outputs: recipients,
+    final txData = await wallet.frostCreateSignConfig(
+      txData: TxData(recipients: recipients),
       changeAddress: (await wallet.currentReceivingAddress),
       feePerWeight: customFeeRate,
     );
 
-    return signConfig;
+    return txData;
   }
 
   Future<void> _createSignConfig() async {
@@ -108,9 +109,9 @@ class _FrostSendViewState extends ConsumerState<FrostSendView> {
         const Duration(milliseconds: 100),
       );
 
-      String? config;
+      TxData? txData;
       if (mounted) {
-        config = await showLoading<String>(
+        txData = await showLoading<TxData>(
           whileFuture: _loadingFuture(),
           context: context,
           message: "Generating sign config",
@@ -121,8 +122,8 @@ class _FrostSendViewState extends ConsumerState<FrostSendView> {
         );
       }
 
-      if (mounted && config != null) {
-        ref.read(pFrostSignConfig.notifier).state = config;
+      if (mounted && txData != null) {
+        ref.read(pFrostTxData.notifier).state = txData;
 
         await Navigator.of(context).pushNamed(
           FrostCreateSignConfigView.routeName,
