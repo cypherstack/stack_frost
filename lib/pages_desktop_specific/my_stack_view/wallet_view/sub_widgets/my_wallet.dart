@@ -10,8 +10,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:stackfrost/pages/send_view/frost_ms/frost_send_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/desktop_receive.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/desktop_send.dart';
+import 'package:stackfrost/providers/global/wallets_provider.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
 import 'package:stackfrost/widgets/custom_tab_view.dart';
 import 'package:stackfrost/widgets/rounded_white_container.dart';
 
@@ -33,8 +36,19 @@ class _MyWalletState extends ConsumerState<MyWallet> {
     "Receive",
   ];
 
+  late final bool isFrost;
+  late final Coin coin;
+
   @override
   void initState() {
+    isFrost = ref
+        .read(walletsChangeNotifierProvider)
+        .getManager(widget.walletId)
+        .isFrostMS;
+    coin = ref
+        .read(walletsChangeNotifierProvider)
+        .getManager(widget.walletId)
+        .coin;
     super.initState();
   }
 
@@ -50,9 +64,14 @@ class _MyWalletState extends ConsumerState<MyWallet> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(20),
-                child: DesktopSend(
-                  walletId: widget.walletId,
-                ),
+                child: isFrost
+                    ? FrostSendView(
+                        walletId: widget.walletId,
+                        coin: coin,
+                      )
+                    : DesktopSend(
+                        walletId: widget.walletId,
+                      ),
               ),
               Padding(
                 padding: const EdgeInsets.all(20),
