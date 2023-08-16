@@ -1,16 +1,12 @@
-import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
 import 'package:stackfrost/providers/global/wallets_provider.dart';
-import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
-import 'package:stackfrost/services/frost.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
-import 'package:stackfrost/utilities/constants.dart';
 import 'package:stackfrost/utilities/logger.dart';
+import 'package:stackfrost/utilities/show_loading.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
 import 'package:stackfrost/utilities/util.dart';
 import 'package:stackfrost/widgets/background.dart';
@@ -19,13 +15,8 @@ import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackfrost/widgets/desktop/desktop_app_bar.dart';
 import 'package:stackfrost/widgets/desktop/desktop_scaffold.dart';
 import 'package:stackfrost/widgets/desktop/primary_button.dart';
-import 'package:stackfrost/widgets/icon_widgets/clipboard_icon.dart';
-import 'package:stackfrost/widgets/icon_widgets/qrcode_icon.dart';
-import 'package:stackfrost/widgets/icon_widgets/x_icon.dart';
 import 'package:stackfrost/widgets/rounded_white_container.dart';
 import 'package:stackfrost/widgets/stack_dialog.dart';
-import 'package:stackfrost/widgets/stack_text_field.dart';
-import 'package:stackfrost/widgets/textfield_icon_button.dart';
 
 class FrostCompleteSignView extends ConsumerStatefulWidget {
   const FrostCompleteSignView({
@@ -43,47 +34,7 @@ class FrostCompleteSignView extends ConsumerStatefulWidget {
 }
 
 class _FrostCompleteSignViewState extends ConsumerState<FrostCompleteSignView> {
-  final List<TextEditingController> controllers = [];
-  final List<FocusNode> focusNodes = [];
-
-  late final List<String> participants;
-  late final String myPreprocess;
-  late final int myIndex;
-
-  final List<bool> fieldIsEmptyFlags = [];
-
-  @override
-  void initState() {
-    final wallet = ref
-        .read(walletsChangeNotifierProvider)
-        .getManager(widget.walletId)
-        .wallet as FrostWallet;
-
-    participants = wallet.participants;
-    myIndex = participants.indexOf(wallet.myName);
-    myPreprocess = ref.read(pFrostAttemptSignData.state).state!.preprocess;
-
-    // temporarily remove my name
-    participants.removeAt(myIndex);
-
-    for (int i = 0; i < participants.length; i++) {
-      controllers.add(TextEditingController());
-      focusNodes.add(FocusNode());
-      fieldIsEmptyFlags.add(true);
-    }
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    for (int i = 0; i < controllers.length; i++) {
-      controllers[i].dispose();
-    }
-    for (int i = 0; i < focusNodes.length; i++) {
-      focusNodes[i].dispose();
-    }
-    super.dispose();
-  }
+  bool _broadcastLock = false;
 
   @override
   Widget build(BuildContext context) {
@@ -114,7 +65,7 @@ class _FrostCompleteSignViewState extends ConsumerState<FrostCompleteSignView> {
                 },
               ),
               title: Text(
-                "Preprocesses",
+                "Preview transaction",
                 style: STextStyles.navBarTitle(context),
               ),
             ),
@@ -148,7 +99,7 @@ class _FrostCompleteSignViewState extends ConsumerState<FrostCompleteSignView> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   QrImageView(
-                    data: myPreprocess,
+                    data: ref.read(pFrostTxData.state).state!.raw!,
                     size: 220,
                     backgroundColor:
                         Theme.of(context).extension<StackColors>()!.background,
@@ -166,181 +117,50 @@ class _FrostCompleteSignViewState extends ConsumerState<FrostCompleteSignView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _Item(
-                    label: "My name",
-                    detail: ref.watch(pFrostMyName.state).state!,
-                  ),
-                  const _Div(),
-                  _Item(
-                    label: "My preprocess",
-                    detail: myPreprocess,
-                    detailSelectable: true,
+                    label: "Raw tx",
+                    detail: ref.read(pFrostTxData.state).state!.raw!,
                   ),
                 ],
               ),
             ),
             const _Div(),
-            Text("Enter remaining participant's preprocesses:"),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                for (int i = 0; i < participants.length; i++)
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(
-                            Constants.size.circularBorderRadius,
-                          ),
-                          child: TextField(
-                            key: Key("frostPreprocessesTextFieldKey_$i"),
-                            controller: controllers[i],
-                            focusNode: focusNodes[i],
-                            readOnly: false,
-                            autocorrect: false,
-                            enableSuggestions: false,
-                            style: STextStyles.field(context),
-                            decoration: standardInputDecoration(
-                              "Enter ${participants[i]}'s commitment",
-                              focusNodes[i],
-                              context,
-                            ).copyWith(
-                              contentPadding: const EdgeInsets.only(
-                                left: 16,
-                                top: 6,
-                                bottom: 8,
-                                right: 5,
-                              ),
-                              suffixIcon: Padding(
-                                padding: fieldIsEmptyFlags[i]
-                                    ? const EdgeInsets.only(right: 8)
-                                    : const EdgeInsets.only(right: 0),
-                                child: UnconstrainedBox(
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    children: [
-                                      !fieldIsEmptyFlags[i]
-                                          ? TextFieldIconButton(
-                                              semanticsLabel:
-                                                  "Clear Button. Clears The Preprocess Field Input.",
-                                              key: Key(
-                                                  "frostPreprocesssClearButtonKey_$i"),
-                                              onTap: () {
-                                                controllers[i].text = "";
-
-                                                setState(() {
-                                                  fieldIsEmptyFlags[i] = true;
-                                                });
-                                              },
-                                              child: const XIcon(),
-                                            )
-                                          : TextFieldIconButton(
-                                              semanticsLabel:
-                                                  "Paste Button. Pastes From Clipboard To Preprocess Field Input.",
-                                              key: Key(
-                                                  "frostPreprocesssPasteButtonKey_$i"),
-                                              onTap: () async {
-                                                final ClipboardData? data =
-                                                    await Clipboard.getData(
-                                                        Clipboard.kTextPlain);
-                                                if (data?.text != null &&
-                                                    data!.text!.isNotEmpty) {
-                                                  controllers[i].text =
-                                                      data.text!.trim();
-                                                }
-
-                                                setState(() {
-                                                  fieldIsEmptyFlags[i] =
-                                                      controllers[i]
-                                                          .text
-                                                          .isEmpty;
-                                                });
-                                              },
-                                              child: fieldIsEmptyFlags[i]
-                                                  ? const ClipboardIcon()
-                                                  : const XIcon(),
-                                            ),
-                                      if (fieldIsEmptyFlags[i])
-                                        TextFieldIconButton(
-                                          semanticsLabel:
-                                              "Scan QR Button. Opens Camera For Scanning QR Code.",
-                                          key: Key(
-                                              "frostPreprocesssScanQrButtonKey_$i"),
-                                          onTap: () async {
-                                            try {
-                                              if (FocusScope.of(context)
-                                                  .hasFocus) {
-                                                FocusScope.of(context)
-                                                    .unfocus();
-                                                await Future<void>.delayed(
-                                                    const Duration(
-                                                        milliseconds: 75));
-                                              }
-
-                                              final qrResult =
-                                                  await BarcodeScanner.scan();
-
-                                              controllers[i].text =
-                                                  qrResult.rawContent;
-
-                                              setState(() {
-                                                fieldIsEmptyFlags[i] =
-                                                    controllers[i].text.isEmpty;
-                                              });
-                                            } on PlatformException catch (e, s) {
-                                              Logging.instance.log(
-                                                "Failed to get camera permissions while trying to scan qr code: $e\n$s",
-                                                level: LogLevel.Warning,
-                                              );
-                                            }
-                                          },
-                                          child: const QrCodeIcon(),
-                                        )
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-              ],
-            ),
             if (!Util.isDesktop) const Spacer(),
             const _Div(),
             PrimaryButton(
-              label: "Generate shares",
+              label: "Broadcast Transaction",
               onPressed: () async {
-                // check for empty preprocesses
-                if (controllers
-                    .map((e) => e.text.isEmpty)
-                    .reduce((value, element) => value |= element)) {
-                  return await showDialog<void>(
-                    context: context,
-                    builder: (_) => StackOkDialog(
-                      title: "Missing Preprocesses",
-                      desktopPopRootNavigator: Util.isDesktop,
-                    ),
-                  );
+                if (_broadcastLock) {
+                  return;
                 }
-
-                // collect Preprocess strings and insert my own at the correct index
-                final preprocesses = controllers.map((e) => e.text).toList();
-                preprocesses.insert(myIndex, myPreprocess);
+                _broadcastLock = true;
 
                 try {
-                  ref.read(pFrostContinueSignData.notifier).state =
-                      Frost.continueSigning(
-                    machinePtr:
-                        ref.read(pFrostAttemptSignData.state).state!.machinePtr,
-                    preprocesses: preprocesses,
-                  );
+                  final txData = await showLoading(
+                      whileFuture: ref
+                          .read(walletsChangeNotifierProvider)
+                          .getManager(widget.walletId)
+                          .confirmSend(
+                            txData: ref.read(pFrostTxData.state).state!,
+                          ),
+                      context: context,
+                      message: "Broadcasting transaction to network",
+                      isDesktop: Util.isDesktop,
+                      onException: (e) {
+                        showDialog<void>(
+                          context: context,
+                          builder: (_) => StackOkDialog(
+                            title: "Broadcast error",
+                            message: e.toString(),
+                            desktopPopRootNavigator: Util.isDesktop,
+                          ),
+                        );
+                      });
+
+                  if (txData != null && mounted) {
+                    ref.read(pFrostTxData.state).state = txData;
+
+                    print("BROADCAST SUCCESS");
+                  }
 
                   // await Navigator.of(context).pushNamed(
                   //   FrostShareSharesView.routeName,
@@ -358,10 +178,13 @@ class _FrostCompleteSignViewState extends ConsumerState<FrostCompleteSignView> {
                   return await showDialog<void>(
                     context: context,
                     builder: (_) => StackOkDialog(
-                      title: "Failed to generate shares",
+                      title: "Broadcast error",
+                      message: e.toString(),
                       desktopPopRootNavigator: Util.isDesktop,
                     ),
                   );
+                } finally {
+                  _broadcastLock = false;
                 }
               },
             ),

@@ -1159,7 +1159,7 @@ class BitcoinWallet extends CoinServiceAPI
   }
 
   @override
-  Future<String> confirmSend({required TxData txData}) async {
+  Future<TxData> confirmSend({required TxData txData}) async {
     try {
       Logging.instance.log("confirmSend txData: $txData", level: LogLevel.Info);
 
@@ -1168,12 +1168,17 @@ class BitcoinWallet extends CoinServiceAPI
       final txHash = await _electrumXClient.broadcastTransaction(rawTx: hex);
       Logging.instance.log("Sent txHash: $txHash", level: LogLevel.Info);
 
-      final utxos = txData.utxos!;
-
       // mark utxos as used
-      await db.putUTXOs(utxos.map((e) => e.copyWith(used: true)).toList());
+      final usedUTXOs = txData.utxos!.map((e) => e.copyWith(used: true));
+      await db.putUTXOs(usedUTXOs.toList());
 
-      return txHash;
+      txData = txData.copyWith(
+        utxos: usedUTXOs.toSet(),
+        txHash: txHash,
+        txid: txHash,
+      );
+
+      return txData;
     } catch (e, s) {
       Logging.instance.log("Exception rethrown from confirmSend(): $e\n$s",
           level: LogLevel.Error);

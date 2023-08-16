@@ -44,5 +44,3 @@ final pFrostContinueSignData = StateProvider<
       Pointer<TransactionSignatureMachineWrapper> machinePtr,
       String share,
     })?>((ref) => null);
-
-final pFrostCompleteSignRawTx = StateProvider<String?>((ref) => null);

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:stackfrost/pages/send_view/frost_ms/frost_complete_sign_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
 import 'package:stackfrost/providers/global/wallets_provider.dart';
@@ -343,8 +344,7 @@ class _FrostContinueSignViewState extends ConsumerState<FrostContinueSignView> {
                 shares.insert(myIndex, myShare);
 
                 try {
-                  ref.read(pFrostCompleteSignRawTx.notifier).state =
-                      Frost.completeSigning(
+                  final rawTx = Frost.completeSigning(
                     machinePtr: ref
                         .read(pFrostContinueSignData.state)
                         .state!
@@ -352,13 +352,15 @@ class _FrostContinueSignViewState extends ConsumerState<FrostContinueSignView> {
                     shares: shares,
                   );
 
-                  // await Navigator.of(context).pushNamed(
-                  //   FrostShareSharesView.routeName,
-                  //   arguments: (
-                  //     walletName: widget.walletName,
-                  //     coin: widget.coin,
-                  //   ),
-                  // );
+                  ref.read(pFrostTxData.state).state =
+                      ref.read(pFrostTxData.state).state!.copyWith(
+                            raw: rawTx,
+                          );
+
+                  await Navigator.of(context).pushNamed(
+                    FrostCompleteSignView.routeName,
+                    arguments: widget.walletId,
+                  );
                 } catch (e, s) {
                   Logging.instance.log(
                     "$e\n$s",

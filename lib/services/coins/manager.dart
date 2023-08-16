@@ -117,12 +117,11 @@ class Manager with ChangeNotifier {
     }
   }
 
-  Future<String> confirmSend({required TxData txData}) async {
+  Future<TxData> confirmSend({required TxData txData}) async {
     try {
-      final txid = await _currentWallet.confirmSend(txData: txData);
+      txData = await _currentWallet.confirmSend(txData: txData);
 
       try {
-        txData = txData.copyWith(txid: txid);
         await _currentWallet.updateSentCachedTxData(txData);
       } catch (e, s) {
         // do not rethrow as that would get handled as a send failure further up
@@ -132,7 +131,7 @@ class Manager with ChangeNotifier {
       }
 
       notifyListeners();
-      return txid;
+      return txData;
     } catch (e) {
       // rethrow to pass error in alert
       rethrow;

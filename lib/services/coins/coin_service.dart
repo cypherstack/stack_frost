@@ -106,7 +106,7 @@ abstract class CoinServiceAPI {
     required TxData txData,
   });
 
-  Future<String> confirmSend({required TxData txData});
+  Future<TxData> confirmSend({required TxData txData});
 
   Future<FeeObject> get fees;
   Future<int> get maxFee;

@@ -108,12 +108,11 @@ class _ConfirmTransactionViewState
     );
 
     late String txid;
-    Future<String> txidFuture;
+    Future<TxData> txidFuture;
 
     final note = noteController.text;
 
     try {
-      final coin = manager.coin;
       txidFuture = manager.confirmSend(txData: transactionInfo);
 
       final results = await Future.wait([
@@ -124,7 +123,8 @@ class _ConfirmTransactionViewState
       sendProgressController.triggerSuccess?.call();
       await Future<void>.delayed(const Duration(seconds: 5));
 
-      txid = results.first as String;
+      final txData = results.first as TxData;
+      txid = txData.txid!;
       ref.refresh(desktopUseUTXOs);
 
       // save note
