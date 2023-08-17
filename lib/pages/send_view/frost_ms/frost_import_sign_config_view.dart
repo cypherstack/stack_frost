@@ -114,8 +114,6 @@ class _FrostImportSignConfigViewState
 
       ref.read(pFrostAttemptSignData.notifier).state = attemptSignRes;
 
-      print("--------------------------------data: $data");
-
       await Navigator.of(context).pushNamed(
         FrostAttemptSignConfigView.routeName,
         arguments: widget.walletId,
