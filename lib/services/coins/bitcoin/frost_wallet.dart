@@ -502,6 +502,18 @@ class FrostWallet extends CoinServiceAPI
     required bool isRescan,
   }) async {
     try {
+      if (!isRescan) {
+        final salt = Format.uint8listToString(
+          frost.multisigSalt(
+            multisigConfig: multisigConfig,
+          ),
+        );
+        if (knownSalts.contains(salt)) {
+          throw Exception("Known frost multisig salt found!");
+        }
+        await updateKnownSalts(knownSalts..add(salt));
+      }
+
       final keys = frost.deserializeKeys(keys: serializedKeys);
       await _saveSerializedKeys(serializedKeys);
       await _saveMultisigConfig(multisigConfig);
@@ -653,8 +665,6 @@ class FrostWallet extends CoinServiceAPI
     try {
       final keys = await getSerializedKeys;
       final config = await multisigConfig;
-      final _mnemonic = await mnemonicString;
-      final _mnemonicPassphrase = await mnemonicPassphrase;
 
       await recoverFromSerializedKeys(
         serializedKeys: keys!,
@@ -713,6 +723,18 @@ class FrostWallet extends CoinServiceAPI
     await _prefs.init();
   }
 
+  List<String> get knownSalts => List<String>.from(DB.instance.get<dynamic>(
+        boxName: walletId,
+        key: "_frostKnownSalts",
+      ) as List? ??
+      []);
+  Future<void> updateKnownSalts(List<String> knownSalts) async =>
+      await DB.instance.put<dynamic>(
+        boxName: walletId,
+        key: "_frostKnownSalts",
+        value: knownSalts,
+      );
+
   Future<void> initializeNewFrost({
     required String mnemonic,
     required String multisigConfig,
@@ -734,6 +756,16 @@ class FrostWallet extends CoinServiceAPI
 
     await _prefs.init();
     try {
+      final salt = Format.uint8listToString(
+        frost.multisigSalt(
+          multisigConfig: multisigConfig,
+        ),
+      );
+      if (knownSalts.contains(salt)) {
+        throw Exception("Known frost multisig salt found!");
+      }
+      await updateKnownSalts(knownSalts..add(salt));
+
       await _secureStore.write(
         key: '${_walletId}_mnemonic',
         value: mnemonic,
