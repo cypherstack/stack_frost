@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:stackfrost/pages/add_wallet_views/frost_ms/confirm_new_frost_ms_wallet_creation_view.dart';
+import 'package:stackfrost/pages/add_wallet_views/frost_ms/new/dialogs/quit_frost_ms_wallet_creation_dialog.dart';
+import 'package:stackfrost/pages_desktop_specific/desktop_home_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
 import 'package:stackfrost/services/frost.dart';
@@ -86,171 +88,252 @@ class _FrostShareSharesViewState extends ConsumerState<FrostShareSharesView> {
 
   @override
   Widget build(BuildContext context) {
-    return ConditionalParent(
-      condition: Util.isDesktop,
-      builder: (child) => DesktopScaffold(
-        background: Theme.of(context).extension<StackColors>()!.background,
-        appBar: const DesktopAppBar(
-          isCompactHeight: false,
-          leading: AppBarBackButton(),
-          trailing: ExitToMyStackButton(),
-        ),
-        body: SizedBox(
-          width: 480,
-          child: child,
-        ),
-      ),
+    return WillPopScope(
+      onWillPop: () async {
+        final result = await showDialog<bool>(
+          context: context,
+          builder: (_) => const QuitFrostMSWalletCreationDialog(),
+        );
+
+        if (result == true && mounted) {
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
+        }
+        return false;
+      },
       child: ConditionalParent(
-        condition: !Util.isDesktop,
-        builder: (child) => Background(
-          child: Scaffold(
-            backgroundColor:
-                Theme.of(context).extension<StackColors>()!.background,
-            appBar: AppBar(
-              leading: AppBarBackButton(
-                onPressed: () {
+        condition: Util.isDesktop,
+        builder: (child) => DesktopScaffold(
+          background: Theme.of(context).extension<StackColors>()!.background,
+          appBar: DesktopAppBar(
+            isCompactHeight: false,
+            leading: AppBarBackButton(
+              onPressed: () async {
+                final result = await showDialog<bool>(
+                  context: context,
+                  builder: (_) => const QuitFrostMSWalletCreationDialog(),
+                );
+
+                if (result == true && mounted) {
                   Navigator.of(context).pop();
-                },
-              ),
-              title: Text(
-                "Generate shares",
-                style: STextStyles.navBarTitle(context),
-              ),
+                  Navigator.of(context).pop();
+                }
+              },
             ),
-            body: SafeArea(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  return SingleChildScrollView(
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minHeight: constraints.maxHeight,
-                      ),
-                      child: IntrinsicHeight(
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: child,
+            trailing: ExitToMyStackButton(
+              onPressed: () async {
+                final result = await showDialog<bool>(
+                  context: context,
+                  builder: (_) => const QuitFrostMSWalletCreationDialog(),
+                );
+
+                if (result == true && mounted) {
+                  Navigator.of(context).popUntil(
+                    ModalRoute.withName(DesktopHomeView.routeName),
+                  );
+                }
+              },
+            ),
+          ),
+          body: SizedBox(
+            width: 480,
+            child: child,
+          ),
+        ),
+        child: ConditionalParent(
+          condition: !Util.isDesktop,
+          builder: (child) => Background(
+            child: Scaffold(
+              backgroundColor:
+                  Theme.of(context).extension<StackColors>()!.background,
+              appBar: AppBar(
+                leading: AppBarBackButton(
+                  onPressed: () async {
+                    final result = await showDialog<bool>(
+                      context: context,
+                      builder: (_) => const QuitFrostMSWalletCreationDialog(),
+                    );
+
+                    if (result == true && mounted) {
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pop();
+                    }
+                  },
+                ),
+                title: Text(
+                  "Generate shares",
+                  style: STextStyles.navBarTitle(context),
+                ),
+              ),
+              body: SafeArea(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: constraints.maxHeight,
+                        ),
+                        child: IntrinsicHeight(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: child,
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
             ),
           ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              height: 220,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  QrImageView(
-                    data: myShare,
-                    size: 220,
-                    backgroundColor:
-                        Theme.of(context).extension<StackColors>()!.background,
-                    foregroundColor: Theme.of(context)
-                        .extension<StackColors>()!
-                        .accentColorDark,
-                  ),
-                ],
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: 220,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    QrImageView(
+                      data: myShare,
+                      size: 220,
+                      backgroundColor: Theme.of(context)
+                          .extension<StackColors>()!
+                          .background,
+                      foregroundColor: Theme.of(context)
+                          .extension<StackColors>()!
+                          .accentColorDark,
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const _Div(),
-            RoundedWhiteContainer(
-              child: Column(
+              const _Div(),
+              RoundedWhiteContainer(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _Item(
+                      label: "My name",
+                      detail: ref.watch(pFrostMyName.state).state!,
+                    ),
+                    const _Div(),
+                    _Item(
+                      label: "My share",
+                      detail: myShare,
+                      detailSelectable: true,
+                    ),
+                  ],
+                ),
+              ),
+              const _Div(),
+              Text("Enter remaining participant's shares:"),
+              Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _Item(
-                    label: "My name",
-                    detail: ref.watch(pFrostMyName.state).state!,
-                  ),
-                  const _Div(),
-                  _Item(
-                    label: "My share",
-                    detail: myShare,
-                    detailSelectable: true,
-                  ),
-                ],
-              ),
-            ),
-            const _Div(),
-            Text("Enter remaining participant's shares:"),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                for (int i = 0; i < participants.length; i++)
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(
-                            Constants.size.circularBorderRadius,
-                          ),
-                          child: TextField(
-                            key: Key("frSharesTextFieldKey_$i"),
-                            controller: controllers[i],
-                            focusNode: focusNodes[i],
-                            readOnly: false,
-                            autocorrect: false,
-                            enableSuggestions: false,
-                            style: STextStyles.field(context),
-                            decoration: standardInputDecoration(
-                              "Enter ${participants[i]}'s share",
-                              focusNodes[i],
-                              context,
-                            ).copyWith(
-                              contentPadding: const EdgeInsets.only(
-                                left: 16,
-                                top: 6,
-                                bottom: 8,
-                                right: 5,
-                              ),
-                              suffixIcon: Padding(
-                                padding: fieldIsEmptyFlags[i]
-                                    ? const EdgeInsets.only(right: 8)
-                                    : const EdgeInsets.only(right: 0),
-                                child: UnconstrainedBox(
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    children: [
-                                      !fieldIsEmptyFlags[i]
-                                          ? TextFieldIconButton(
-                                              semanticsLabel:
-                                                  "Clear Button. Clears The Share Field Input.",
-                                              key: Key(
-                                                  "frSharesClearButtonKey_$i"),
-                                              onTap: () {
-                                                controllers[i].text = "";
+                  for (int i = 0; i < participants.length; i++)
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(
+                              Constants.size.circularBorderRadius,
+                            ),
+                            child: TextField(
+                              key: Key("frSharesTextFieldKey_$i"),
+                              controller: controllers[i],
+                              focusNode: focusNodes[i],
+                              readOnly: false,
+                              autocorrect: false,
+                              enableSuggestions: false,
+                              style: STextStyles.field(context),
+                              decoration: standardInputDecoration(
+                                "Enter ${participants[i]}'s share",
+                                focusNodes[i],
+                                context,
+                              ).copyWith(
+                                contentPadding: const EdgeInsets.only(
+                                  left: 16,
+                                  top: 6,
+                                  bottom: 8,
+                                  right: 5,
+                                ),
+                                suffixIcon: Padding(
+                                  padding: fieldIsEmptyFlags[i]
+                                      ? const EdgeInsets.only(right: 8)
+                                      : const EdgeInsets.only(right: 0),
+                                  child: UnconstrainedBox(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: [
+                                        !fieldIsEmptyFlags[i]
+                                            ? TextFieldIconButton(
+                                                semanticsLabel:
+                                                    "Clear Button. Clears The Share Field Input.",
+                                                key: Key(
+                                                    "frSharesClearButtonKey_$i"),
+                                                onTap: () {
+                                                  controllers[i].text = "";
 
-                                                setState(() {
-                                                  fieldIsEmptyFlags[i] = true;
-                                                });
-                                              },
-                                              child: const XIcon(),
-                                            )
-                                          : TextFieldIconButton(
-                                              semanticsLabel:
-                                                  "Paste Button. Pastes From Clipboard To Share Field Input.",
-                                              key: Key(
-                                                  "frSharesPasteButtonKey_$i"),
-                                              onTap: () async {
-                                                final ClipboardData? data =
-                                                    await Clipboard.getData(
-                                                        Clipboard.kTextPlain);
-                                                if (data?.text != null &&
-                                                    data!.text!.isNotEmpty) {
-                                                  controllers[i].text =
-                                                      data.text!.trim();
+                                                  setState(() {
+                                                    fieldIsEmptyFlags[i] = true;
+                                                  });
+                                                },
+                                                child: const XIcon(),
+                                              )
+                                            : TextFieldIconButton(
+                                                semanticsLabel:
+                                                    "Paste Button. Pastes From Clipboard To Share Field Input.",
+                                                key: Key(
+                                                    "frSharesPasteButtonKey_$i"),
+                                                onTap: () async {
+                                                  final ClipboardData? data =
+                                                      await Clipboard.getData(
+                                                          Clipboard.kTextPlain);
+                                                  if (data?.text != null &&
+                                                      data!.text!.isNotEmpty) {
+                                                    controllers[i].text =
+                                                        data.text!.trim();
+                                                  }
+
+                                                  setState(() {
+                                                    fieldIsEmptyFlags[i] =
+                                                        controllers[i]
+                                                            .text
+                                                            .isEmpty;
+                                                  });
+                                                },
+                                                child: fieldIsEmptyFlags[i]
+                                                    ? const ClipboardIcon()
+                                                    : const XIcon(),
+                                              ),
+                                        if (fieldIsEmptyFlags[i])
+                                          TextFieldIconButton(
+                                            semanticsLabel:
+                                                "Scan QR Button. Opens Camera For Scanning QR Code.",
+                                            key: Key(
+                                                "frSharesScanQrButtonKey_$i"),
+                                            onTap: () async {
+                                              try {
+                                                if (FocusScope.of(context)
+                                                    .hasFocus) {
+                                                  FocusScope.of(context)
+                                                      .unfocus();
+                                                  await Future<void>.delayed(
+                                                      const Duration(
+                                                          milliseconds: 75));
                                                 }
+
+                                                final qrResult =
+                                                    await BarcodeScanner.scan();
+
+                                                controllers[i].text =
+                                                    qrResult.rawContent;
 
                                                 setState(() {
                                                   fieldIsEmptyFlags[i] =
@@ -258,118 +341,87 @@ class _FrostShareSharesViewState extends ConsumerState<FrostShareSharesView> {
                                                           .text
                                                           .isEmpty;
                                                 });
-                                              },
-                                              child: fieldIsEmptyFlags[i]
-                                                  ? const ClipboardIcon()
-                                                  : const XIcon(),
-                                            ),
-                                      if (fieldIsEmptyFlags[i])
-                                        TextFieldIconButton(
-                                          semanticsLabel:
-                                              "Scan QR Button. Opens Camera For Scanning QR Code.",
-                                          key:
-                                              Key("frSharesScanQrButtonKey_$i"),
-                                          onTap: () async {
-                                            try {
-                                              if (FocusScope.of(context)
-                                                  .hasFocus) {
-                                                FocusScope.of(context)
-                                                    .unfocus();
-                                                await Future<void>.delayed(
-                                                    const Duration(
-                                                        milliseconds: 75));
+                                              } on PlatformException catch (e, s) {
+                                                Logging.instance.log(
+                                                  "Failed to get camera permissions while trying to scan qr code: $e\n$s",
+                                                  level: LogLevel.Warning,
+                                                );
                                               }
-
-                                              final qrResult =
-                                                  await BarcodeScanner.scan();
-
-                                              controllers[i].text =
-                                                  qrResult.rawContent;
-
-                                              setState(() {
-                                                fieldIsEmptyFlags[i] =
-                                                    controllers[i].text.isEmpty;
-                                              });
-                                            } on PlatformException catch (e, s) {
-                                              Logging.instance.log(
-                                                "Failed to get camera permissions while trying to scan qr code: $e\n$s",
-                                                level: LogLevel.Warning,
-                                              );
-                                            }
-                                          },
-                                          child: const QrCodeIcon(),
-                                        )
-                                    ],
+                                            },
+                                            child: const QrCodeIcon(),
+                                          )
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
                           ),
                         ),
+                      ],
+                    ),
+                ],
+              ),
+              if (!Util.isDesktop) const Spacer(),
+              const _Div(),
+              PrimaryButton(
+                label: "Generate",
+                onPressed: () async {
+                  // check for empty commitments
+                  if (controllers
+                      .map((e) => e.text.isEmpty)
+                      .reduce((value, element) => value |= element)) {
+                    return await showDialog<void>(
+                      context: context,
+                      builder: (_) => StackOkDialog(
+                        title: "Missing commitments",
+                        desktopPopRootNavigator: Util.isDesktop,
                       ),
-                    ],
-                  ),
-              ],
-            ),
-            if (!Util.isDesktop) const Spacer(),
-            const _Div(),
-            PrimaryButton(
-              label: "Generate",
-              onPressed: () async {
-                // check for empty commitments
-                if (controllers
-                    .map((e) => e.text.isEmpty)
-                    .reduce((value, element) => value |= element)) {
-                  return await showDialog<void>(
-                    context: context,
-                    builder: (_) => StackOkDialog(
-                      title: "Missing commitments",
-                      desktopPopRootNavigator: Util.isDesktop,
-                    ),
-                  );
-                }
+                    );
+                  }
 
-                // collect commitment strings and insert my own at the correct index
-                final shares = controllers.map((e) => e.text).toList();
-                shares.insert(myIndex, myShare);
+                  // collect commitment strings and insert my own at the correct index
+                  final shares = controllers.map((e) => e.text).toList();
+                  shares.insert(myIndex, myShare);
 
-                try {
-                  ref.read(pFrostCompletedKeyGenData.notifier).state =
-                      Frost.completeKeyGeneration(
-                    multisigConfigWithNamePtr: ref
-                        .read(pFrostStartKeyGenData.state)
-                        .state!
-                        .multisigConfigWithNamePtr,
-                    secretSharesResPtr: ref
-                        .read(pFrostSecretSharesData.state)
-                        .state!
-                        .secretSharesResPtr,
-                    shares: shares,
-                  );
-                  await Navigator.of(context).pushNamed(
-                    ConfirmNewFrostMSWalletCreationView.routeName,
-                    arguments: (
-                      walletName: widget.walletName,
-                      coin: widget.coin,
-                    ),
-                  );
-                } catch (e, s) {
-                  Logging.instance.log(
-                    "$e\n$s",
-                    level: LogLevel.Fatal,
-                  );
+                  try {
+                    ref.read(pFrostCompletedKeyGenData.notifier).state =
+                        Frost.completeKeyGeneration(
+                      multisigConfigWithNamePtr: ref
+                          .read(pFrostStartKeyGenData.state)
+                          .state!
+                          .multisigConfigWithNamePtr,
+                      secretSharesResPtr: ref
+                          .read(pFrostSecretSharesData.state)
+                          .state!
+                          .secretSharesResPtr,
+                      shares: shares,
+                    );
+                    await Navigator.of(context).pushNamed(
+                      ConfirmNewFrostMSWalletCreationView.routeName,
+                      arguments: (
+                        walletName: widget.walletName,
+                        coin: widget.coin,
+                      ),
+                    );
+                  } catch (e, s) {
+                    Logging.instance.log(
+                      "$e\n$s",
+                      level: LogLevel.Fatal,
+                    );
 
-                  return await showDialog<void>(
-                    context: context,
-                    builder: (_) => StackOkDialog(
-                      title: "Failed to complete key generation",
-                      desktopPopRootNavigator: Util.isDesktop,
-                    ),
-                  );
-                }
-              },
-            ),
-          ],
+                    return await showDialog<void>(
+                      context: context,
+                      builder: (_) => StackOkDialog(
+                        title: "Failed to complete key generation",
+                        desktopPopRootNavigator: Util.isDesktop,
+                      ),
+                    );
+                  }
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -7,6 +7,7 @@ import 'package:stackfrost/electrumx_rpc/cached_electrumx.dart';
 import 'package:stackfrost/electrumx_rpc/electrumx.dart';
 import 'package:stackfrost/models/node_model.dart';
 import 'package:stackfrost/notifications/show_flush_bar.dart';
+import 'package:stackfrost/pages/add_wallet_views/frost_ms/new/dialogs/quit_frost_ms_wallet_creation_dialog.dart';
 import 'package:stackfrost/pages/home_view/home_view.dart';
 import 'package:stackfrost/pages_desktop_specific/desktop_home_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
@@ -67,266 +68,317 @@ class _ConfirmNewFrostMSWalletCreationViewState
         ref.read(pFrostCompletedKeyGenData.state).state!.recoveryString;
     multisigId = ref.read(pFrostCompletedKeyGenData.state).state!.multisigId;
     multisigConfig = ref.read(pFrostMultisigConfig.state).state!;
+
+    ref.read(pFrostCompletedKeyGenData.state).state = null;
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return ConditionalParent(
-      condition: Util.isDesktop,
-      builder: (child) => DesktopScaffold(
-        background: Theme.of(context).extension<StackColors>()!.background,
-        appBar: const DesktopAppBar(
-          isCompactHeight: false,
-          leading: AppBarBackButton(),
-          trailing: ExitToMyStackButton(),
-        ),
-        body: SizedBox(
-          width: 480,
-          child: child,
-        ),
-      ),
+    return WillPopScope(
+      onWillPop: () async {
+        final result = await showDialog<bool>(
+          context: context,
+          builder: (_) => const QuitFrostMSWalletCreationDialog(),
+        );
+
+        if (result == true && mounted) {
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
+        }
+        return false;
+      },
       child: ConditionalParent(
-        condition: !Util.isDesktop,
-        builder: (child) => Background(
-          child: Scaffold(
-            backgroundColor:
-                Theme.of(context).extension<StackColors>()!.background,
-            appBar: AppBar(
-              leading: AppBarBackButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              title: Text(
-                "Finalize FROST multisig wallet",
-                style: STextStyles.navBarTitle(context),
-              ),
-            ),
-            body: SafeArea(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  return SingleChildScrollView(
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minHeight: constraints.maxHeight,
-                      ),
-                      child: IntrinsicHeight(
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: child,
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Ensure your multisig ID matches that of each other participant",
-              style: STextStyles.pageTitleH2(context),
-            ),
-            const _Div(),
-            _Item(
-              label: "ID",
-              detail: multisigId.toString(),
-              detailSelectable: true,
-            ),
-            const _Div(),
-            const _Div(),
-            Text(
-              "Back up your keys and config",
-              style: STextStyles.pageTitleH2(context),
-            ),
-            const _Div(),
-            _Item(
-              label: "Multisig Config:",
-              detail: multisigConfig,
-              detailSelectable: true,
-            ),
-            const _Div(),
-            _Item(
-              label: "Keys:",
-              detail: serializedKeys,
-              detailSelectable: true,
-            ),
-            if (!Util.isDesktop) const Spacer(),
-            const _Div(),
-            PrimaryButton(
-              label: "Confirm",
+        condition: Util.isDesktop,
+        builder: (child) => DesktopScaffold(
+          background: Theme.of(context).extension<StackColors>()!.background,
+          appBar: DesktopAppBar(
+            isCompactHeight: false,
+            leading: AppBarBackButton(
               onPressed: () async {
-                bool progressPopped = false;
-                try {
-                  unawaited(
-                    showDialog<dynamic>(
-                      context: context,
-                      barrierDismissible: false,
-                      useSafeArea: true,
-                      builder: (ctx) {
-                        return const Center(
-                          child: LoadingIndicator(
-                            width: 50,
-                            height: 50,
-                          ),
-                        );
-                      },
-                    ),
-                  );
+                final result = await showDialog<bool>(
+                  context: context,
+                  builder: (_) => const QuitFrostMSWalletCreationDialog(),
+                );
 
-                  final walletsService =
-                      ref.read(walletsServiceChangeNotifierProvider);
-
-                  final walletId = await walletsService.addNewWallet(
-                    name: widget.walletName,
-                    coin: widget.coin,
-                    type: WalletType.frostMS,
-                    shouldNotifyListeners: false,
-                  );
-
-                  NodeModel? node = ref
-                      .read(nodeServiceChangeNotifierProvider)
-                      .getPrimaryNodeFor(coin: widget.coin);
-
-                  if (node == null) {
-                    node = DefaultNodes.getNodeFor(widget.coin);
-                    await ref
-                        .read(nodeServiceChangeNotifierProvider)
-                        .setPrimaryNodeFor(
-                          coin: widget.coin,
-                          node: node,
-                        );
-                  }
-
-                  final txTracker = TransactionNotificationTracker(
-                    walletId: walletId!,
-                  );
-
-                  final failovers = ref
-                      .read(nodeServiceChangeNotifierProvider)
-                      .failoverNodesFor(coin: widget.coin);
-
-                  final electrumxNode = ElectrumXNode(
-                    address: node.host,
-                    port: node.port,
-                    name: node.name,
-                    id: node.id,
-                    useSSL: node.useSSL,
-                  );
-                  final client = ElectrumX.from(
-                    node: electrumxNode,
-                    failovers: failovers
-                        .map((e) => ElectrumXNode(
-                              address: e.host,
-                              port: e.port,
-                              name: e.name,
-                              id: e.id,
-                              useSSL: e.useSSL,
-                            ))
-                        .toList(),
-                    prefs: ref.read(prefsChangeNotifierProvider),
-                  );
-                  final cachedClient = CachedElectrumX.from(
-                    electrumXClient: client,
-                  );
-
-                  final wallet = FrostWallet(
-                    walletId: walletId,
-                    walletName: widget.walletName,
-                    coin: widget.coin,
-                    client: client,
-                    cachedClient: cachedClient,
-                    tracker: txTracker,
-                    secureStore: ref.read(secureStoreProvider),
-                  );
-
-                  await wallet.initializeNewFrost(
-                    mnemonic: seed,
-                    multisigConfig: multisigConfig,
-                    recoveryString: recoveryString,
-                    serializedKeys: serializedKeys,
-                    multisigId: multisigId,
-                    myName: ref.read(pFrostMyName.state).state!,
-                    participants: Frost.getParticipants(
-                      multisigConfig:
-                          ref.read(pFrostMultisigConfig.state).state!,
-                    ),
-                    threshold: Frost.getThreshold(
-                      multisigConfig:
-                          ref.read(pFrostMultisigConfig.state).state!,
-                    ),
-                  );
-
-                  final manager = Manager(wallet);
-
-                  await ref
-                      .read(walletsServiceChangeNotifierProvider)
-                      .setMnemonicVerified(
-                        walletId: manager.walletId,
-                      );
-
-                  ref.read(walletsChangeNotifierProvider.notifier).addWallet(
-                        walletId: manager.walletId,
-                        manager: manager,
-                      );
-
-                  ref.read(pFrostMultisigConfig.state).state = null;
-                  ref.read(pFrostStartKeyGenData.state).state = null;
-                  ref.read(pFrostSecretSharesData.state).state = null;
-                  ref.read(pFrostCompletedKeyGenData.state).state = null;
-
-                  // pop progress dialog
-                  if (mounted) {
-                    Navigator.pop(context);
-                    progressPopped = true;
-                  }
-
-                  if (mounted) {
-                    if (Util.isDesktop) {
-                      Navigator.of(context).popUntil(
-                        ModalRoute.withName(
-                          DesktopHomeView.routeName,
-                        ),
-                      );
-                    } else {
-                      unawaited(
-                        Navigator.of(context).pushNamedAndRemoveUntil(
-                          HomeView.routeName,
-                          (route) => false,
-                        ),
-                      );
-                    }
-
-                    unawaited(
-                      showFloatingFlushBar(
-                        type: FlushBarType.success,
-                        message: "Correct! Your wallet is set up.",
-                        iconAsset: Assets.svg.check,
-                        context: context,
-                      ),
-                    );
-                  }
-                } catch (e, s) {
-                  Logging.instance.log(
-                    "$e\n$s",
-                    level: LogLevel.Fatal,
-                  );
-
-                  // pop progress dialog
-                  if (mounted && !progressPopped) {
-                    Navigator.pop(context);
-                    progressPopped = true;
-                  }
-                  // TODO: handle gracefully
-                  rethrow;
+                if (result == true && mounted) {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
                 }
               },
             ),
-          ],
+            trailing: ExitToMyStackButton(
+              onPressed: () async {
+                final result = await showDialog<bool>(
+                  context: context,
+                  builder: (_) => const QuitFrostMSWalletCreationDialog(),
+                );
+
+                if (result == true && mounted) {
+                  Navigator.of(context).popUntil(
+                    ModalRoute.withName(DesktopHomeView.routeName),
+                  );
+                }
+              },
+            ),
+          ),
+          body: SizedBox(
+            width: 480,
+            child: child,
+          ),
+        ),
+        child: ConditionalParent(
+          condition: !Util.isDesktop,
+          builder: (child) => Background(
+            child: Scaffold(
+              backgroundColor:
+                  Theme.of(context).extension<StackColors>()!.background,
+              appBar: AppBar(
+                leading: AppBarBackButton(
+                  onPressed: () async {
+                    final result = await showDialog<bool>(
+                      context: context,
+                      builder: (_) => const QuitFrostMSWalletCreationDialog(),
+                    );
+
+                    if (result == true && mounted) {
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pop();
+                    }
+                  },
+                ),
+                title: Text(
+                  "Finalize FROST multisig wallet",
+                  style: STextStyles.navBarTitle(context),
+                ),
+              ),
+              body: SafeArea(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: constraints.maxHeight,
+                        ),
+                        child: IntrinsicHeight(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: child,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Ensure your multisig ID matches that of each other participant",
+                style: STextStyles.pageTitleH2(context),
+              ),
+              const _Div(),
+              _Item(
+                label: "ID",
+                detail: multisigId.toString(),
+                detailSelectable: true,
+              ),
+              const _Div(),
+              const _Div(),
+              Text(
+                "Back up your keys and config",
+                style: STextStyles.pageTitleH2(context),
+              ),
+              const _Div(),
+              _Item(
+                label: "Multisig Config:",
+                detail: multisigConfig,
+                detailSelectable: true,
+              ),
+              const _Div(),
+              _Item(
+                label: "Keys:",
+                detail: serializedKeys,
+                detailSelectable: true,
+              ),
+              if (!Util.isDesktop) const Spacer(),
+              const _Div(),
+              PrimaryButton(
+                label: "Confirm",
+                onPressed: () async {
+                  bool progressPopped = false;
+                  try {
+                    unawaited(
+                      showDialog<dynamic>(
+                        context: context,
+                        barrierDismissible: false,
+                        useSafeArea: true,
+                        builder: (ctx) {
+                          return const Center(
+                            child: LoadingIndicator(
+                              width: 50,
+                              height: 50,
+                            ),
+                          );
+                        },
+                      ),
+                    );
+
+                    final walletsService =
+                        ref.read(walletsServiceChangeNotifierProvider);
+
+                    final walletId = await walletsService.addNewWallet(
+                      name: widget.walletName,
+                      coin: widget.coin,
+                      type: WalletType.frostMS,
+                      shouldNotifyListeners: false,
+                    );
+
+                    NodeModel? node = ref
+                        .read(nodeServiceChangeNotifierProvider)
+                        .getPrimaryNodeFor(coin: widget.coin);
+
+                    if (node == null) {
+                      node = DefaultNodes.getNodeFor(widget.coin);
+                      await ref
+                          .read(nodeServiceChangeNotifierProvider)
+                          .setPrimaryNodeFor(
+                            coin: widget.coin,
+                            node: node,
+                          );
+                    }
+
+                    final txTracker = TransactionNotificationTracker(
+                      walletId: walletId!,
+                    );
+
+                    final failovers = ref
+                        .read(nodeServiceChangeNotifierProvider)
+                        .failoverNodesFor(coin: widget.coin);
+
+                    final electrumxNode = ElectrumXNode(
+                      address: node.host,
+                      port: node.port,
+                      name: node.name,
+                      id: node.id,
+                      useSSL: node.useSSL,
+                    );
+                    final client = ElectrumX.from(
+                      node: electrumxNode,
+                      failovers: failovers
+                          .map((e) => ElectrumXNode(
+                                address: e.host,
+                                port: e.port,
+                                name: e.name,
+                                id: e.id,
+                                useSSL: e.useSSL,
+                              ))
+                          .toList(),
+                      prefs: ref.read(prefsChangeNotifierProvider),
+                    );
+                    final cachedClient = CachedElectrumX.from(
+                      electrumXClient: client,
+                    );
+
+                    final wallet = FrostWallet(
+                      walletId: walletId,
+                      walletName: widget.walletName,
+                      coin: widget.coin,
+                      client: client,
+                      cachedClient: cachedClient,
+                      tracker: txTracker,
+                      secureStore: ref.read(secureStoreProvider),
+                    );
+
+                    await wallet.initializeNewFrost(
+                      mnemonic: seed,
+                      multisigConfig: multisigConfig,
+                      recoveryString: recoveryString,
+                      serializedKeys: serializedKeys,
+                      multisigId: multisigId,
+                      myName: ref.read(pFrostMyName.state).state!,
+                      participants: Frost.getParticipants(
+                        multisigConfig:
+                            ref.read(pFrostMultisigConfig.state).state!,
+                      ),
+                      threshold: Frost.getThreshold(
+                        multisigConfig:
+                            ref.read(pFrostMultisigConfig.state).state!,
+                      ),
+                    );
+
+                    final manager = Manager(wallet);
+
+                    await ref
+                        .read(walletsServiceChangeNotifierProvider)
+                        .setMnemonicVerified(
+                          walletId: manager.walletId,
+                        );
+
+                    ref.read(walletsChangeNotifierProvider.notifier).addWallet(
+                          walletId: manager.walletId,
+                          manager: manager,
+                        );
+
+                    // pop progress dialog
+                    if (mounted) {
+                      Navigator.pop(context);
+                      progressPopped = true;
+                    }
+
+                    if (mounted) {
+                      if (Util.isDesktop) {
+                        Navigator.of(context).popUntil(
+                          ModalRoute.withName(
+                            DesktopHomeView.routeName,
+                          ),
+                        );
+                      } else {
+                        unawaited(
+                          Navigator.of(context).pushNamedAndRemoveUntil(
+                            HomeView.routeName,
+                            (route) => false,
+                          ),
+                        );
+                      }
+
+                      ref.read(pFrostMultisigConfig.state).state = null;
+                      ref.read(pFrostStartKeyGenData.state).state = null;
+                      ref.read(pFrostSecretSharesData.state).state = null;
+
+                      unawaited(
+                        showFloatingFlushBar(
+                          type: FlushBarType.success,
+                          message: "Your wallet is set up.",
+                          iconAsset: Assets.svg.check,
+                          context: context,
+                        ),
+                      );
+                    }
+                  } catch (e, s) {
+                    Logging.instance.log(
+                      "$e\n$s",
+                      level: LogLevel.Fatal,
+                    );
+
+                    // pop progress dialog
+                    if (mounted && !progressPopped) {
+                      Navigator.pop(context);
+                      progressPopped = true;
+                    }
+                    // TODO: handle gracefully
+                    rethrow;
+                  }
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
