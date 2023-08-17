@@ -306,6 +306,7 @@ abstract class SWB {
           final wallet = manager.wallet as FrostWallet;
 
           backupWallet["serializedKeysFROST"] = await wallet.getSerializedKeys;
+          backupWallet["multisigConfigFROST"] = await wallet.multisigConfig;
           backupWallet["recoveryStringFROST"] = await wallet.recoveryString;
           backupWallet["participantsFROST"] = wallet.participants;
           backupWallet["myNameFROST"] = wallet.myName;
@@ -446,8 +447,7 @@ abstract class SWB {
 
         await wallet.recoverFromSerializedKeys(
           serializedKeys: walletbackup["serializedKeysFROST"] as String,
-          mnemonic: mnemonic,
-          mnemonicPassphrase: mnemonicPassphrase,
+          multisigConfig: walletbackup["multisigConfigFROST"] as String,
           isRescan: false,
         );
       } else {

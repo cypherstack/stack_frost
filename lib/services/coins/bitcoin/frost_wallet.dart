@@ -498,13 +498,13 @@ class FrostWallet extends CoinServiceAPI
 
   Future<void> recoverFromSerializedKeys({
     required String serializedKeys,
-    required String mnemonic,
-    required String mnemonicPassphrase,
+    required String multisigConfig,
     required bool isRescan,
   }) async {
     try {
       final keys = frost.deserializeKeys(keys: serializedKeys);
       await _saveSerializedKeys(serializedKeys);
+      await _saveMultisigConfig(multisigConfig);
 
       final addressString = frost.addressForKeys(
         network: coin == Coin.bitcoin ? Network.Mainnet : Network.Testnet,
@@ -560,7 +560,7 @@ class FrostWallet extends CoinServiceAPI
   Future<String?> get multisigConfig async => await _secureStore.read(
         key: "{$walletId}_multisigConfig",
       );
-  Future<void> saveMultisigConfig(String multisigConfig) async =>
+  Future<void> _saveMultisigConfig(String multisigConfig) async =>
       await _secureStore.write(
         key: "{$walletId}_multisigConfig",
         value: multisigConfig,
@@ -652,13 +652,13 @@ class FrostWallet extends CoinServiceAPI
 
     try {
       final keys = await getSerializedKeys;
+      final config = await multisigConfig;
       final _mnemonic = await mnemonicString;
       final _mnemonicPassphrase = await mnemonicPassphrase;
 
       await recoverFromSerializedKeys(
         serializedKeys: keys!,
-        mnemonic: _mnemonic!,
-        mnemonicPassphrase: _mnemonicPassphrase!,
+        multisigConfig: config!,
         isRescan: true,
       );
 
@@ -746,7 +746,7 @@ class FrostWallet extends CoinServiceAPI
       await saveMyName(myName);
       await updateParticipants(participants);
       await saveThreshold(threshold);
-      await saveMultisigConfig(multisigConfig);
+      await _saveMultisigConfig(multisigConfig);
 
       final keys = frost.deserializeKeys(keys: serializedKeys);
 
