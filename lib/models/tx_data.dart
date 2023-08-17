@@ -80,4 +80,21 @@ class TxData {
       frostMSConfig: frostMSConfig ?? this.frostMSConfig,
     );
   }
+
+  @override
+  String toString() => 'TxData{'
+      'feeRateType: $feeRateType, '
+      'feeRateAmount: $feeRateAmount, '
+      'satsPerVByte: $satsPerVByte, '
+      'fee: $fee, '
+      'vSize: $vSize, '
+      'raw: $raw, '
+      'txid: $txid, '
+      'txHash: $txHash, '
+      'note: $note, '
+      'noteOnChain: $noteOnChain, '
+      'recipients: $recipients, '
+      'utxos: $utxos, '
+      'frostMSConfig: $frostMSConfig'
+      '}';
 }
