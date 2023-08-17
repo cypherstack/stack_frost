@@ -92,7 +92,9 @@ class _FrostShareSharesViewState extends ConsumerState<FrostShareSharesView> {
       onWillPop: () async {
         final result = await showDialog<bool>(
           context: context,
-          builder: (_) => const QuitFrostMSWalletCreationDialog(),
+          builder: (_) => const QuitFrostMSWalletProcessDialog(
+            type: FrostQuitDialogType.walletCreation,
+          ),
         );
 
         if (result == true && mounted) {
@@ -111,7 +113,9 @@ class _FrostShareSharesViewState extends ConsumerState<FrostShareSharesView> {
               onPressed: () async {
                 final result = await showDialog<bool>(
                   context: context,
-                  builder: (_) => const QuitFrostMSWalletCreationDialog(),
+                  builder: (_) => const QuitFrostMSWalletProcessDialog(
+                    type: FrostQuitDialogType.walletCreation,
+                  ),
                 );
 
                 if (result == true && mounted) {
@@ -124,7 +128,9 @@ class _FrostShareSharesViewState extends ConsumerState<FrostShareSharesView> {
               onPressed: () async {
                 final result = await showDialog<bool>(
                   context: context,
-                  builder: (_) => const QuitFrostMSWalletCreationDialog(),
+                  builder: (_) => const QuitFrostMSWalletProcessDialog(
+                    type: FrostQuitDialogType.walletCreation,
+                  ),
                 );
 
                 if (result == true && mounted) {
@@ -151,7 +157,9 @@ class _FrostShareSharesViewState extends ConsumerState<FrostShareSharesView> {
                   onPressed: () async {
                     final result = await showDialog<bool>(
                       context: context,
-                      builder: (_) => const QuitFrostMSWalletCreationDialog(),
+                      builder: (_) => const QuitFrostMSWalletProcessDialog(
+                        type: FrostQuitDialogType.walletCreation,
+                      ),
                     );
 
                     if (result == true && mounted) {

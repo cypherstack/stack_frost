@@ -93,7 +93,9 @@ class _FrostShareCommitmentsViewState
       onWillPop: () async {
         final result = await showDialog<bool>(
           context: context,
-          builder: (_) => const QuitFrostMSWalletCreationDialog(),
+          builder: (_) => const QuitFrostMSWalletProcessDialog(
+            type: FrostQuitDialogType.walletCreation,
+          ),
         );
 
         if (result == true) {
@@ -112,7 +114,9 @@ class _FrostShareCommitmentsViewState
               onPressed: () async {
                 final result = await showDialog<bool>(
                   context: context,
-                  builder: (_) => const QuitFrostMSWalletCreationDialog(),
+                  builder: (_) => const QuitFrostMSWalletProcessDialog(
+                    type: FrostQuitDialogType.walletCreation,
+                  ),
                 );
 
                 if (result == true && mounted) {
@@ -124,7 +128,9 @@ class _FrostShareCommitmentsViewState
               onPressed: () async {
                 final result = await showDialog<bool>(
                   context: context,
-                  builder: (_) => const QuitFrostMSWalletCreationDialog(),
+                  builder: (_) => const QuitFrostMSWalletProcessDialog(
+                    type: FrostQuitDialogType.walletCreation,
+                  ),
                 );
 
                 if (result == true && mounted) {
@@ -151,7 +157,9 @@ class _FrostShareCommitmentsViewState
                   onPressed: () async {
                     final result = await showDialog<bool>(
                       context: context,
-                      builder: (_) => const QuitFrostMSWalletCreationDialog(),
+                      builder: (_) => const QuitFrostMSWalletProcessDialog(
+                        type: FrostQuitDialogType.walletCreation,
+                      ),
                     );
 
                     if (result == true && mounted) {

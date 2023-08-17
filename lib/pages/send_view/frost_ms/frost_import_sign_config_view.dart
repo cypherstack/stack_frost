@@ -7,7 +7,6 @@ import 'package:isar/isar.dart';
 import 'package:stackfrost/models/isar/models/isar_models.dart';
 import 'package:stackfrost/models/tx_data.dart';
 import 'package:stackfrost/pages/send_view/frost_ms/frost_attempt_sign_config_view.dart';
-import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
 import 'package:stackfrost/providers/db/main_db_provider.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
 import 'package:stackfrost/providers/global/wallets_provider.dart';
@@ -162,7 +161,6 @@ class _FrostImportSignConfigViewState
         appBar: const DesktopAppBar(
           isCompactHeight: false,
           leading: AppBarBackButton(),
-          trailing: ExitToMyStackButton(),
         ),
         body: SizedBox(
           width: 480,

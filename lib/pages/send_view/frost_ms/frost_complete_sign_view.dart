@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
+import 'package:stackfrost/pages/wallet_view/wallet_view.dart';
+import 'package:stackfrost/pages_desktop_specific/my_stack_view/my_stack_view.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
 import 'package:stackfrost/providers/global/wallets_provider.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
@@ -45,7 +46,6 @@ class _FrostCompleteSignViewState extends ConsumerState<FrostCompleteSignView> {
         appBar: const DesktopAppBar(
           isCompactHeight: false,
           leading: AppBarBackButton(),
-          trailing: ExitToMyStackButton(),
         ),
         body: SizedBox(
           width: 480,
@@ -137,39 +137,41 @@ class _FrostCompleteSignViewState extends ConsumerState<FrostCompleteSignView> {
 
                 try {
                   final txData = await showLoading(
-                      whileFuture: ref
-                          .read(walletsChangeNotifierProvider)
-                          .getManager(widget.walletId)
-                          .confirmSend(
-                            txData: ref.read(pFrostTxData.state).state!,
-                          ),
-                      context: context,
-                      message: "Broadcasting transaction to network",
-                      isDesktop: Util.isDesktop,
-                      onException: (e) {
-                        showDialog<void>(
-                          context: context,
-                          builder: (_) => StackOkDialog(
-                            title: "Broadcast error",
-                            message: e.toString(),
-                            desktopPopRootNavigator: Util.isDesktop,
-                          ),
-                        );
-                      });
+                    whileFuture: ref
+                        .read(walletsChangeNotifierProvider)
+                        .getManager(widget.walletId)
+                        .confirmSend(
+                          txData: ref.read(pFrostTxData.state).state!,
+                        ),
+                    context: context,
+                    message: "Broadcasting transaction to network",
+                    isDesktop: Util.isDesktop,
+                    onException: (e) {
+                      showDialog<void>(
+                        context: context,
+                        builder: (_) => StackOkDialog(
+                          title: "Broadcast error",
+                          message: e.toString(),
+                          desktopPopRootNavigator: Util.isDesktop,
+                        ),
+                      );
+                    },
+                  );
 
-                  if (txData != null && mounted) {
-                    ref.read(pFrostTxData.state).state = txData;
-
-                    print("BROADCAST SUCCESS");
+                  if (mounted) {
+                    if (txData != null) {
+                      ref.read(pFrostTxData.state).state = txData;
+                      Navigator.of(context).popUntil(
+                        ModalRoute.withName(
+                          Util.isDesktop
+                              ? MyStackView.routeName
+                              : WalletView.routeName,
+                        ),
+                      );
+                    } else {
+                      throw Exception("txData is null");
+                    }
                   }
-
-                  // await Navigator.of(context).pushNamed(
-                  //   FrostShareSharesView.routeName,
-                  //   arguments: (
-                  //     walletName: widget.walletName,
-                  //     coin: widget.coin,
-                  //   ),
-                  // );
                 } catch (e, s) {
                   Logging.instance.log(
                     "$e\n$s",
