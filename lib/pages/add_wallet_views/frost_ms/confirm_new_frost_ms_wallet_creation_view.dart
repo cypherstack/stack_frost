@@ -55,7 +55,7 @@ class ConfirmNewFrostMSWalletCreationView extends ConsumerStatefulWidget {
 
 class _ConfirmNewFrostMSWalletCreationViewState
     extends ConsumerState<ConfirmNewFrostMSWalletCreationView> {
-  late final String seed, recoveryString, serializedKeys;
+  late final String seed, recoveryString, serializedKeys, multisigConfig;
   late final Uint8List multisigId;
 
   @override
@@ -66,6 +66,7 @@ class _ConfirmNewFrostMSWalletCreationViewState
     recoveryString =
         ref.read(pFrostCompletedKeyGenData.state).state!.recoveryString;
     multisigId = ref.read(pFrostCompletedKeyGenData.state).state!.multisigId;
+    multisigConfig = ref.read(pFrostMultisigConfig.state).state!;
     super.initState();
   }
 
@@ -126,27 +127,32 @@ class _ConfirmNewFrostMSWalletCreationViewState
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _Item(
-              label: "Seed",
-              detail: seed,
-              detailSelectable: true,
-            ),
-            const _Div(),
-            _Item(
-              label: "Keys",
-              detail: serializedKeys,
-              detailSelectable: true,
-            ),
-            const _Div(),
-            _Item(
-              label: "Recovery",
-              detail: recoveryString,
-              detailSelectable: true,
+            Text(
+              "Ensure your multisig ID matches that of each other participant",
+              style: STextStyles.pageTitleH2(context),
             ),
             const _Div(),
             _Item(
               label: "ID",
               detail: multisigId.toString(),
+              detailSelectable: true,
+            ),
+            const _Div(),
+            const _Div(),
+            Text(
+              "Back up your keys and config",
+              style: STextStyles.pageTitleH2(context),
+            ),
+            const _Div(),
+            _Item(
+              label: "Multisig Config:",
+              detail: multisigConfig,
+              detailSelectable: true,
+            ),
+            const _Div(),
+            _Item(
+              label: "Keys:",
+              detail: serializedKeys,
               detailSelectable: true,
             ),
             if (!Util.isDesktop) const Spacer(),
@@ -240,6 +246,7 @@ class _ConfirmNewFrostMSWalletCreationViewState
 
                   await wallet.initializeNewFrost(
                     mnemonic: seed,
+                    multisigConfig: multisigConfig,
                     recoveryString: recoveryString,
                     serializedKeys: serializedKeys,
                     multisigId: multisigId,

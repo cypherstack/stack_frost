@@ -557,6 +557,15 @@ class FrostWallet extends CoinServiceAPI
         value: keys,
       );
 
+  Future<String?> get multisigConfig async => await _secureStore.read(
+        key: "{$walletId}_multisigConfig",
+      );
+  Future<void> saveMultisigConfig(String multisigConfig) async =>
+      await _secureStore.write(
+        key: "{$walletId}_multisigConfig",
+        value: multisigConfig,
+      );
+
   Future<Uint8List?> get multisigId async {
     final id = await _secureStore.read(
       key: "{$walletId}_multisigIdFROST",
@@ -706,6 +715,7 @@ class FrostWallet extends CoinServiceAPI
 
   Future<void> initializeNewFrost({
     required String mnemonic,
+    required String multisigConfig,
     required String recoveryString,
     required String serializedKeys,
     required Uint8List multisigId,
@@ -736,6 +746,7 @@ class FrostWallet extends CoinServiceAPI
       await saveMyName(myName);
       await updateParticipants(participants);
       await saveThreshold(threshold);
+      await saveMultisigConfig(multisigConfig);
 
       final keys = frost.deserializeKeys(keys: serializedKeys);
 
