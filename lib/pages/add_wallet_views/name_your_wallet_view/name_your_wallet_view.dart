@@ -16,6 +16,7 @@ import 'package:stackfrost/notifications/show_flush_bar.dart';
 import 'package:stackfrost/pages/add_wallet_views/create_or_restore_wallet_view/sub_widgets/coin_image.dart';
 import 'package:stackfrost/pages/add_wallet_views/frost_ms/new/create_new_frost_ms_wallet_view.dart';
 import 'package:stackfrost/pages/add_wallet_views/frost_ms/new/import_new_frost_ms_wallet_view.dart';
+import 'package:stackfrost/pages/add_wallet_views/frost_ms/restore/restore_frost_ms_wallet_view.dart';
 import 'package:stackfrost/pages/add_wallet_views/new_wallet_recovery_phrase_warning_view/new_wallet_recovery_phrase_warning_view.dart';
 import 'package:stackfrost/pages/add_wallet_views/restore_wallet_view/restore_options_view/restore_options_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
@@ -330,10 +331,9 @@ class _NameYourWalletViewState extends ConsumerState<NameYourWalletView> {
               height: 32,
             ),
           widget.walletType == WalletType.frostMS
-              ? Column(
-                  children: [
-                    PrimaryButton(
-                      label: "Create config",
+              ? widget.addWalletType == AddWalletType.Restore
+                  ? PrimaryButton(
+                      label: "Next",
                       enabled: _nextEnabled,
                       onPressed: () async {
                         final walletsService =
@@ -353,7 +353,7 @@ class _NameYourWalletViewState extends ConsumerState<NameYourWalletView> {
                           }
                         } else if (mounted) {
                           await Navigator.of(context).pushNamed(
-                            CreateNewFrostMsWalletView.routeName,
+                            RestoreFrostMsWalletView.routeName,
                             arguments: (
                               walletName: name,
                               coin: coin,
@@ -361,42 +361,74 @@ class _NameYourWalletViewState extends ConsumerState<NameYourWalletView> {
                           );
                         }
                       },
-                    ),
-                    const SizedBox(
-                      height: 12,
-                    ),
-                    SecondaryButton(
-                      label: "Import config",
-                      enabled: _nextEnabled,
-                      onPressed: () async {
-                        final walletsService =
-                            ref.read(walletsServiceChangeNotifierProvider);
-                        final name = textEditingController.text;
+                    )
+                  : Column(
+                      children: [
+                        PrimaryButton(
+                          label: "Create config",
+                          enabled: _nextEnabled,
+                          onPressed: () async {
+                            final walletsService =
+                                ref.read(walletsServiceChangeNotifierProvider);
+                            final name = textEditingController.text;
 
-                        if (await walletsService.checkForDuplicate(name)) {
-                          if (mounted) {
-                            unawaited(
-                              showFloatingFlushBar(
-                                type: FlushBarType.warning,
-                                message: "Wallet name already in use.",
-                                iconAsset: Assets.svg.circleAlert,
-                                context: context,
-                              ),
-                            );
-                          }
-                        } else if (mounted) {
-                          await Navigator.of(context).pushNamed(
-                            ImportNewFrostMsWalletView.routeName,
-                            arguments: (
-                              walletName: name,
-                              coin: coin,
-                            ),
-                          );
-                        }
-                      },
-                    ),
-                  ],
-                )
+                            if (await walletsService.checkForDuplicate(name)) {
+                              if (mounted) {
+                                unawaited(
+                                  showFloatingFlushBar(
+                                    type: FlushBarType.warning,
+                                    message: "Wallet name already in use.",
+                                    iconAsset: Assets.svg.circleAlert,
+                                    context: context,
+                                  ),
+                                );
+                              }
+                            } else if (mounted) {
+                              await Navigator.of(context).pushNamed(
+                                CreateNewFrostMsWalletView.routeName,
+                                arguments: (
+                                  walletName: name,
+                                  coin: coin,
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                        const SizedBox(
+                          height: 12,
+                        ),
+                        SecondaryButton(
+                          label: "Import config",
+                          enabled: _nextEnabled,
+                          onPressed: () async {
+                            final walletsService =
+                                ref.read(walletsServiceChangeNotifierProvider);
+                            final name = textEditingController.text;
+
+                            if (await walletsService.checkForDuplicate(name)) {
+                              if (mounted) {
+                                unawaited(
+                                  showFloatingFlushBar(
+                                    type: FlushBarType.warning,
+                                    message: "Wallet name already in use.",
+                                    iconAsset: Assets.svg.circleAlert,
+                                    context: context,
+                                  ),
+                                );
+                              }
+                            } else if (mounted) {
+                              await Navigator.of(context).pushNamed(
+                                ImportNewFrostMsWalletView.routeName,
+                                arguments: (
+                                  walletName: name,
+                                  coin: coin,
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                      ],
+                    )
               : ConstrainedBox(
                   constraints: BoxConstraints(
                     minWidth: isDesktop ? 480 : 0,

@@ -423,6 +423,7 @@ class _FrostShareCommitmentsViewState
                       context: context,
                       builder: (_) => StackOkDialog(
                         title: "Failed to generate shares",
+                        message: e.toString(),
                         desktopPopRootNavigator: Util.isDesktop,
                       ),
                     );

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:stackfrost/pages/add_wallet_views/frost_ms/confirm_new_frost_ms_wallet_creation_view.dart';
+import 'package:stackfrost/pages/add_wallet_views/frost_ms/new/confirm_new_frost_ms_wallet_creation_view.dart';
 import 'package:stackfrost/pages/add_wallet_views/frost_ms/new/dialogs/quit_frost_ms_wallet_creation_dialog.dart';
 import 'package:stackfrost/pages_desktop_specific/desktop_home_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';

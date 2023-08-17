@@ -20,7 +20,7 @@ import 'package:stackfrost/models/send_view_auto_fill_data.dart';
 import 'package:stackfrost/models/tx_data.dart';
 import 'package:stackfrost/pages/add_wallet_views/add_wallet_view/add_wallet_view.dart';
 import 'package:stackfrost/pages/add_wallet_views/create_or_restore_wallet_view/create_or_restore_wallet_view.dart';
-import 'package:stackfrost/pages/add_wallet_views/frost_ms/confirm_new_frost_ms_wallet_creation_view.dart';
+import 'package:stackfrost/pages/add_wallet_views/frost_ms/new/confirm_new_frost_ms_wallet_creation_view.dart';
 import 'package:stackfrost/pages/add_wallet_views/frost_ms/new/create_new_frost_ms_wallet_view.dart';
 import 'package:stackfrost/pages/add_wallet_views/frost_ms/new/frost_share_commitments_view.dart';
 import 'package:stackfrost/pages/add_wallet_views/frost_ms/new/frost_share_shares_view.dart';
