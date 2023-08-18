@@ -12,6 +12,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/frost_participants_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/modify_participants_view.dart';
+import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
+import 'package:stackfrost/providers/global/wallets_provider.dart';
+import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/utilities/constants.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
@@ -70,6 +73,13 @@ class FrostMSWalletOptionsView extends ConsumerWidget {
                 _OptionButton(
                   label: "Modify participants",
                   onPressed: () {
+                    final wallet = ref
+                        .read(walletsChangeNotifierProvider)
+                        .getManager(walletId)
+                        .wallet as FrostWallet;
+
+                    ref.read(pFrostMyName.state).state = wallet.myName;
+
                     Navigator.of(context).pushNamed(
                       ModifyParticipantsView.routeName,
                       arguments: walletId,

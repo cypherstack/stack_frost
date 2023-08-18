@@ -115,8 +115,6 @@ class _ModifyParticipantsViewState
         .getManager(widget.walletId)
         .wallet as FrostWallet;
 
-    ref.read(pFrostMyName.state).state = wallet.myName;
-
     for (final participant in wallet.participants) {
       controllers.add(TextEditingController()..text = participant);
     }
