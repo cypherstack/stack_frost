@@ -10,12 +10,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:stackfrost/pages/send_view/frost_ms/frost_import_sign_config_view.dart';
 import 'package:stackfrost/pages/send_view/frost_ms/frost_send_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/desktop_receive.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/desktop_send.dart';
 import 'package:stackfrost/providers/global/wallets_provider.dart';
 import 'package:stackfrost/utilities/enums/coin_enum.dart';
 import 'package:stackfrost/widgets/custom_tab_view.dart';
+import 'package:stackfrost/widgets/desktop/secondary_button.dart';
 import 'package:stackfrost/widgets/rounded_white_container.dart';
 
 class MyWallet extends ConsumerStatefulWidget {
@@ -65,9 +67,29 @@ class _MyWalletState extends ConsumerState<MyWallet> {
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: isFrost
-                    ? FrostSendView(
-                        walletId: widget.walletId,
-                        coin: coin,
+                    ? Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              SecondaryButton(
+                                width: 200,
+                                buttonHeight: ButtonHeight.l,
+                                label: "Import sign config",
+                                onPressed: () {
+                                  Navigator.of(context).pushNamed(
+                                    FrostImportSignConfigView.routeName,
+                                    arguments: widget.walletId,
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                          FrostSendView(
+                            walletId: widget.walletId,
+                            coin: coin,
+                          ),
+                        ],
                       )
                     : DesktopSend(
                         walletId: widget.walletId,

@@ -301,6 +301,7 @@ class _FrostSendViewState extends ConsumerState<FrostSendView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          if (!Util.isDesktop)
           Container(
             decoration: BoxDecoration(
               color: Theme.of(context).extension<StackColors>()!.popupBG,
