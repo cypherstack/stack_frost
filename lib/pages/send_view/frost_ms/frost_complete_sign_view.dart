@@ -136,6 +136,7 @@ class _FrostCompleteSignViewState extends ConsumerState<FrostCompleteSignView> {
                 _broadcastLock = true;
 
                 try {
+                  Exception? ex;
                   final txData = await showLoading(
                     whileFuture: ref
                         .read(walletsChangeNotifierProvider)
@@ -147,16 +148,13 @@ class _FrostCompleteSignViewState extends ConsumerState<FrostCompleteSignView> {
                     message: "Broadcasting transaction to network",
                     isDesktop: Util.isDesktop,
                     onException: (e) {
-                      showDialog<void>(
-                        context: context,
-                        builder: (_) => StackOkDialog(
-                          title: "Broadcast error",
-                          message: e.toString(),
-                          desktopPopRootNavigator: Util.isDesktop,
-                        ),
-                      );
+                      ex = e;
                     },
                   );
+
+                  if (ex != null) {
+                    throw ex!;
+                  }
 
                   if (mounted) {
                     if (txData != null) {
@@ -168,8 +166,6 @@ class _FrostCompleteSignViewState extends ConsumerState<FrostCompleteSignView> {
                               : WalletView.routeName,
                         ),
                       );
-                    } else {
-                      throw Exception("txData is null");
                     }
                   }
                 } catch (e, s) {
