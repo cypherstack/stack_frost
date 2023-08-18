@@ -44,3 +44,7 @@ final pFrostContinueSignData = StateProvider<
       Pointer<TransactionSignatureMachineWrapper> machinePtr,
       String share,
     })?>((ref) => null);
+
+// ================= shared/util ======================================
+final pFrostSelectParticipantsUnordered =
+    StateProvider<List<String>?>((ref) => null);

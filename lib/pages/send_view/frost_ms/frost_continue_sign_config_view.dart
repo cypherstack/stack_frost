@@ -50,7 +50,8 @@ class _FrostContinueSignViewState extends ConsumerState<FrostContinueSignView> {
   final List<FocusNode> focusNodes = [];
 
   late final String myName;
-  late final List<String> participants;
+  late final List<String> participantsWithoutMe;
+  late final List<String> participantsAll;
   late final String myShare;
   late final int myIndex;
 
@@ -64,14 +65,19 @@ class _FrostContinueSignViewState extends ConsumerState<FrostContinueSignView> {
         .wallet as FrostWallet;
 
     myName = wallet.myName;
-    participants = wallet.participants;
-    myIndex = participants.indexOf(wallet.myName);
+    participantsAll = wallet.participants;
+    myIndex = wallet.participants.indexOf(wallet.myName);
     myShare = ref.read(pFrostContinueSignData.state).state!.share;
 
-    // temporarily remove my name
-    participants.removeAt(myIndex);
+    participantsWithoutMe = wallet.participants
+        .toSet()
+        .intersection(
+            ref.read(pFrostSelectParticipantsUnordered.state).state!.toSet())
+        .toList();
 
-    for (int i = 0; i < participants.length; i++) {
+    participantsWithoutMe.remove(myName);
+
+    for (int i = 0; i < participantsWithoutMe.length; i++) {
       controllers.add(TextEditingController());
       focusNodes.add(FocusNode());
       fieldIsEmptyFlags.add(true);
@@ -225,7 +231,7 @@ class _FrostContinueSignViewState extends ConsumerState<FrostContinueSignView> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  for (int i = 0; i < participants.length; i++)
+                  for (int i = 0; i < participantsWithoutMe.length; i++)
                     Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -245,7 +251,7 @@ class _FrostContinueSignViewState extends ConsumerState<FrostContinueSignView> {
                               enableSuggestions: false,
                               style: STextStyles.field(context),
                               decoration: standardInputDecoration(
-                                "Enter ${participants[i]}'s share",
+                                "Enter ${participantsWithoutMe[i]}'s share",
                                 focusNodes[i],
                                 context,
                               ).copyWith(
@@ -379,9 +385,19 @@ class _FrostContinueSignViewState extends ConsumerState<FrostContinueSignView> {
                     );
                   }
 
-                  // collect Share strings and insert an empty string at my index
-                  final shares = controllers.map((e) => e.text).toList();
-                  shares.insert(myIndex, "");
+                  // collect Share strings
+                  final sharesCollected =
+                      controllers.map((e) => e.text).toList();
+
+                  final List<String> shares = [];
+                  for (final participant in participantsAll) {
+                    if (participantsWithoutMe.contains(participant)) {
+                      shares.add(sharesCollected[
+                          participantsWithoutMe.indexOf(participant)]);
+                    } else {
+                      shares.add("");
+                    }
+                  }
 
                   try {
                     final rawTx = Frost.completeSigning(

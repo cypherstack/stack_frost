@@ -50,11 +50,25 @@ class _FrostAttemptSignConfigViewState
   final List<FocusNode> focusNodes = [];
 
   late final String myName;
-  late final List<String> participants;
+  late final List<String> participantsWithoutMe;
   late final String myPreprocess;
   late final int myIndex;
+  late final int threshold;
 
   final List<bool> fieldIsEmptyFlags = [];
+
+  bool hasEnoughPreprocesses() {
+    // own preprocess is not included in controllers and must be set here
+    int count = 1;
+
+    for (final controller in controllers) {
+      if (controller.text.isNotEmpty) {
+        count++;
+      }
+    }
+
+    return count >= threshold;
+  }
 
   @override
   void initState() {
@@ -64,14 +78,14 @@ class _FrostAttemptSignConfigViewState
         .wallet as FrostWallet;
 
     myName = wallet.myName;
-    participants = wallet.participants;
-    myIndex = participants.indexOf(wallet.myName);
+    threshold = wallet.threshold;
+    participantsWithoutMe = wallet.participants;
+    myIndex = participantsWithoutMe.indexOf(wallet.myName);
     myPreprocess = ref.read(pFrostAttemptSignData.state).state!.preprocess;
 
-    // temporarily remove my name
-    participants.removeAt(myIndex);
+    participantsWithoutMe.removeAt(myIndex);
 
-    for (int i = 0; i < participants.length; i++) {
+    for (int i = 0; i < participantsWithoutMe.length; i++) {
       controllers.add(TextEditingController());
       focusNodes.add(FocusNode());
       fieldIsEmptyFlags.add(true);
@@ -185,7 +199,7 @@ class _FrostAttemptSignConfigViewState
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                for (int i = 0; i < participants.length; i++)
+                for (int i = 0; i < participantsWithoutMe.length; i++)
                   Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -204,8 +218,14 @@ class _FrostAttemptSignConfigViewState
                             autocorrect: false,
                             enableSuggestions: false,
                             style: STextStyles.field(context),
+                            onChanged: (_) {
+                              setState(() {
+                                fieldIsEmptyFlags[i] =
+                                    controllers[i].text.isEmpty;
+                              });
+                            },
                             decoration: standardInputDecoration(
-                              "Enter ${participants[i]}'s preprocess",
+                              "Enter ${participantsWithoutMe[i]}'s preprocess",
                               focusNodes[i],
                               context,
                             ).copyWith(
@@ -320,22 +340,22 @@ class _FrostAttemptSignConfigViewState
             const _Div(),
             PrimaryButton(
               label: "Continue signing",
+              enabled: hasEnoughPreprocesses(),
               onPressed: () async {
-                // check for empty preprocesses
-                if (controllers
-                    .map((e) => e.text.isEmpty)
-                    .reduce((value, element) => value |= element)) {
-                  return await showDialog<void>(
-                    context: context,
-                    builder: (_) => StackOkDialog(
-                      title: "Missing Preprocesses",
-                      desktopPopRootNavigator: Util.isDesktop,
-                    ),
-                  );
-                }
-
-                // collect Preprocess strings and insert an empty string at my index
+                // collect Preprocess strings (not including my own)
                 final preprocesses = controllers.map((e) => e.text).toList();
+
+                // collect participants who are involved in this transaction
+                final List<String> requiredParticipantsUnordered = [];
+                for (int i = 0; i < participantsWithoutMe.length; i++) {
+                  if (preprocesses[i].isNotEmpty) {
+                    requiredParticipantsUnordered.add(participantsWithoutMe[i]);
+                  }
+                }
+                ref.read(pFrostSelectParticipantsUnordered.notifier).state =
+                    requiredParticipantsUnordered;
+
+                // insert an empty string at my index
                 preprocesses.insert(myIndex, "");
 
                 try {
