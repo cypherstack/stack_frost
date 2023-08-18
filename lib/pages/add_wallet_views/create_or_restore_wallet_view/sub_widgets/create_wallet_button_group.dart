@@ -32,7 +32,7 @@ class CreateWalletButtonGroup extends StatefulWidget {
 }
 
 class _CreateWalletButtonGroupState extends State<CreateWalletButtonGroup> {
-  bool _frostMS = false;
+  bool _frostMS = true;
 
   @override
   Widget build(BuildContext context) {
@@ -41,27 +41,27 @@ class _CreateWalletButtonGroupState extends State<CreateWalletButtonGroup> {
           ? CrossAxisAlignment.center
           : CrossAxisAlignment.stretch,
       children: [
-        Row(
-          children: [
-            Checkbox(
-              value: _frostMS,
-              onChanged: (v) {
-                setState(() {
-                  _frostMS = v!;
-                });
-              },
-            ),
-            Text(
-              "FROST Multisig",
-              style: widget.isDesktop
-                  ? STextStyles.desktopSubtitleH2(context)
-                  : STextStyles.subtitle(context),
-            ),
-          ],
-        ),
-        SizedBox(
-          height: widget.isDesktop ? 12 : 8,
-        ),
+        // Row(
+        //   children: [
+        //     Checkbox(
+        //       value: _frostMS,
+        //       onChanged: (v) {
+        //         setState(() {
+        //           _frostMS = v!;
+        //         });
+        //       },
+        //     ),
+        //     Text(
+        //       "FROST Multisig",
+        //       style: widget.isDesktop
+        //           ? STextStyles.desktopSubtitleH2(context)
+        //           : STextStyles.subtitle(context),
+        //     ),
+        //   ],
+        // ),
+        // SizedBox(
+        //   height: widget.isDesktop ? 12 : 8,
+        // ),
         ConstrainedBox(
           constraints: BoxConstraints(
             minHeight: widget.isDesktop ? 70 : 0,
