@@ -245,10 +245,44 @@ class _WalletSettingsViewState extends ConsumerState<WalletSettingsView> {
                                       iconSize: 16,
                                       title: "Wallet backup",
                                       onPressed: () async {
-                                        final mnemonic = await ref
+                                        final wallet = ref
                                             .read(walletsChangeNotifierProvider)
                                             .getManager(walletId)
-                                            .mnemonic;
+                                            .wallet;
+
+                                        ({
+                                          String myName,
+                                          String config,
+                                          String keys,
+                                        })? frostWalletData;
+
+                                        List<Future<dynamic>> futures = [
+                                          wallet.mnemonic,
+                                        ];
+
+                                        if (wallet is FrostWallet) {
+                                          futures.addAll(
+                                            [
+                                              wallet.getSerializedKeys,
+                                              wallet.multisigConfig,
+                                            ],
+                                          );
+                                        }
+
+                                        final results =
+                                            await Future.wait(futures);
+
+                                        final List<String> mnemonic =
+                                            results.first as List<String>;
+
+                                        if (results.length == 3) {
+                                          frostWalletData = (
+                                            myName:
+                                                (wallet as FrostWallet).myName,
+                                            config: results[2],
+                                            keys: results[1],
+                                          );
+                                        }
 
                                         if (mounted) {
                                           await Navigator.push(
@@ -258,8 +292,12 @@ class _WalletSettingsViewState extends ConsumerState<WalletSettingsView> {
                                                   RouteGenerator
                                                       .useMaterialPageRoute,
                                               builder: (_) => LockscreenView(
-                                                routeOnSuccessArguments:
-                                                    Tuple2(walletId, mnemonic),
+                                                routeOnSuccessArguments: (
+                                                  walletId: walletId,
+                                                  mnemonic: mnemonic,
+                                                  frostWalletData:
+                                                      frostWalletData,
+                                                ),
                                                 showBackButton: true,
                                                 routeOnSuccess:
                                                     WalletBackupView.routeName,
