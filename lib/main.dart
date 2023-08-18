@@ -68,7 +68,11 @@ final openedFromSWBFileStringStateProvider =
 // main() is the entry point to the app. It initializes Hive (local database),
 // runs the MyApp widget and checks for new users, caching the value in the
 // miscellaneous box for later use
-void main() async {
+void main(List<String> args) async {
+  if (args.length == 2 && args.first == "-d") {
+    StackFileSystem.overrideDir = args.last;
+  }
+
   WidgetsFlutterBinding.ensureInitialized();
   GoogleFonts.config.allowRuntimeFetching = false;
   if (Platform.isIOS) {

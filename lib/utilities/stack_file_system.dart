@@ -15,6 +15,8 @@ import 'package:stackfrost/utilities/logger.dart';
 import 'package:stackfrost/utilities/util.dart';
 
 abstract class StackFileSystem {
+  static String? overrideDir;
+
   static Future<Directory> applicationRootDirectory() async {
     Directory appDirectory;
 
@@ -23,7 +25,11 @@ abstract class StackFileSystem {
       appDirectory = await getApplicationDocumentsDirectory();
       appDirectory = Directory("${appDirectory.path}/.stackfrost");
     } else if (Platform.isLinux) {
-      appDirectory = Directory("${Platform.environment['HOME']}/.stackfrost");
+      if (overrideDir != null) {
+        appDirectory = Directory(overrideDir!);
+      } else {
+        appDirectory = Directory("${Platform.environment['HOME']}/.stackfrost");
+      }
     } else if (Platform.isWindows) {
       appDirectory = await getApplicationSupportDirectory();
     } else if (Platform.isMacOS) {
