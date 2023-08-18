@@ -132,9 +132,7 @@ class _ShareNewMultisigConfigViewState
                 ref.read(pFrostStartKeyGenData.notifier).state =
                     Frost.startKeyGeneration(
                   multisigConfig: ref.watch(pFrostMultisigConfig.state).state!,
-                  myName: Frost.getName(
-                      multisigConfig:
-                          ref.read(pFrostMultisigConfig.state).state!),
+                  myName: ref.read(pFrostMyName.state).state!,
                 );
 
                 await Navigator.of(context).pushNamed(

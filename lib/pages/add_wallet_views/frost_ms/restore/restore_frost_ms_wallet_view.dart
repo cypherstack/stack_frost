@@ -146,11 +146,9 @@ class _RestoreFrostMsWalletViewState
       secureStore: ref.read(secureStoreProvider),
     );
 
-    final multisigConfigPointer = decodeMultisigConfig(multisigConfig: config);
-
     await wallet.saveThreshold(
       multisigThreshold(
-        multisigConfigPointer: multisigConfigPointer,
+        multisigConfig: config,
       ),
     );
     await wallet.updateParticipants(participants);

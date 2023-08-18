@@ -69,7 +69,6 @@ class _ConfirmNewFrostMSWalletCreationViewState
     multisigId = ref.read(pFrostCompletedKeyGenData.state).state!.multisigId;
     multisigConfig = ref.read(pFrostMultisigConfig.state).state!;
 
-    ref.read(pFrostCompletedKeyGenData.state).state = null;
     super.initState();
   }
 

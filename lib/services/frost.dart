@@ -18,44 +18,20 @@ abstract class Frost {
   }) {
     try {
       final numberOfParticipants = multisigParticipants(
-        multisigConfigPointer: decodeMultisigConfig(
-          multisigConfig: multisigConfig,
-        ),
+        multisigConfig: multisigConfig,
       );
 
       final List<String> participants = [];
       for (int i = 0; i < numberOfParticipants; i++) {
         participants.add(
           multisigParticipant(
-            multisigConfigPointer: decodeMultisigConfig(
-              multisigConfig: multisigConfig,
-            ),
+            multisigConfig: multisigConfig,
             index: i,
           ),
         );
       }
 
       return participants;
-    } catch (e, s) {
-      Logging.instance.log(
-        "getParticipants failed: $e\n$s",
-        level: LogLevel.Fatal,
-      );
-      rethrow;
-    }
-  }
-
-  static String getName({
-    required String multisigConfig,
-  }) {
-    try {
-      final name = multisigName(
-        multisigConfigPointer: decodeMultisigConfig(
-          multisigConfig: multisigConfig,
-        ),
-      );
-
-      return name;
     } catch (e, s) {
       Logging.instance.log(
         "getParticipants failed: $e\n$s",
@@ -83,9 +59,7 @@ abstract class Frost {
   }) {
     try {
       final threshold = multisigThreshold(
-        multisigConfigPointer: decodeMultisigConfig(
-          multisigConfig: multisigConfig,
-        ),
+        multisigConfig: multisigConfig,
       );
 
       return threshold;
@@ -172,13 +146,13 @@ abstract class Frost {
     required List<String> participants,
   }) {
     try {
-      final configPtr = newMultisigConfig(
+      final config = newMultisigConfig(
         name: name,
         threshold: threshold,
         participants: participants,
       );
 
-      return configPtr.ref.encoded.toDartString();
+      return config;
     } catch (e, s) {
       Logging.instance.log(
         "createMultisigConfig failed: $e\n$s",
@@ -199,7 +173,7 @@ abstract class Frost {
   }) {
     try {
       final startKeyGenResPtr = startKeyGen(
-        multisigConfig: decodeMultisigConfig(multisigConfig: multisigConfig),
+        multisigConfig: multisigConfig,
         myName: myName,
         language: Language.english,
       );
@@ -305,7 +279,7 @@ abstract class Frost {
     required int feePerWeight,
   }) {
     try {
-      final signConfigRes = newSignConfig(
+      final signConfig = newSignConfig(
         network: network,
         outputs: inputs
             .map(
@@ -323,7 +297,7 @@ abstract class Frost {
         feePerWeight: feePerWeight,
       );
 
-      return signConfigRes.ref.encoded.toDartString();
+      return signConfig;
     } catch (e, s) {
       Logging.instance.log(
         "createSignConfig failed: $e\n$s",
@@ -342,16 +316,12 @@ abstract class Frost {
     required String serializedKeys,
   }) {
     try {
-      final signConfigRes = decodeSignConfig(
-        network: network,
-        encodedSignConfig: config,
-      );
-
       final keys = deserializeKeys(keys: serializedKeys);
 
       final attemptSignRes = attemptSign(
         thresholdKeysWrapperPointer: keys,
-        signConfigPointer: signConfigRes,
+        network: network,
+        signConfig: config,
       );
 
       return (
