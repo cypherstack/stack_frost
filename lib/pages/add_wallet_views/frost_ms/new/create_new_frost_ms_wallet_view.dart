@@ -58,6 +58,10 @@ class _NewFrostMsWalletViewState
       return "Threshold cannot be greater than the number of participants";
     }
 
+    if (partsCount < 2) {
+      return "At least two participants required";
+    }
+
     if (controllers.length != partsCount) {
       return "Participants count error";
     }
@@ -69,7 +73,6 @@ class _NewFrostMsWalletViewState
       return "Participants must not be empty";
     }
 
-    // TODO not sure if duplicate participant names are allowed
     if (controllers.length != controllers.map((e) => e.text).toSet().length) {
       return "Duplicate participant name found";
     }
@@ -170,6 +173,9 @@ class _NewFrostMsWalletViewState
               "Threshold",
               style: STextStyles.label(context),
             ),
+            const SizedBox(
+              height: 10,
+            ),
             TextField(
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -181,6 +187,9 @@ class _NewFrostMsWalletViewState
             Text(
               "Number of participants",
               style: STextStyles.label(context),
+            ),
+            const SizedBox(
+              height: 10,
             ),
             TextField(
               keyboardType: TextInputType.number,
@@ -197,8 +206,16 @@ class _NewFrostMsWalletViewState
                 style: STextStyles.label(context),
               ),
             if (controllers.isNotEmpty)
+              const SizedBox(
+                height: 10,
+              ),
+            if (controllers.isNotEmpty)
               TextField(
                 controller: controllers.first,
+              ),
+            if (controllers.length > 1)
+              const SizedBox(
+                height: 16,
               ),
             if (controllers.length > 1)
               Text(
