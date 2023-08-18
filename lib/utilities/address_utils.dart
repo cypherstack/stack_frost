@@ -30,8 +30,11 @@ class AddressUtils {
     String overridePrefix = "",
   ]) {
     try {
-      final output =
-          Address.addressToOutputScript(address, network, overridePrefix);
+      final output = Address.addressToOutputScript(
+        address,
+        network,
+        overridePrefix,
+      );
       return convertBytesToScriptHash(output);
     } catch (e) {
       rethrow;
@@ -42,9 +45,9 @@ class AddressUtils {
     final hash = sha256.convert(bytes.toList(growable: false)).toString();
 
     final chars = hash.split("");
-    final reversedPairs = <String>[];
+    final List<String> reversedPairs = [];
     // TODO find a better/faster way to do this?
-    var i = chars.length - 1;
+    int i = chars.length - 1;
     while (i > 0) {
       reversedPairs.add(chars[i - 1]);
       reversedPairs.add(chars[i]);
