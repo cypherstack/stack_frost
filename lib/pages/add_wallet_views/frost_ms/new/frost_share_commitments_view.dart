@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:stackfrost/pages/add_wallet_views/frost_ms/new/dialogs/quit_frost_ms_wallet_creation_dialog.dart';
 import 'package:stackfrost/pages/add_wallet_views/frost_ms/new/frost_share_shares_view.dart';
+import 'package:stackfrost/pages/wallet_view/transaction_views/transaction_details_view.dart';
 import 'package:stackfrost/pages_desktop_specific/desktop_home_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
@@ -18,13 +19,14 @@ import 'package:stackfrost/utilities/util.dart';
 import 'package:stackfrost/widgets/background.dart';
 import 'package:stackfrost/widgets/conditional_parent.dart';
 import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
+import 'package:stackfrost/widgets/custom_buttons/simple_copy_button.dart';
 import 'package:stackfrost/widgets/desktop/desktop_app_bar.dart';
 import 'package:stackfrost/widgets/desktop/desktop_scaffold.dart';
 import 'package:stackfrost/widgets/desktop/primary_button.dart';
+import 'package:stackfrost/widgets/detail_item.dart';
 import 'package:stackfrost/widgets/icon_widgets/clipboard_icon.dart';
 import 'package:stackfrost/widgets/icon_widgets/qrcode_icon.dart';
 import 'package:stackfrost/widgets/icon_widgets/x_icon.dart';
-import 'package:stackfrost/widgets/rounded_white_container.dart';
 import 'package:stackfrost/widgets/stack_dialog.dart';
 import 'package:stackfrost/widgets/stack_text_field.dart';
 import 'package:stackfrost/widgets/textfield_icon_button.dart';
@@ -215,26 +217,23 @@ class _FrostShareCommitmentsViewState
                 ),
               ),
               const _Div(),
-              RoundedWhiteContainer(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _Item(
-                      label: "My name",
-                      detail: ref.watch(pFrostMyName.state).state!,
-                    ),
-                    const _Div(),
-                    _Item(
-                      label: "My commitment",
-                      detail: myCommitment,
-                      detailSelectable: true,
-                    ),
-                  ],
-                ),
+              DetailItem(
+                title: "My name",
+                detail: ref.watch(pFrostMyName.state).state!,
               ),
               const _Div(),
-              Text("Enter remaining participant's commitments:"),
+              DetailItem(
+                title: "My commitment",
+                detail: myCommitment,
+                button: Util.isDesktop
+                    ? IconCopyButton(
+                        data: myCommitment,
+                      )
+                    : SimpleCopyButton(
+                        data: myCommitment,
+                      ),
+              ),
+              const _Div(),
               Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -258,6 +257,12 @@ class _FrostShareCommitmentsViewState
                               autocorrect: false,
                               enableSuggestions: false,
                               style: STextStyles.field(context),
+                              onChanged: (_) {
+                                setState(() {
+                                  fieldIsEmptyFlags[i] =
+                                      controllers[i].text.isEmpty;
+                                });
+                              },
                               decoration: standardInputDecoration(
                                 "Enter ${participants[i]}'s commitment",
                                 focusNodes[i],
@@ -373,6 +378,7 @@ class _FrostShareCommitmentsViewState
               const _Div(),
               PrimaryButton(
                 label: "Generate shares",
+                enabled: !fieldIsEmptyFlags.reduce((v, e) => v |= e),
                 onPressed: () async {
                   // check for empty commitments
                   if (controllers
@@ -445,31 +451,6 @@ class _Div extends StatelessWidget {
   Widget build(BuildContext context) {
     return const SizedBox(
       height: 12,
-    );
-  }
-}
-
-class _Item extends StatelessWidget {
-  const _Item({
-    super.key,
-    required this.label,
-    required this.detail,
-    this.detailSelectable = false,
-  });
-
-  final String label;
-  final String detail;
-  final bool detailSelectable;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label),
-        detailSelectable ? SelectableText(detail) : Text(detail),
-      ],
     );
   }
 }

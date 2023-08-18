@@ -9,6 +9,7 @@ import 'package:stackfrost/models/node_model.dart';
 import 'package:stackfrost/notifications/show_flush_bar.dart';
 import 'package:stackfrost/pages/add_wallet_views/frost_ms/new/dialogs/quit_frost_ms_wallet_creation_dialog.dart';
 import 'package:stackfrost/pages/home_view/home_view.dart';
+import 'package:stackfrost/pages/wallet_view/transaction_views/transaction_details_view.dart';
 import 'package:stackfrost/pages_desktop_specific/desktop_home_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
@@ -32,9 +33,11 @@ import 'package:stackfrost/utilities/util.dart';
 import 'package:stackfrost/widgets/background.dart';
 import 'package:stackfrost/widgets/conditional_parent.dart';
 import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
+import 'package:stackfrost/widgets/custom_buttons/simple_copy_button.dart';
 import 'package:stackfrost/widgets/desktop/desktop_app_bar.dart';
 import 'package:stackfrost/widgets/desktop/desktop_scaffold.dart';
 import 'package:stackfrost/widgets/desktop/primary_button.dart';
+import 'package:stackfrost/widgets/detail_item.dart';
 import 'package:stackfrost/widgets/loading_indicator.dart';
 
 class ConfirmNewFrostMSWalletCreationView extends ConsumerStatefulWidget {
@@ -191,10 +194,16 @@ class _ConfirmNewFrostMSWalletCreationViewState
                 style: STextStyles.pageTitleH2(context),
               ),
               const _Div(),
-              _Item(
-                label: "ID",
+              DetailItem(
+                title: "ID",
                 detail: multisigId.toString(),
-                detailSelectable: true,
+                button: Util.isDesktop
+                    ? IconCopyButton(
+                        data: multisigId.toString(),
+                      )
+                    : SimpleCopyButton(
+                        data: multisigId.toString(),
+                      ),
               ),
               const _Div(),
               const _Div(),
@@ -203,16 +212,28 @@ class _ConfirmNewFrostMSWalletCreationViewState
                 style: STextStyles.pageTitleH2(context),
               ),
               const _Div(),
-              _Item(
-                label: "Multisig Config:",
+              DetailItem(
+                title: "Multisig Config",
                 detail: multisigConfig,
-                detailSelectable: true,
+                button: Util.isDesktop
+                    ? IconCopyButton(
+                        data: multisigConfig,
+                      )
+                    : SimpleCopyButton(
+                        data: multisigConfig,
+                      ),
               ),
               const _Div(),
-              _Item(
-                label: "Keys:",
+              DetailItem(
+                title: "Keys",
                 detail: serializedKeys,
-                detailSelectable: true,
+                button: Util.isDesktop
+                    ? IconCopyButton(
+                        data: serializedKeys,
+                      )
+                    : SimpleCopyButton(
+                        data: serializedKeys,
+                      ),
               ),
               if (!Util.isDesktop) const Spacer(),
               const _Div(),
@@ -399,31 +420,6 @@ class _Div extends StatelessWidget {
   Widget build(BuildContext context) {
     return const SizedBox(
       height: 12,
-    );
-  }
-}
-
-class _Item extends StatelessWidget {
-  const _Item({
-    super.key,
-    required this.label,
-    required this.detail,
-    this.detailSelectable = false,
-  });
-
-  final String label;
-  final String detail;
-  final bool detailSelectable;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label),
-        detailSelectable ? SelectableText(detail) : Text(detail),
-      ],
     );
   }
 }

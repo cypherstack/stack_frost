@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:stackfrost/pages/send_view/frost_ms/frost_continue_sign_config_view.dart';
+import 'package:stackfrost/pages/wallet_view/transaction_views/transaction_details_view.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
 import 'package:stackfrost/providers/global/wallets_provider.dart';
 import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
@@ -16,13 +17,14 @@ import 'package:stackfrost/utilities/util.dart';
 import 'package:stackfrost/widgets/background.dart';
 import 'package:stackfrost/widgets/conditional_parent.dart';
 import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
+import 'package:stackfrost/widgets/custom_buttons/simple_copy_button.dart';
 import 'package:stackfrost/widgets/desktop/desktop_app_bar.dart';
 import 'package:stackfrost/widgets/desktop/desktop_scaffold.dart';
 import 'package:stackfrost/widgets/desktop/primary_button.dart';
+import 'package:stackfrost/widgets/detail_item.dart';
 import 'package:stackfrost/widgets/icon_widgets/clipboard_icon.dart';
 import 'package:stackfrost/widgets/icon_widgets/qrcode_icon.dart';
 import 'package:stackfrost/widgets/icon_widgets/x_icon.dart';
-import 'package:stackfrost/widgets/rounded_white_container.dart';
 import 'package:stackfrost/widgets/stack_dialog.dart';
 import 'package:stackfrost/widgets/stack_text_field.dart';
 import 'package:stackfrost/widgets/textfield_icon_button.dart';
@@ -162,26 +164,23 @@ class _FrostAttemptSignConfigViewState
               ),
             ),
             const _Div(),
-            RoundedWhiteContainer(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _Item(
-                    label: "My name",
-                    detail: myName,
-                  ),
-                  const _Div(),
-                  _Item(
-                    label: "My preprocess",
-                    detail: myPreprocess,
-                    detailSelectable: true,
-                  ),
-                ],
-              ),
+            DetailItem(
+              title: "My name",
+              detail: myName,
             ),
             const _Div(),
-            Text("Enter remaining participant's preprocesses:"),
+            DetailItem(
+              title: "My preprocess",
+              detail: myPreprocess,
+              button: Util.isDesktop
+                  ? IconCopyButton(
+                      data: myPreprocess,
+                    )
+                  : SimpleCopyButton(
+                      data: myPreprocess,
+                    ),
+            ),
+            const _Div(),
             Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -381,31 +380,6 @@ class _Div extends StatelessWidget {
   Widget build(BuildContext context) {
     return const SizedBox(
       height: 12,
-    );
-  }
-}
-
-class _Item extends StatelessWidget {
-  const _Item({
-    super.key,
-    required this.label,
-    required this.detail,
-    this.detailSelectable = false,
-  });
-
-  final String label;
-  final String detail;
-  final bool detailSelectable;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label),
-        detailSelectable ? SelectableText(detail) : Text(detail),
-      ],
     );
   }
 }

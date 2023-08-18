@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:stackfrost/pages/add_wallet_views/frost_ms/new/frost_share_commitments_view.dart';
+import 'package:stackfrost/pages/wallet_view/transaction_views/transaction_details_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
 import 'package:stackfrost/services/frost.dart';
@@ -12,10 +13,11 @@ import 'package:stackfrost/utilities/util.dart';
 import 'package:stackfrost/widgets/background.dart';
 import 'package:stackfrost/widgets/conditional_parent.dart';
 import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
+import 'package:stackfrost/widgets/custom_buttons/simple_copy_button.dart';
 import 'package:stackfrost/widgets/desktop/desktop_app_bar.dart';
 import 'package:stackfrost/widgets/desktop/desktop_scaffold.dart';
 import 'package:stackfrost/widgets/desktop/primary_button.dart';
-import 'package:stackfrost/widgets/rounded_white_container.dart';
+import 'package:stackfrost/widgets/detail_item.dart';
 
 class ShareNewMultisigConfigView extends ConsumerStatefulWidget {
   const ShareNewMultisigConfigView({
@@ -113,11 +115,16 @@ class _ShareNewMultisigConfigViewState
             const SizedBox(
               height: 32,
             ),
-            RoundedWhiteContainer(
-              child: SelectableText(
-                ref.watch(pFrostMultisigConfig.state).state!,
-                style: STextStyles.itemSubtitle(context),
-              ),
+            DetailItem(
+              title: "Encoded config",
+              detail: ref.watch(pFrostMultisigConfig.state).state!,
+              button: Util.isDesktop
+                  ? IconCopyButton(
+                      data: ref.watch(pFrostMultisigConfig.state).state!,
+                    )
+                  : SimpleCopyButton(
+                      data: ref.watch(pFrostMultisigConfig.state).state!,
+                    ),
             ),
             SizedBox(
               height: Util.isDesktop ? 64 : 16,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:stackfrost/pages/wallet_view/transaction_views/transaction_details_view.dart';
 import 'package:stackfrost/pages/wallet_view/wallet_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/my_stack_view.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
@@ -13,10 +14,11 @@ import 'package:stackfrost/utilities/util.dart';
 import 'package:stackfrost/widgets/background.dart';
 import 'package:stackfrost/widgets/conditional_parent.dart';
 import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
+import 'package:stackfrost/widgets/custom_buttons/simple_copy_button.dart';
 import 'package:stackfrost/widgets/desktop/desktop_app_bar.dart';
 import 'package:stackfrost/widgets/desktop/desktop_scaffold.dart';
 import 'package:stackfrost/widgets/desktop/primary_button.dart';
-import 'package:stackfrost/widgets/rounded_white_container.dart';
+import 'package:stackfrost/widgets/detail_item.dart';
 import 'package:stackfrost/widgets/stack_dialog.dart';
 
 class FrostCompleteSignView extends ConsumerStatefulWidget {
@@ -99,7 +101,7 @@ class _FrostCompleteSignViewState extends ConsumerState<FrostCompleteSignView> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   QrImageView(
-                    data: ref.read(pFrostTxData.state).state!.raw!,
+                    data: ref.watch(pFrostTxData.state).state!.raw!,
                     size: 220,
                     backgroundColor:
                         Theme.of(context).extension<StackColors>()!.background,
@@ -111,18 +113,16 @@ class _FrostCompleteSignViewState extends ConsumerState<FrostCompleteSignView> {
               ),
             ),
             const _Div(),
-            RoundedWhiteContainer(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _Item(
-                    label: "Raw tx",
-                    detail: ref.read(pFrostTxData.state).state!.raw!,
-                    detailSelectable: true,
-                  ),
-                ],
-              ),
+            DetailItem(
+              title: "Raw transaction hex",
+              detail: ref.watch(pFrostTxData.state).state!.raw!,
+              button: Util.isDesktop
+                  ? IconCopyButton(
+                      data: ref.watch(pFrostTxData.state).state!.raw!,
+                    )
+                  : SimpleCopyButton(
+                      data: ref.watch(pFrostTxData.state).state!.raw!,
+                    ),
             ),
             const _Div(),
             if (!Util.isDesktop) const Spacer(),
@@ -201,31 +201,6 @@ class _Div extends StatelessWidget {
   Widget build(BuildContext context) {
     return const SizedBox(
       height: 12,
-    );
-  }
-}
-
-class _Item extends StatelessWidget {
-  const _Item({
-    super.key,
-    required this.label,
-    required this.detail,
-    this.detailSelectable = false,
-  });
-
-  final String label;
-  final String detail;
-  final bool detailSelectable;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label),
-        detailSelectable ? SelectableText(detail) : Text(detail),
-      ],
     );
   }
 }

@@ -594,12 +594,12 @@ class _FrostSendViewState extends ConsumerState<FrostSendView> {
                     .extension<StackColors>()!
                     .getPrimaryDisabledButtonStyle(context),
             child: Text(
-              "Preview",
+              "Create config",
               style: STextStyles.button(context),
             ),
           ),
           const SizedBox(
-            height: 4,
+            height: 16,
           ),
         ],
       ),
