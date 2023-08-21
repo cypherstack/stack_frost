@@ -2,7 +2,6 @@ import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frostdart/frostdart_bindings_generated.dart';
 import 'package:isar/isar.dart';
 import 'package:stackfrost/models/isar/models/isar_models.dart';
 import 'package:stackfrost/models/tx_data.dart';
@@ -14,7 +13,6 @@ import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
 import 'package:stackfrost/services/frost.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/utilities/constants.dart';
-import 'package:stackfrost/utilities/enums/coin_enum.dart';
 import 'package:stackfrost/utilities/format.dart';
 import 'package:stackfrost/utilities/logger.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
@@ -74,16 +72,8 @@ class _FrostImportSignConfigViewState
           .getManager(widget.walletId)
           .wallet as FrostWallet;
 
-      final network =
-          wallet.coin == Coin.bitcoin ? Network.Mainnet : Network.Testnet;
-
-      final configPtr = Frost.decodedSignConfig(
-        encodedConfig: config,
-        network: network,
-      );
-
       final data = Frost.extractDataFromSignConfig(
-        signConfigPointer: configPtr,
+        signConfig: config,
         coin: wallet.coin,
       );
 

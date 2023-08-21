@@ -78,10 +78,16 @@ abstract class Frost {
     int feePerWeight,
     List<Output> inputs,
   }) extractDataFromSignConfig({
-    required Pointer<SignConfig> signConfigPointer,
+    required String signConfig,
     required Coin coin,
   }) {
     try {
+      final network = coin.isTestNet ? Network.Testnet : Network.Mainnet;
+      final signConfigPointer = decodedSignConfig(
+        encodedConfig: signConfig,
+        network: network,
+      );
+
       // get various data from config
       final feePerWeight =
           signFeePerWeight(signConfigPointer: signConfigPointer);
@@ -116,9 +122,11 @@ abstract class Frost {
       final count = signInputs(signConfigPointer: signConfigPointer);
       final List<Output> outputs = [];
       for (int i = 0; i < count; i++) {
-        final p = signInput(signConfigPointer: signConfigPointer, index: i);
-
-        final output = convertOutput(ownedPortableOutputPointer: p.value);
+        final output = signInput(
+          signConfig: signConfig,
+          index: i,
+          network: network,
+        );
 
         outputs.add(output);
       }
