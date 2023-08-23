@@ -15,6 +15,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:stackfrost/notifications/show_flush_bar.dart';
 import 'package:stackfrost/pages/add_wallet_views/new_wallet_recovery_phrase_view/sub_widgets/mnemonic_table.dart';
 import 'package:stackfrost/pages/home_view/home_view.dart';
+import 'package:stackfrost/pages/wallet_view/transaction_views/transaction_details_view.dart';
 import 'package:stackfrost/providers/providers.dart';
 import 'package:stackfrost/services/coins/manager.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
@@ -22,8 +23,12 @@ import 'package:stackfrost/utilities/assets.dart';
 import 'package:stackfrost/utilities/clipboard_interface.dart';
 import 'package:stackfrost/utilities/constants.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/utilities/util.dart';
 import 'package:stackfrost/widgets/background.dart';
 import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
+import 'package:stackfrost/widgets/custom_buttons/simple_copy_button.dart';
+import 'package:stackfrost/widgets/detail_item.dart';
+import 'package:stackfrost/widgets/rounded_white_container.dart';
 import 'package:stackfrost/widgets/stack_dialog.dart';
 
 class DeleteWalletRecoveryPhraseView extends ConsumerStatefulWidget {
@@ -31,12 +36,14 @@ class DeleteWalletRecoveryPhraseView extends ConsumerStatefulWidget {
     Key? key,
     required this.manager,
     required this.mnemonic,
+    this.frostWalletData,
     this.clipboardInterface = const ClipboardWrapper(),
   }) : super(key: key);
 
   static const routeName = "/deleteWalletRecoveryPhrase";
 
   final Manager manager;
+  final ({String myName, String config, String keys})? frostWalletData;
   final List<String> mnemonic;
 
   final ClipboardInterface clipboardInterface;
@@ -64,6 +71,8 @@ class _DeleteWalletRecoveryPhraseViewState
   Widget build(BuildContext context) {
     debugPrint("BUILD: $runtimeType");
 
+    final bool frost = widget.frostWalletData != null;
+
     return Background(
       child: Scaffold(
         backgroundColor: Theme.of(context).extension<StackColors>()!.background,
@@ -74,35 +83,39 @@ class _DeleteWalletRecoveryPhraseViewState
             },
           ),
           actions: [
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: AspectRatio(
-                aspectRatio: 1,
-                child: AppBarIconButton(
-                  color: Theme.of(context).extension<StackColors>()!.background,
-                  shadows: const [],
-                  icon: SvgPicture.asset(
-                    Assets.svg.copy,
-                    width: 20,
-                    height: 20,
-                    color: Theme.of(context)
-                        .extension<StackColors>()!
-                        .topNavIconPrimary,
+            if (!frost)
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: AspectRatio(
+                  aspectRatio: 1,
+                  child: AppBarIconButton(
+                    color:
+                        Theme.of(context).extension<StackColors>()!.background,
+                    shadows: const [],
+                    icon: SvgPicture.asset(
+                      Assets.svg.copy,
+                      width: 20,
+                      height: 20,
+                      color: Theme.of(context)
+                          .extension<StackColors>()!
+                          .topNavIconPrimary,
+                    ),
+                    onPressed: () async {
+                      final words = await _manager.mnemonic;
+                      await _clipboardInterface
+                          .setData(ClipboardData(text: words.join(" ")));
+                      if (mounted) {
+                        await showFloatingFlushBar(
+                          type: FlushBarType.info,
+                          message: "Copied to clipboard",
+                          iconAsset: Assets.svg.copy,
+                          context: context,
+                        );
+                      }
+                    },
                   ),
-                  onPressed: () async {
-                    final words = await _manager.mnemonic;
-                    await _clipboardInterface
-                        .setData(ClipboardData(text: words.join(" ")));
-                    showFloatingFlushBar(
-                      type: FlushBarType.info,
-                      message: "Copied to clipboard",
-                      iconAsset: Assets.svg.copy,
-                      context: context,
-                    );
-                  },
                 ),
               ),
-            ),
           ],
         ),
         body: Padding(
@@ -110,54 +123,125 @@ class _DeleteWalletRecoveryPhraseViewState
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(
-                height: 4,
-              ),
-              Text(
-                _manager.walletName,
-                textAlign: TextAlign.center,
-                style: STextStyles.label(context).copyWith(
-                  fontSize: 12,
-                ),
-              ),
-              const SizedBox(
-                height: 4,
-              ),
-              Text(
-                "Recovery Phrase",
-                textAlign: TextAlign.center,
-                style: STextStyles.pageTitleH1(context),
-              ),
-              const SizedBox(
-                height: 16,
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).extension<StackColors>()!.popupBG,
-                  borderRadius: BorderRadius.circular(
-                      Constants.size.circularBorderRadius),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Text(
-                    "Please write down your recovery phrase in the correct order and save it to keep your funds secure. You will also be asked to verify the words on the next screen.",
-                    style: STextStyles.label(context).copyWith(
-                        color: Theme.of(context)
-                            .extension<StackColors>()!
-                            .accentColorDark),
-                  ),
-                ),
-              ),
-              const SizedBox(
-                height: 8,
-              ),
               Expanded(
-                child: SingleChildScrollView(
-                  child: MnemonicTable(
-                    words: _mnemonic,
-                    isDesktop: false,
-                  ),
-                ),
+                child: frost
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          RoundedWhiteContainer(
+                            child: Text(
+                              "Please write down your backup data. Keep it safe and "
+                              "never share it with anyone. "
+                              "Your backup data is the only way you can access your "
+                              "funds if you forget your PIN, lose your phone, etc."
+                              "\n\n"
+                              "Stack Wallet does not keep nor is able to restore "
+                              "your backup data. "
+                              "Only you have access to your wallet.",
+                              style: STextStyles.label(context),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 24,
+                          ),
+                          // DetailItem(
+                          //   title: "My name",
+                          //   detail: frostWalletData!.myName,
+                          //   button: Util.isDesktop
+                          //       ? IconCopyButton(
+                          //           data: frostWalletData!.myName,
+                          //         )
+                          //       : SimpleCopyButton(
+                          //           data: frostWalletData!.myName,
+                          //         ),
+                          // ),
+                          // const SizedBox(
+                          //   height: 16,
+                          // ),
+                          DetailItem(
+                            title: "Multisig config",
+                            detail: widget.frostWalletData!.config,
+                            button: Util.isDesktop
+                                ? IconCopyButton(
+                                    data: widget.frostWalletData!.config,
+                                  )
+                                : SimpleCopyButton(
+                                    data: widget.frostWalletData!.config,
+                                  ),
+                          ),
+                          const SizedBox(
+                            height: 16,
+                          ),
+                          DetailItem(
+                            title: "Keys",
+                            detail: widget.frostWalletData!.keys,
+                            button: Util.isDesktop
+                                ? IconCopyButton(
+                                    data: widget.frostWalletData!.keys,
+                                  )
+                                : SimpleCopyButton(
+                                    data: widget.frostWalletData!.keys,
+                                  ),
+                          ),
+                          if (!Util.isDesktop) const Spacer(),
+                        ],
+                      )
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const SizedBox(
+                            height: 4,
+                          ),
+                          Text(
+                            _manager.walletName,
+                            textAlign: TextAlign.center,
+                            style: STextStyles.label(context).copyWith(
+                              fontSize: 12,
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 4,
+                          ),
+                          Text(
+                            "Recovery Phrase",
+                            textAlign: TextAlign.center,
+                            style: STextStyles.pageTitleH1(context),
+                          ),
+                          const SizedBox(
+                            height: 16,
+                          ),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Theme.of(context)
+                                  .extension<StackColors>()!
+                                  .popupBG,
+                              borderRadius: BorderRadius.circular(
+                                  Constants.size.circularBorderRadius),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: Text(
+                                "Please write down your recovery phrase in the correct order and save it to keep your funds secure. You will also be asked to verify the words on the next screen.",
+                                style: STextStyles.label(context).copyWith(
+                                    color: Theme.of(context)
+                                        .extension<StackColors>()!
+                                        .accentColorDark),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          Expanded(
+                            child: SingleChildScrollView(
+                              child: MnemonicTable(
+                                words: _mnemonic,
+                                isDesktop: false,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
               ),
               const SizedBox(
                 height: 16,

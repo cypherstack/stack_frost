@@ -17,6 +17,7 @@ import 'package:stackfrost/notifications/show_flush_bar.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/wallet_keys_desktop_popup.dart';
 import 'package:stackfrost/providers/desktop/storage_crypto_handler_provider.dart';
 import 'package:stackfrost/providers/providers.dart';
+import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/utilities/assets.dart';
 import 'package:stackfrost/utilities/constants.dart';
@@ -78,15 +79,28 @@ class _UnlockWalletKeysDesktopState
     if (verified) {
       Navigator.of(context, rootNavigator: true).pop();
 
-      final words = await ref
+      final wallet = ref
           .read(walletsChangeNotifierProvider)
           .getManager(widget.walletId)
-          .mnemonic;
+          .wallet;
+
+      final words = await wallet.mnemonic;
+
+      ({String keys, String config})? frostData;
+      if (wallet is FrostWallet) {
+        frostData = (
+          keys: (await wallet.getSerializedKeys)!,
+          config: (await wallet.multisigConfig)!,
+        );
+      }
 
       if (mounted) {
         await Navigator.of(context).pushReplacementNamed(
           WalletKeysDesktopPopup.routeName,
-          arguments: words,
+          arguments: (
+            mnemonic: words,
+            frostData: frostData,
+          ),
         );
       }
     } else {
@@ -295,16 +309,29 @@ class _UnlockWalletKeysDesktopState
                             if (verified) {
                               Navigator.of(context, rootNavigator: true).pop();
 
-                              final words = await ref
+                              final wallet = ref
                                   .read(walletsChangeNotifierProvider)
                                   .getManager(widget.walletId)
-                                  .mnemonic;
+                                  .wallet;
+
+                              final words = await wallet.mnemonic;
+
+                              ({String keys, String config})? frostData;
+                              if (wallet is FrostWallet) {
+                                frostData = (
+                                  keys: (await wallet.getSerializedKeys)!,
+                                  config: (await wallet.multisigConfig)!,
+                                );
+                              }
 
                               if (mounted) {
                                 await Navigator.of(context)
                                     .pushReplacementNamed(
                                   WalletKeysDesktopPopup.routeName,
-                                  arguments: words,
+                                  arguments: (
+                                    mnemonic: words,
+                                    frostData: frostData,
+                                  ),
                                 );
                               }
                             } else {

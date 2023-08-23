@@ -53,7 +53,7 @@ class WalletBackupView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     debugPrint("BUILD: $runtimeType");
 
-    bool frost = frostWalletData != null;
+    final bool frost = frostWalletData != null;
 
     return Background(
       child: Scaffold(
@@ -127,20 +127,20 @@ class WalletBackupView extends ConsumerWidget {
                     const SizedBox(
                       height: 24,
                     ),
-                    DetailItem(
-                      title: "My name",
-                      detail: frostWalletData!.myName,
-                      button: Util.isDesktop
-                          ? IconCopyButton(
-                              data: frostWalletData!.myName,
-                            )
-                          : SimpleCopyButton(
-                              data: frostWalletData!.myName,
-                            ),
-                    ),
-                    const SizedBox(
-                      height: 16,
-                    ),
+                    // DetailItem(
+                    //   title: "My name",
+                    //   detail: frostWalletData!.myName,
+                    //   button: Util.isDesktop
+                    //       ? IconCopyButton(
+                    //           data: frostWalletData!.myName,
+                    //         )
+                    //       : SimpleCopyButton(
+                    //           data: frostWalletData!.myName,
+                    //         ),
+                    // ),
+                    // const SizedBox(
+                    //   height: 16,
+                    // ),
                     DetailItem(
                       title: "Multisig config",
                       detail: frostWalletData!.config,

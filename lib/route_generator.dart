@@ -1356,6 +1356,19 @@ class RouteGenerator {
               name: settings.name,
             ),
           );
+        } else if (args is Tuple3<Manager, List<String>,
+            ({String myName, String config, String keys})?>) {
+          return getRoute(
+            shouldUseMaterialRoute: useMaterialPageRoute,
+            builder: (_) => DeleteWalletRecoveryPhraseView(
+              manager: args.item1,
+              mnemonic: args.item2,
+              frostWalletData: args.item3,
+            ),
+            settings: RouteSettings(
+              name: settings.name,
+            ),
+          );
         }
         return _routeError("${settings.name} invalid args: ${args.toString()}");
 
@@ -1559,7 +1572,29 @@ class RouteGenerator {
             settings: RouteSettings(name: settings.name));
 
       case WalletKeysDesktopPopup.routeName:
-        if (args is List<String>) {
+        if (args is ({
+          List<String> mnemonic,
+          ({String keys, String config}) frostData
+        })) {
+          return FadePageRoute(
+            WalletKeysDesktopPopup(
+              words: args.mnemonic,
+              frostData: args.frostData,
+            ),
+            RouteSettings(
+              name: settings.name,
+            ),
+          );
+          // return getRoute(
+          //   shouldUseMaterialRoute: useMaterialPageRoute,
+          //   builder: (_) => WalletKeysDesktopPopup(
+          //     words: args,
+          //   ),
+          //   settings: RouteSettings(
+          //     name: settings.name,
+          //   ),
+          // );
+        } else if (args is List<String>) {
           return FadePageRoute(
             WalletKeysDesktopPopup(
               words: args,

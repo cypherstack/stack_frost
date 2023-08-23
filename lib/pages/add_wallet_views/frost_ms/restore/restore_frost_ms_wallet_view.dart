@@ -63,25 +63,20 @@ class RestoreFrostMsWalletView extends ConsumerStatefulWidget {
 
 class _RestoreFrostMsWalletViewState
     extends ConsumerState<RestoreFrostMsWalletView> {
-  late final TextEditingController myNameFieldController,
-      keysFieldController,
-      configFieldController;
-  late final FocusNode myNameFocusNode, keysFocusNode, configFocusNode;
+  late final TextEditingController keysFieldController, configFieldController;
+  late final FocusNode keysFocusNode, configFocusNode;
 
-  bool _nameEmpty = true, _keysEmpty = true, _configEmpty = true;
+  bool _keysEmpty = true, _configEmpty = true;
 
   bool _restoreButtonLock = false;
 
   Future<Manager> _createWallet() async {
-    final myName = myNameFieldController.text;
     final keys = keysFieldController.text;
     final config = configFieldController.text;
 
+    final myNameIndex = getParticipantIndexFromKeys(serializedKeys: keys);
     final participants = Frost.getParticipants(multisigConfig: config);
-
-    if (!participants.contains(myName)) {
-      throw Exception("My name not found in config participants");
-    }
+    final myName = participants[myNameIndex];
 
     final walletsService = ref.read(walletsServiceChangeNotifierProvider);
 
@@ -246,10 +241,8 @@ class _RestoreFrostMsWalletViewState
 
   @override
   void initState() {
-    myNameFieldController = TextEditingController();
     keysFieldController = TextEditingController();
     configFieldController = TextEditingController();
-    myNameFocusNode = FocusNode();
     keysFocusNode = FocusNode();
     configFocusNode = FocusNode();
     super.initState();
@@ -257,10 +250,8 @@ class _RestoreFrostMsWalletViewState
 
   @override
   void dispose() {
-    myNameFieldController.dispose();
     keysFieldController.dispose();
     configFieldController.dispose();
-    myNameFocusNode.dispose();
     keysFocusNode.dispose();
     configFocusNode.dispose();
     super.dispose();
@@ -323,89 +314,6 @@ class _RestoreFrostMsWalletViewState
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(
-              height: 16,
-            ),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(
-                Constants.size.circularBorderRadius,
-              ),
-              child: TextField(
-                key: const Key("frMyNameTextFieldKey"),
-                controller: myNameFieldController,
-                onChanged: (_) {
-                  setState(() {
-                    _nameEmpty = myNameFieldController.text.isEmpty;
-                  });
-                },
-                focusNode: myNameFocusNode,
-                readOnly: false,
-                autocorrect: false,
-                enableSuggestions: false,
-                style: STextStyles.field(context),
-                decoration: standardInputDecoration(
-                  "My name",
-                  myNameFocusNode,
-                  context,
-                ).copyWith(
-                  contentPadding: const EdgeInsets.only(
-                    left: 16,
-                    top: 6,
-                    bottom: 8,
-                    right: 5,
-                  ),
-                  suffixIcon: Padding(
-                    padding: _nameEmpty
-                        ? const EdgeInsets.only(right: 8)
-                        : const EdgeInsets.only(right: 0),
-                    child: UnconstrainedBox(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          !_nameEmpty
-                              ? TextFieldIconButton(
-                                  semanticsLabel:
-                                      "Clear Button. Clears The Config Field.",
-                                  key: const Key("frMyNameClearButtonKey"),
-                                  onTap: () {
-                                    myNameFieldController.text = "";
-
-                                    setState(() {
-                                      _nameEmpty = true;
-                                    });
-                                  },
-                                  child: const XIcon(),
-                                )
-                              : TextFieldIconButton(
-                                  semanticsLabel:
-                                      "Paste Button. Pastes From Clipboard To Name Field.",
-                                  key: const Key("frMyNamePasteButtonKey"),
-                                  onTap: () async {
-                                    final ClipboardData? data =
-                                        await Clipboard.getData(
-                                            Clipboard.kTextPlain);
-                                    if (data?.text != null &&
-                                        data!.text!.isNotEmpty) {
-                                      myNameFieldController.text =
-                                          data.text!.trim();
-                                    }
-
-                                    setState(() {
-                                      _nameEmpty =
-                                          myNameFieldController.text.isEmpty;
-                                    });
-                                  },
-                                  child: _nameEmpty
-                                      ? const ClipboardIcon()
-                                      : const XIcon(),
-                                ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
             const SizedBox(
               height: 16,
             ),
@@ -612,7 +520,7 @@ class _RestoreFrostMsWalletViewState
             ),
             PrimaryButton(
               label: "Restore",
-              enabled: !_keysEmpty && !_configEmpty && !_nameEmpty,
+              enabled: !_keysEmpty && !_configEmpty,
               onPressed: _restore,
             ),
           ],
