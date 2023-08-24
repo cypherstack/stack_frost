@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/reshare_ms_config_view.dart';
+import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/reshare_ms_config_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
 import 'package:stackfrost/providers/global/wallets_provider.dart';
@@ -18,37 +18,37 @@ import 'package:stackfrost/widgets/desktop/desktop_scaffold.dart';
 import 'package:stackfrost/widgets/desktop/primary_button.dart';
 import 'package:stackfrost/widgets/stack_dialog.dart';
 
-final class ModifyParticipantsView extends ConsumerStatefulWidget {
-  const ModifyParticipantsView({
+final class CompleteResharingConfigView extends ConsumerStatefulWidget {
+  const CompleteResharingConfigView({
     super.key,
     required this.walletId,
   });
 
-  static const String routeName = "/modifyParticipantsView";
+  static const String routeName = "/completeResharingConfigView";
 
   final String walletId;
 
   @override
-  ConsumerState<ModifyParticipantsView> createState() =>
-      _ModifyParticipantsViewState();
+  ConsumerState<CompleteResharingConfigView> createState() =>
+      _CompleteResharingConfigViewState();
 }
 
-class _ModifyParticipantsViewState
-    extends ConsumerState<ModifyParticipantsView> {
-  final _thresholdController = TextEditingController();
-  final _participantsController = TextEditingController();
+class _CompleteResharingConfigViewState
+    extends ConsumerState<CompleteResharingConfigView> {
+  final _newThresholdController = TextEditingController();
+  final _newParticipantsCountController = TextEditingController();
 
   final List<TextEditingController> controllers = [];
 
   int _participantsCount = 0;
 
   String _validateInputData(FrostWallet wallet) {
-    final threshold = int.tryParse(_thresholdController.text);
+    final threshold = int.tryParse(_newThresholdController.text);
     if (threshold == null) {
       return "Choose a threshold";
     }
 
-    final partsCount = int.tryParse(_participantsController.text);
+    final partsCount = int.tryParse(_newParticipantsCountController.text);
     if (partsCount == null) {
       return "Choose total number of participants";
     }
@@ -57,18 +57,12 @@ class _ModifyParticipantsViewState
       return "Threshold cannot be greater than the number of participants";
     }
 
-    if (controllers.length != partsCount) {
-      return "Participants count error";
+    if (partsCount < 2) {
+      return "At least two participants required";
     }
 
-    int oldSignersCount = 0;
-    for (final controller in controllers) {
-      if (wallet.participants.contains(controller.text)) {
-        oldSignersCount++;
-      }
-    }
-    if (wallet.threshold > oldSignersCount) {
-      return "Must keep at least ${wallet.threshold} previous participants";
+    if (controllers.length != partsCount) {
+      return "Participants count error";
     }
 
     final hasEmptyParticipants = controllers
@@ -78,7 +72,6 @@ class _ModifyParticipantsViewState
       return "Participants must not be empty";
     }
 
-    // TODO not sure if duplicate participant names are allowed
     if (controllers.length != controllers.map((e) => e.text).toSet().length) {
       return "Duplicate participant name found";
     }
@@ -109,26 +102,9 @@ class _ModifyParticipantsViewState
   }
 
   @override
-  void initState() {
-    final wallet = ref
-        .read(walletsChangeNotifierProvider)
-        .getManager(widget.walletId)
-        .wallet as FrostWallet;
-
-    for (final participant in wallet.participants) {
-      controllers.add(TextEditingController()..text = participant);
-    }
-
-    _thresholdController.text = wallet.threshold.toString();
-    _participantsController.text = wallet.participants.length.toString();
-
-    super.initState();
-  }
-
-  @override
   void dispose() {
-    _thresholdController.dispose();
-    _participantsController.dispose();
+    _newThresholdController.dispose();
+    _newParticipantsCountController.dispose();
     for (final e in controllers) {
       e.dispose();
     }
@@ -194,25 +170,31 @@ class _ModifyParticipantsViewState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Edit threshold",
+              "New threshold",
               style: STextStyles.label(context),
+            ),
+            const SizedBox(
+              height: 10,
             ),
             TextField(
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              controller: _thresholdController,
+              controller: _newThresholdController,
             ),
             const SizedBox(
               height: 16,
             ),
             Text(
-              "Edit number of participants",
+              "Number of participants",
               style: STextStyles.label(context),
+            ),
+            const SizedBox(
+              height: 10,
             ),
             TextField(
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              controller: _participantsController,
+              controller: _newParticipantsCountController,
               onChanged: _participantsCountChanged,
             ),
             const SizedBox(
@@ -227,8 +209,6 @@ class _ModifyParticipantsViewState
                         top: 10,
                       ),
                       child: TextField(
-                        enabled: controllers[i].text !=
-                            ref.watch(pFrostMyName.state).state!,
                         controller: controllers[i],
                       ),
                     ),
@@ -239,7 +219,7 @@ class _ModifyParticipantsViewState
               height: 16,
             ),
             PrimaryButton(
-              label: "Generate",
+              label: "Generate config",
               onPressed: () async {
                 if (FocusScope.of(context).hasFocus) {
                   FocusScope.of(context).unfocus();
@@ -260,14 +240,13 @@ class _ModifyParticipantsViewState
                   );
                 }
 
-                final config = Frost.createMultisigConfig(
-                  name: ref.watch(pFrostMyName.state).state!,
-                  threshold: int.parse(_thresholdController.text),
-                  participants: controllers.map((e) => e.text).toList(),
+                final config = Frost.createResharerConfig(
+                  newThreshold: int.parse(_newThresholdController.text),
+                  resharers: ref.read(pFrostResharers).values.toList(),
+                  newParticipants: controllers.map((e) => e.text).toList(),
                 );
 
-                ref.read(pFrostMyName.notifier).state = controllers.first.text;
-                ref.read(pFrostMultisigConfig.notifier).state = config;
+                ref.read(pFrostResharerConfig.notifier).state = config;
 
                 await Navigator.of(context).pushNamed(
                   ReshareMultisigConfigView.routeName,

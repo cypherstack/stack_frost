@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
-import 'package:stackfrost/services/frost.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
 import 'package:stackfrost/utilities/util.dart';
@@ -61,7 +60,7 @@ class _ShareNewMultisigConfigViewState
                 },
               ),
               title: Text(
-                "Updated multisig config",
+                "Resharer config",
                 style: STextStyles.navBarTitle(context),
               ),
             ),
@@ -95,7 +94,7 @@ class _ShareNewMultisigConfigViewState
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   QrImageView(
-                    data: ref.watch(pFrostMultisigConfig.state).state!,
+                    data: ref.watch(pFrostResharerConfig.state).state!,
                     size: 220,
                     backgroundColor:
                         Theme.of(context).extension<StackColors>()!.background,
@@ -111,7 +110,7 @@ class _ShareNewMultisigConfigViewState
             ),
             RoundedWhiteContainer(
               child: SelectableText(
-                ref.watch(pFrostMultisigConfig.state).state!,
+                ref.watch(pFrostResharerConfig.state).state!,
                 style: STextStyles.itemSubtitle(context),
               ),
             ),
@@ -123,13 +122,13 @@ class _ShareNewMultisigConfigViewState
                 flex: 2,
               ),
             PrimaryButton(
-              label: "Start key generation",
+              label: "Start resharing",
               onPressed: () async {
-                ref.read(pFrostStartKeyGenData.notifier).state =
-                    Frost.startKeyGeneration(
-                  multisigConfig: ref.watch(pFrostMultisigConfig.state).state!,
-                  myName: ref.read(pFrostMyName.state).state!,
-                );
+                // ref.read(pFrostStartKeyGenData.notifier).state =
+                //     Frost.startKeyGeneration(
+                //   multisigConfig: ref.watch(pFrostMultisigConfig.state).state!,
+                //   myName: ref.read(pFrostMyName.state).state!,
+                // );
 
                 // await Navigator.of(context).pushNamed(
                 //   FrostShareCommitmentsView.routeName,

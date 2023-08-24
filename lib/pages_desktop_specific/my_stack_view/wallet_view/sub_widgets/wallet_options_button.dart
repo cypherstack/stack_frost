@@ -13,7 +13,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/modify_participants_view.dart';
+import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/start_resharing_config_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_settings_wallet_settings/xpub_view.dart';
 import 'package:stackfrost/pages_desktop_specific/addresses/desktop_wallet_addresses_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/desktop_delete_wallet_dialog.dart';
@@ -111,7 +111,7 @@ class WalletOptionsButton extends ConsumerWidget {
                   .myName;
               unawaited(
                 Navigator.of(context).pushNamed(
-                  ModifyParticipantsView.routeName,
+                  StartResharingConfigView.routeName,
                   arguments: walletId,
                 ),
               );

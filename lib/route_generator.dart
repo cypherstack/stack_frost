@@ -96,8 +96,9 @@ import 'package:stackfrost/pages/settings_views/global_settings_view/syncing_pre
 import 'package:stackfrost/pages/settings_views/global_settings_view/syncing_preferences_views/wallet_syncing_options_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/frost_ms_options_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/frost_participants_view.dart';
-import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/modify_participants_view.dart';
-import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/reshare_ms_config_view.dart';
+import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/complete_resharing_config_view.dart';
+import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/reshare_ms_config_view.dart';
+import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/start_resharing_config_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_backup_views/wallet_backup_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_network_settings_view/wallet_network_settings_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_settings_view.dart';
@@ -1023,11 +1024,25 @@ class RouteGenerator {
         }
         return _routeError("${settings.name} invalid args: ${args.toString()}");
 
-      case ModifyParticipantsView.routeName:
+      case StartResharingConfigView.routeName:
         if (args is String) {
           return getRoute(
             shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => ModifyParticipantsView(
+            builder: (_) => StartResharingConfigView(
+              walletId: args,
+            ),
+            settings: RouteSettings(
+              name: settings.name,
+            ),
+          );
+        }
+        return _routeError("${settings.name} invalid args: ${args.toString()}");
+
+      case CompleteResharingConfigView.routeName:
+        if (args is String) {
+          return getRoute(
+            shouldUseMaterialRoute: useMaterialPageRoute,
+            builder: (_) => CompleteResharingConfigView(
               walletId: args,
             ),
             settings: RouteSettings(

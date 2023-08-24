@@ -45,6 +45,10 @@ final pFrostContinueSignData = StateProvider<
       String share,
     })?>((ref) => null);
 
-// ================= shared/util ======================================
+// ===================== shared/util ===========================================
 final pFrostSelectParticipantsUnordered =
     StateProvider<List<String>?>((ref) => null);
+
+// ========================= resharing =========================================
+final pFrostResharers = Provider<Map<String, int>>((ref) => {});
+final pFrostResharerConfig = StateProvider<String?>((ref) => null);
