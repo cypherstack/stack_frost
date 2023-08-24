@@ -13,11 +13,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/modify_participants_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_settings_wallet_settings/xpub_view.dart';
 import 'package:stackfrost/pages_desktop_specific/addresses/desktop_wallet_addresses_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/desktop_delete_wallet_dialog.dart';
+import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
 import 'package:stackfrost/providers/providers.dart';
 import 'package:stackfrost/route_generator.dart';
+import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/utilities/assets.dart';
 import 'package:stackfrost/utilities/constants.dart';
@@ -26,6 +29,7 @@ import 'package:stackfrost/utilities/text_styles.dart';
 enum _WalletOptions {
   addressList,
   deleteWallet,
+  resharing,
   // changeRepresentative,
   showXpub;
 
@@ -35,6 +39,8 @@ enum _WalletOptions {
         return "Address list";
       case _WalletOptions.deleteWallet:
         return "Delete wallet";
+      case _WalletOptions.resharing:
+        return "Resharing";
       // case _WalletOptions.changeRepresentative:
       //   return "Change representative";
       case _WalletOptions.showXpub:
@@ -43,7 +49,7 @@ enum _WalletOptions {
   }
 }
 
-class WalletOptionsButton extends StatelessWidget {
+class WalletOptionsButton extends ConsumerWidget {
   const WalletOptionsButton({
     Key? key,
     required this.walletId,
@@ -52,7 +58,7 @@ class WalletOptionsButton extends StatelessWidget {
   final String walletId;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return RawMaterialButton(
       constraints: const BoxConstraints(
         minHeight: 32,
@@ -73,6 +79,9 @@ class WalletOptionsButton extends StatelessWidget {
               onAddressListPressed: () async {
                 Navigator.of(context).pop(_WalletOptions.addressList);
               },
+              onResharingPressed: () async {
+                Navigator.of(context).pop(_WalletOptions.resharing);
+              },
               // onChangeRepPressed: () async {
               //   Navigator.of(context).pop(_WalletOptions.changeRepresentative);
               // },
@@ -90,6 +99,19 @@ class WalletOptionsButton extends StatelessWidget {
               unawaited(
                 Navigator.of(context).pushNamed(
                   DesktopWalletAddressesView.routeName,
+                  arguments: walletId,
+                ),
+              );
+              break;
+            case _WalletOptions.resharing:
+              ref.read(pFrostMyName.state).state = (ref
+                      .read(walletsChangeNotifierProvider)
+                      .getManager(walletId)
+                      .wallet as FrostWallet)
+                  .myName;
+              unawaited(
+                Navigator.of(context).pushNamed(
+                  ModifyParticipantsView.routeName,
                   arguments: walletId,
                 ),
               );
@@ -203,6 +225,7 @@ class WalletOptionsPopupMenu extends ConsumerWidget {
     required this.onDeletePressed,
     required this.onAddressListPressed,
     required this.onShowXpubPressed,
+    required this.onResharingPressed,
     // required this.onChangeRepPressed,
     required this.walletId,
   }) : super(key: key);
@@ -210,6 +233,7 @@ class WalletOptionsPopupMenu extends ConsumerWidget {
   final VoidCallback onDeletePressed;
   final VoidCallback onAddressListPressed;
   final VoidCallback onShowXpubPressed;
+  final VoidCallback onResharingPressed;
   // final VoidCallback onChangeRepPressed;
   final String walletId;
 
@@ -349,6 +373,41 @@ class WalletOptionsPopupMenu extends ConsumerWidget {
                         ),
                       ),
                     ),
+                  const SizedBox(
+                    height: 8,
+                  ),
+                  TransparentButton(
+                    onPressed: onResharingPressed,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          SvgPicture.asset(
+                            Assets.svg.exchangeDesktop,
+                            width: 20,
+                            height: 20,
+                            color: Theme.of(context)
+                                .extension<StackColors>()!
+                                .textFieldActiveSearchIconLeft,
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Text(
+                              _WalletOptions.resharing.prettyName,
+                              style: STextStyles.desktopTextExtraExtraSmall(
+                                      context)
+                                  .copyWith(
+                                color: Theme.of(context)
+                                    .extension<StackColors>()!
+                                    .textDark,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                   const SizedBox(
                     height: 8,
                   ),
