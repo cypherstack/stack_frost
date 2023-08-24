@@ -59,29 +59,7 @@ class _TransactionCardState extends ConsumerState<TransactionCard> {
       coin.requiredConfirmations,
     );
 
-    if (type != TransactionType.incoming &&
-        _transaction.subType == TransactionSubType.mint) {
-      // if (type == "Received") {
-      if (confirmedStatus) {
-        return "Anonymized";
-      } else {
-        return "Anonymizing";
-      }
-      // } else if (type == "Sent") {
-      //   if (_transaction.confirmedStatus) {
-      //     return "Sent MINT";
-      //   } else {
-      //     return "Sending MINT";
-      //   }
-      // } else {
-      //   return type;
-      // }
-    }
-
     if (type == TransactionType.incoming) {
-      // if (_transaction.isMinting) {
-      //   return "Minting";
-      // } else
       if (confirmedStatus) {
         return "Received";
       } else {

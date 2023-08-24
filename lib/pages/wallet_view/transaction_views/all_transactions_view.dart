@@ -444,12 +444,12 @@ class _TransactionDetailsViewState extends ConsumerState<AllTransactionsView> {
               ),
             if (isDesktop &&
                 ref.watch(transactionFilterProvider.state).state != null)
-              Padding(
-                padding: const EdgeInsets.symmetric(
+              const Padding(
+                padding: EdgeInsets.symmetric(
                   vertical: 8,
                 ),
                 child: Row(
-                  children: const [
+                  children: [
                     TransactionFilterOptionBar(),
                   ],
                 ),
@@ -801,18 +801,6 @@ class _DesktopTransactionCardRowState
   late final String walletId;
 
   String whatIsIt(TransactionType type, Coin coin, int height) {
-    if (_transaction.slateId == null) {
-      return "Restored Funds";
-    }
-
-    if (_transaction.subType == TransactionSubType.mint) {
-      if (_transaction.isConfirmed(height, coin.requiredConfirmations)) {
-        return "Anonymized";
-      } else {
-        return "Anonymizing";
-      }
-    }
-
     if (type == TransactionType.incoming) {
       if (_transaction.isConfirmed(height, coin.requiredConfirmations)) {
         return "Received";
