@@ -401,7 +401,180 @@ abstract class Frost {
       return configPtr;
     } catch (e, s) {
       Logging.instance.log(
-        "validateEncodedSignConfig failed: $e\n$s",
+        "decodedSignConfig failed: $e\n$s",
+        level: LogLevel.Fatal,
+      );
+      rethrow;
+    }
+  }
+
+  //========================== resharing =======================================
+
+  static String createResharerConfig({
+    required int newThreshold,
+    required List<int> resharers,
+    required List<String> newParticipants,
+  }) {
+    try {
+      final config = newResharerConfig(
+        newThreshold: newThreshold,
+        newParticipants: newParticipants,
+        resharers: resharers,
+      );
+
+      return config;
+    } catch (e, s) {
+      Logging.instance.log(
+        "createResharerConfig failed: $e\n$s",
+        level: LogLevel.Fatal,
+      );
+      rethrow;
+    }
+  }
+
+  // TODO change return value?
+  static Pointer<StartResharerRes> beginResharer({
+    required String serializedKeys,
+    required String config,
+  }) {
+    try {
+      final result = startResharer(
+        serializedKeys: serializedKeys,
+        config: config,
+      );
+
+      return result;
+    } catch (e, s) {
+      Logging.instance.log(
+        "beginResharer failed: $e\n$s",
+        level: LogLevel.Fatal,
+      );
+      rethrow;
+    }
+  }
+
+// TODO change return value?
+  static Pointer<StartResharedRes> beingReshared({
+    required String multisigConfig,
+    required String resharerConfig,
+    required List<String> resharerStarts,
+  }) {
+    try {
+      final result = startReshared(
+        multisigConfig: multisigConfig,
+        resharerConfig: resharerConfig,
+        resharerStarts: resharerStarts,
+      );
+      return result;
+    } catch (e, s) {
+      Logging.instance.log(
+        "beingReshared failed: $e\n$s",
+        level: LogLevel.Fatal,
+      );
+      rethrow;
+    }
+  }
+
+// TODO change return value
+  CResult_CompleteResharerRes finishResharer({
+    required StartResharerRes machine,
+    required List<String> encryptionKeysOfResharedTo,
+  }) {
+    try {
+      final result = completeResharer(
+        machine: machine,
+        encryptionKeysOfResharedTo: encryptionKeysOfResharedTo,
+      );
+      return result;
+    } catch (e, s) {
+      Logging.instance.log(
+        "finishResharer failed: $e\n$s",
+        level: LogLevel.Fatal,
+      );
+      rethrow;
+    }
+  }
+
+// TODO change return value
+  CResult_CompleteResharedRes finishReshared({
+    required StartResharedRes machine,
+    required List<String> resharerCompletes,
+  }) {
+    try {
+      final result = completeReshared(
+        machine: machine,
+        resharerCompletes: resharerCompletes,
+      );
+      return result;
+    } catch (e, s) {
+      Logging.instance.log(
+        "finishReshared failed: $e\n$s",
+        level: LogLevel.Fatal,
+      );
+      rethrow;
+    }
+  }
+
+  static Pointer<ResharerConfig> decodedResharerConfig({
+    required String resharerConfig,
+  }) {
+    try {
+      final config = decodeResharerConfig(resharerConfig: resharerConfig);
+
+      return config;
+    } catch (e, s) {
+      Logging.instance.log(
+        "decodedResharerConfig failed: $e\n$s",
+        level: LogLevel.Fatal,
+      );
+      rethrow;
+    }
+  }
+
+  static ({
+    int newThreshold,
+    List<int> resharers,
+    List<String> newParticipants,
+  }) extractResharerConfigData({
+    required String resharerConfig,
+  }) {
+    try {
+      final configPointer =
+          decodedResharerConfig(resharerConfig: resharerConfig);
+
+      final newThreshold = resharerNewThreshold(
+        resharerConfigPointer: configPointer,
+      );
+
+      final resharersCount = resharerResharers(
+        resharerConfigPointer: configPointer,
+      );
+      final List<int> resharers = [];
+      for (int i = 0; i < resharersCount; i++) {
+        resharers.add(
+          resharerResharer(resharerConfigPointer: configPointer, index: i),
+        );
+      }
+
+      final newParticipantsCount = resharerNewThreshold(
+        resharerConfigPointer: configPointer,
+      );
+      final List<String> newParticipants = [];
+      for (int i = 0; i < newParticipantsCount; i++) {
+        newParticipants.add(
+          resharerNewParticipant(
+              resharerConfigPointer: configPointer, index: i),
+        );
+      }
+
+      return (
+        newThreshold: newThreshold,
+        resharers: resharers,
+        newParticipants: newParticipants,
+      );
+    } catch (e, s) {
+      Logging.instance.log(
+        "extractResharerConfigData failed: $e\n$s",
         level: LogLevel.Fatal,
       );
       rethrow;
