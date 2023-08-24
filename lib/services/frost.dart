@@ -432,8 +432,10 @@ abstract class Frost {
     }
   }
 
-  // TODO change return value?
-  static Pointer<StartResharerRes> beginResharer({
+  static ({
+    String resharerStart,
+    Pointer<StartResharerRes> machine,
+  }) beginResharer({
     required String serializedKeys,
     required String config,
   }) {
@@ -443,7 +445,10 @@ abstract class Frost {
         config: config,
       );
 
-      return result;
+      return (
+        resharerStart: result.encoded,
+        machine: result.machine,
+      );
     } catch (e, s) {
       Logging.instance.log(
         "beginResharer failed: $e\n$s",
@@ -453,19 +458,24 @@ abstract class Frost {
     }
   }
 
-// TODO change return value?
-  static Pointer<StartResharedRes> beingReshared({
-    required String multisigConfig,
+  static ({
+    String resharedStart,
+    Pointer<StartResharedRes> prior,
+  }) beginReshared({
+    required String myName,
     required String resharerConfig,
     required List<String> resharerStarts,
   }) {
     try {
       final result = startReshared(
-        multisigConfig: multisigConfig,
+        myName: myName,
         resharerConfig: resharerConfig,
         resharerStarts: resharerStarts,
       );
-      return result;
+      return (
+        resharedStart: result.encoded,
+        prior: result.machine,
+      );
     } catch (e, s) {
       Logging.instance.log(
         "beingReshared failed: $e\n$s",
@@ -475,8 +485,7 @@ abstract class Frost {
     }
   }
 
-// TODO change return value
-  CResult_CompleteResharerRes finishResharer({
+  static String finishResharer({
     required StartResharerRes machine,
     required List<String> encryptionKeysOfResharedTo,
   }) {
@@ -495,14 +504,13 @@ abstract class Frost {
     }
   }
 
-// TODO change return value
-  CResult_CompleteResharedRes finishReshared({
-    required StartResharedRes machine,
+  static String finishReshared({
+    required StartResharedRes prior,
     required List<String> resharerCompletes,
   }) {
     try {
       final result = completeReshared(
-        machine: machine,
+        prior: prior,
         resharerCompletes: resharerCompletes,
       );
       return result;
@@ -539,8 +547,9 @@ abstract class Frost {
     required String resharerConfig,
   }) {
     try {
-      final configPointer =
-          decodedResharerConfig(resharerConfig: resharerConfig);
+      final configPointer = decodedResharerConfig(
+        resharerConfig: resharerConfig,
+      );
 
       final newThreshold = resharerNewThreshold(
         resharerConfigPointer: configPointer,
@@ -552,7 +561,10 @@ abstract class Frost {
       final List<int> resharers = [];
       for (int i = 0; i < resharersCount; i++) {
         resharers.add(
-          resharerResharer(resharerConfigPointer: configPointer, index: i),
+          resharerResharer(
+            resharerConfigPointer: configPointer,
+            index: i,
+          ),
         );
       }
 
@@ -563,7 +575,9 @@ abstract class Frost {
       for (int i = 0; i < newParticipantsCount; i++) {
         newParticipants.add(
           resharerNewParticipant(
-              resharerConfigPointer: configPointer, index: i),
+            resharerConfigPointer: configPointer,
+            index: i,
+          ),
         );
       }
 
