@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/step_2/start_resharer_view.dart';
+import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/step_2/begin_resharing_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
 import 'package:stackfrost/providers/global/wallets_provider.dart';
@@ -37,6 +37,8 @@ class DisplayReshareConfigView extends ConsumerStatefulWidget {
 
 class _DisplayReshareConfigViewState
     extends ConsumerState<DisplayReshareConfigView> {
+  late final bool iAmInvolved;
+
   bool _buttonLock = false;
 
   Future<void> _onPressed() async {
@@ -61,7 +63,7 @@ class _DisplayReshareConfigViewState
         ref.read(pFrostResharerData.state).state = result;
 
         await Navigator.of(context).pushNamed(
-          StartResharingView.routeName,
+          BeginResharingView.routeName,
           arguments: widget.walletId,
         );
       }
@@ -81,6 +83,13 @@ class _DisplayReshareConfigViewState
     } finally {
       _buttonLock = false;
     }
+  }
+
+  @override
+  void initState() {
+    iAmInvolved =
+        ref.read(pFrostResharers).keys.contains(ref.read(pFrostMyName)!);
+    super.initState();
   }
 
   @override
@@ -173,10 +182,11 @@ class _DisplayReshareConfigViewState
               const Spacer(
                 flex: 2,
               ),
-            PrimaryButton(
-              label: "Start resharing",
-              onPressed: _onPressed,
-            ),
+            if (iAmInvolved)
+              PrimaryButton(
+                label: "Start resharing",
+                onPressed: _onPressed,
+              ),
           ],
         ),
       ),

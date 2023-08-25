@@ -66,7 +66,7 @@ class _FrostShareSharesViewState extends ConsumerState<FrostShareSharesView> {
     myIndex = participants.indexOf(ref.read(pFrostMyName.state).state!);
     myShare = ref.read(pFrostSecretSharesData.state).state!.share;
 
-    // temporarily remove my name
+    // temporarily remove my name. Added back later
     participants.removeAt(myIndex);
 
     for (int i = 0; i < participants.length; i++) {
@@ -358,7 +358,7 @@ class _FrostShareSharesViewState extends ConsumerState<FrostShareSharesView> {
                     return await showDialog<void>(
                       context: context,
                       builder: (_) => StackOkDialog(
-                        title: "Missing commitments",
+                        title: "Missing shares",
                         desktopPopRootNavigator: Util.isDesktop,
                       ),
                     );
