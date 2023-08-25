@@ -573,7 +573,7 @@ abstract class Frost {
         );
       }
 
-      final newParticipantsCount = resharerNewThreshold(
+      final newParticipantsCount = resharerNewParticipants(
         resharerConfigPointer: configPointer,
       );
       final List<String> newParticipants = [];
