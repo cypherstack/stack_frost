@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:ffi';
 import 'dart:typed_data';
 
-import 'package:bitcoindart/bitcoindart.dart';
 import 'package:frostdart/frostdart.dart' as frost;
 import 'package:frostdart/frostdart_bindings_generated.dart';
 import 'package:isar/isar.dart';
@@ -83,17 +82,6 @@ class FrostWallet extends CoinServiceAPI
   late final TransactionNotificationTracker txTracker;
 
   bool longMutex = false;
-
-  NetworkType get _network {
-    switch (coin) {
-      case Coin.bitcoin:
-        return bitcoin;
-      case Coin.bitcoinTestNet:
-        return testnet;
-      default:
-        throw Exception("Invalid network type!");
-    }
-  }
 
   Future<int> get chainHeight async {
     try {
@@ -496,6 +484,22 @@ class FrostWallet extends CoinServiceAPI
     }
   }
 
+  Future<void> updateWithResharedData({
+    required String serializedKeys,
+    required String reshareConfig,
+  }) async {
+    await _saveSerializedKeys(serializedKeys);
+    await _saveReshareConfig(reshareConfig);
+
+    final data = Frost.extractResharerConfigData(
+      resharerConfig: reshareConfig,
+    );
+
+    await saveThreshold(data.newThreshold);
+
+    await updateParticipants(data.newParticipants);
+  }
+
   Future<void> recoverFromSerializedKeys({
     required String serializedKeys,
     required String multisigConfig,
@@ -575,6 +579,15 @@ class FrostWallet extends CoinServiceAPI
   Future<void> _saveMultisigConfig(String multisigConfig) async =>
       await _secureStore.write(
         key: "{$walletId}_multisigConfig",
+        value: multisigConfig,
+      );
+
+  Future<String?> get reshareConfig async => await _secureStore.read(
+        key: "{$walletId}_reshareConfig",
+      );
+  Future<void> _saveReshareConfig(String multisigConfig) async =>
+      await _secureStore.write(
+        key: "{$walletId}_reshareConfig",
         value: multisigConfig,
       );
 
