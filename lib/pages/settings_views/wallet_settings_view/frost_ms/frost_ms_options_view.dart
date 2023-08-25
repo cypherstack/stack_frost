@@ -11,7 +11,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/frost_participants_view.dart';
-import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/start_resharing_config_view.dart';
+import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/step_1/begin_reshare_config_view.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
 import 'package:stackfrost/providers/global/wallets_provider.dart';
 import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
@@ -81,7 +81,7 @@ class FrostMSWalletOptionsView extends ConsumerWidget {
                     ref.read(pFrostMyName.state).state = wallet.myName;
 
                     Navigator.of(context).pushNamed(
-                      StartResharingConfigView.routeName,
+                      BeginReshareConfigView.routeName,
                       arguments: walletId,
                     );
                   },

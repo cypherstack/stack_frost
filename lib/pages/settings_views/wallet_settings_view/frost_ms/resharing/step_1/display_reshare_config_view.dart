@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/step_2/start_resharer_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
+import 'package:stackfrost/providers/global/wallets_provider.dart';
+import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
+import 'package:stackfrost/services/frost.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/logger.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
 import 'package:stackfrost/utilities/util.dart';
 import 'package:stackfrost/widgets/background.dart';
@@ -13,24 +18,71 @@ import 'package:stackfrost/widgets/desktop/desktop_app_bar.dart';
 import 'package:stackfrost/widgets/desktop/desktop_scaffold.dart';
 import 'package:stackfrost/widgets/desktop/primary_button.dart';
 import 'package:stackfrost/widgets/rounded_white_container.dart';
+import 'package:stackfrost/widgets/stack_dialog.dart';
 
-class ReshareMultisigConfigView extends ConsumerStatefulWidget {
-  const ReshareMultisigConfigView({
+class DisplayReshareConfigView extends ConsumerStatefulWidget {
+  const DisplayReshareConfigView({
     super.key,
     required this.walletId,
   });
 
-  static const String routeName = "/reshareMultisigConfigView";
+  static const String routeName = "/displayReshareConfigView";
 
   final String walletId;
 
   @override
-  ConsumerState<ReshareMultisigConfigView> createState() =>
-      _ShareNewMultisigConfigViewState();
+  ConsumerState<DisplayReshareConfigView> createState() =>
+      _DisplayReshareConfigViewState();
 }
 
-class _ShareNewMultisigConfigViewState
-    extends ConsumerState<ReshareMultisigConfigView> {
+class _DisplayReshareConfigViewState
+    extends ConsumerState<DisplayReshareConfigView> {
+  bool _buttonLock = false;
+
+  Future<void> _onPressed() async {
+    if (_buttonLock) {
+      return;
+    }
+    _buttonLock = true;
+
+    try {
+      final wallet = ref
+          .read(walletsChangeNotifierProvider)
+          .getManager(widget.walletId)
+          .wallet as FrostWallet;
+
+      final serializedKeys = await wallet.getSerializedKeys;
+      if (mounted) {
+        final result = Frost.beginResharer(
+          serializedKeys: serializedKeys!,
+          config: ref.read(pFrostResharerConfig)!,
+        );
+
+        ref.read(pFrostResharerData.state).state = result;
+
+        await Navigator.of(context).pushNamed(
+          StartResharingView.routeName,
+          arguments: widget.walletId,
+        );
+      }
+    } catch (e, s) {
+      Logging.instance.log(
+        "$e\n$s",
+        level: LogLevel.Fatal,
+      );
+
+      await showDialog<void>(
+        context: context,
+        builder: (_) => StackOkDialog(
+          title: e.toString(),
+          desktopPopRootNavigator: Util.isDesktop,
+        ),
+      );
+    } finally {
+      _buttonLock = false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ConditionalParent(
@@ -123,21 +175,7 @@ class _ShareNewMultisigConfigViewState
               ),
             PrimaryButton(
               label: "Start resharing",
-              onPressed: () async {
-                // ref.read(pFrostStartKeyGenData.notifier).state =
-                //     Frost.startKeyGeneration(
-                //   multisigConfig: ref.watch(pFrostMultisigConfig.state).state!,
-                //   myName: ref.read(pFrostMyName.state).state!,
-                // );
-
-                // await Navigator.of(context).pushNamed(
-                //   FrostShareCommitmentsView.routeName,
-                //   arguments: (
-                //     walletName: widget.walletName,
-                //     coin: widget.coin,
-                //   ),
-                // );
-              },
+              onPressed: _onPressed,
             ),
           ],
         ),

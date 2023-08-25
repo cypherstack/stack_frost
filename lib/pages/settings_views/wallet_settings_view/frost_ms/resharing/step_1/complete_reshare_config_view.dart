@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/reshare_ms_config_view.dart';
+import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/step_1/display_reshare_config_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
 import 'package:stackfrost/providers/global/wallets_provider.dart';
@@ -18,23 +18,23 @@ import 'package:stackfrost/widgets/desktop/desktop_scaffold.dart';
 import 'package:stackfrost/widgets/desktop/primary_button.dart';
 import 'package:stackfrost/widgets/stack_dialog.dart';
 
-final class CompleteResharingConfigView extends ConsumerStatefulWidget {
-  const CompleteResharingConfigView({
+final class CompleteReshareConfigView extends ConsumerStatefulWidget {
+  const CompleteReshareConfigView({
     super.key,
     required this.walletId,
   });
 
-  static const String routeName = "/completeResharingConfigView";
+  static const String routeName = "/completeReshareConfigView";
 
   final String walletId;
 
   @override
-  ConsumerState<CompleteResharingConfigView> createState() =>
-      _CompleteResharingConfigViewState();
+  ConsumerState<CompleteReshareConfigView> createState() =>
+      _CompleteReshareConfigViewState();
 }
 
-class _CompleteResharingConfigViewState
-    extends ConsumerState<CompleteResharingConfigView> {
+class _CompleteReshareConfigViewState
+    extends ConsumerState<CompleteReshareConfigView> {
   final _newThresholdController = TextEditingController();
   final _newParticipantsCountController = TextEditingController();
 
@@ -249,7 +249,7 @@ class _CompleteResharingConfigViewState
                 ref.read(pFrostResharerConfig.notifier).state = config;
 
                 await Navigator.of(context).pushNamed(
-                  ReshareMultisigConfigView.routeName,
+                  DisplayReshareConfigView.routeName,
                   arguments: widget.walletId,
                 );
               },

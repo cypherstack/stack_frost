@@ -52,3 +52,15 @@ final pFrostSelectParticipantsUnordered =
 // ========================= resharing =========================================
 final pFrostResharers = Provider<Map<String, int>>((ref) => {});
 final pFrostResharerConfig = StateProvider<String?>((ref) => null);
+
+final pFrostResharerData = StateProvider<
+    ({
+      String resharerStart,
+      Pointer<StartResharerRes> machine,
+    })?>((ref) => null);
+
+final pFrostResharedData = StateProvider<
+    ({
+      String resharedStart,
+      Pointer<StartResharedRes> prior,
+    })?>((ref) => null);
