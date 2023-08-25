@@ -11,7 +11,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/frost_participants_view.dart';
-import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/step_1/begin_reshare_config_view.dart';
+import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/step_1a/begin_reshare_config_view.dart';
+import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/step_1b/import_reshare_config_view.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
 import 'package:stackfrost/providers/global/wallets_provider.dart';
 import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
@@ -71,7 +72,7 @@ class FrostMSWalletOptionsView extends ConsumerWidget {
                   height: 8,
                 ),
                 _OptionButton(
-                  label: "Modify participants",
+                  label: "Initiate resharing",
                   onPressed: () {
                     final wallet = ref
                         .read(walletsChangeNotifierProvider)
@@ -82,6 +83,25 @@ class FrostMSWalletOptionsView extends ConsumerWidget {
 
                     Navigator.of(context).pushNamed(
                       BeginReshareConfigView.routeName,
+                      arguments: walletId,
+                    );
+                  },
+                ),
+                const SizedBox(
+                  height: 8,
+                ),
+                _OptionButton(
+                  label: "Import reshare config",
+                  onPressed: () {
+                    final wallet = ref
+                        .read(walletsChangeNotifierProvider)
+                        .getManager(walletId)
+                        .wallet as FrostWallet;
+
+                    ref.read(pFrostMyName.state).state = wallet.myName;
+
+                    Navigator.of(context).pushNamed(
+                      ImportReshareConfigView.routeName,
                       arguments: walletId,
                     );
                   },

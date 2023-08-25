@@ -13,7 +13,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/step_1/begin_reshare_config_view.dart';
+import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/step_1a/begin_reshare_config_view.dart';
+import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/step_1b/import_reshare_config_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_settings_wallet_settings/xpub_view.dart';
 import 'package:stackfrost/pages_desktop_specific/addresses/desktop_wallet_addresses_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/desktop_delete_wallet_dialog.dart';
@@ -29,7 +30,8 @@ import 'package:stackfrost/utilities/text_styles.dart';
 enum _WalletOptions {
   addressList,
   deleteWallet,
-  resharing,
+  initiateResharing,
+  importResharing,
   // changeRepresentative,
   showXpub;
 
@@ -39,8 +41,10 @@ enum _WalletOptions {
         return "Address list";
       case _WalletOptions.deleteWallet:
         return "Delete wallet";
-      case _WalletOptions.resharing:
-        return "Resharing";
+      case _WalletOptions.initiateResharing:
+        return "Initiate resharing";
+      case _WalletOptions.importResharing:
+        return "Import reshare config";
       // case _WalletOptions.changeRepresentative:
       //   return "Change representative";
       case _WalletOptions.showXpub:
@@ -80,7 +84,10 @@ class WalletOptionsButton extends ConsumerWidget {
                 Navigator.of(context).pop(_WalletOptions.addressList);
               },
               onResharingPressed: () async {
-                Navigator.of(context).pop(_WalletOptions.resharing);
+                Navigator.of(context).pop(_WalletOptions.initiateResharing);
+              },
+              onImportResharingPressed: () async {
+                Navigator.of(context).pop(_WalletOptions.importResharing);
               },
               // onChangeRepPressed: () async {
               //   Navigator.of(context).pop(_WalletOptions.changeRepresentative);
@@ -103,7 +110,7 @@ class WalletOptionsButton extends ConsumerWidget {
                 ),
               );
               break;
-            case _WalletOptions.resharing:
+            case _WalletOptions.initiateResharing:
               ref.read(pFrostMyName.state).state = (ref
                       .read(walletsChangeNotifierProvider)
                       .getManager(walletId)
@@ -112,6 +119,19 @@ class WalletOptionsButton extends ConsumerWidget {
               unawaited(
                 Navigator.of(context).pushNamed(
                   BeginReshareConfigView.routeName,
+                  arguments: walletId,
+                ),
+              );
+              break;
+            case _WalletOptions.importResharing:
+              ref.read(pFrostMyName.state).state = (ref
+                      .read(walletsChangeNotifierProvider)
+                      .getManager(walletId)
+                      .wallet as FrostWallet)
+                  .myName;
+              unawaited(
+                Navigator.of(context).pushNamed(
+                  ImportReshareConfigView.routeName,
                   arguments: walletId,
                 ),
               );
@@ -226,6 +246,7 @@ class WalletOptionsPopupMenu extends ConsumerWidget {
     required this.onAddressListPressed,
     required this.onShowXpubPressed,
     required this.onResharingPressed,
+    required this.onImportResharingPressed,
     // required this.onChangeRepPressed,
     required this.walletId,
   }) : super(key: key);
@@ -234,6 +255,7 @@ class WalletOptionsPopupMenu extends ConsumerWidget {
   final VoidCallback onAddressListPressed;
   final VoidCallback onShowXpubPressed;
   final VoidCallback onResharingPressed;
+  final VoidCallback onImportResharingPressed;
   // final VoidCallback onChangeRepPressed;
   final String walletId;
 
@@ -394,7 +416,42 @@ class WalletOptionsPopupMenu extends ConsumerWidget {
                           const SizedBox(width: 14),
                           Expanded(
                             child: Text(
-                              _WalletOptions.resharing.prettyName,
+                              _WalletOptions.initiateResharing.prettyName,
+                              style: STextStyles.desktopTextExtraExtraSmall(
+                                      context)
+                                  .copyWith(
+                                color: Theme.of(context)
+                                    .extension<StackColors>()!
+                                    .textDark,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 8,
+                  ),
+                  TransparentButton(
+                    onPressed: onImportResharingPressed,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          SvgPicture.asset(
+                            Assets.svg.exchangeDesktop,
+                            width: 20,
+                            height: 20,
+                            color: Theme.of(context)
+                                .extension<StackColors>()!
+                                .textFieldActiveSearchIconLeft,
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Text(
+                              _WalletOptions.importResharing.prettyName,
                               style: STextStyles.desktopTextExtraExtraSmall(
                                       context)
                                   .copyWith(
