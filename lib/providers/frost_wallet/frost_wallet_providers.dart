@@ -69,6 +69,7 @@ final pFrostResharerComplete = StateProvider<String?>((ref) => null);
 
 final pFrostReshareNewWalletData = StateProvider<
     ({
+      String multisigConfig,
       String serializedKeys,
-      String config,
+      String resharedId,
     })?>((ref) => null);

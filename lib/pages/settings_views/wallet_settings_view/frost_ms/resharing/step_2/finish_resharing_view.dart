@@ -68,15 +68,12 @@ class _FinishResharingViewState extends ConsumerState<FinishResharingView> {
       final resharerCompletes = controllers.map((e) => e.text).toList();
       resharerCompletes.insert(myResharerIndex, myResharerComplete);
 
-      final serializedKeys = Frost.finishReshared(
+      final data = Frost.finishReshared(
         prior: ref.read(pFrostResharedData)!.prior.ref,
         resharerCompletes: resharerCompletes,
       );
 
-      ref.read(pFrostReshareNewWalletData.state).state = (
-        serializedKeys: serializedKeys,
-        config: ref.read(pFrostResharerConfig)!,
-      );
+      ref.read(pFrostReshareNewWalletData.state).state = data;
 
       await Navigator.of(context).pushNamed(
         VerifyUpdatedWalletView.routeName,

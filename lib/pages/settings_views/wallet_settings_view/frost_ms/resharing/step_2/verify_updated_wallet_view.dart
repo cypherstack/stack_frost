@@ -41,6 +41,7 @@ class _VerifyUpdatedWalletViewState
     extends ConsumerState<VerifyUpdatedWalletView> {
   late final String config;
   late final String serializedKeys;
+  late final String reshareId;
 
   bool _buttonLock = false;
   Future<void> _onPressed() async {
@@ -59,7 +60,7 @@ class _VerifyUpdatedWalletViewState
                 .wallet as FrostWallet)
             .updateWithResharedData(
           serializedKeys: serializedKeys,
-          reshareConfig: config,
+          multisigConfig: config,
         ),
         context: context,
         message: "Updating wallet data",
@@ -99,7 +100,7 @@ class _VerifyUpdatedWalletViewState
 
   @override
   void initState() {
-    config = ref.read(pFrostReshareNewWalletData)!.config;
+    config = ref.read(pFrostReshareNewWalletData)!.multisigConfig;
     serializedKeys = ref.read(pFrostReshareNewWalletData)!.serializedKeys;
     super.initState();
   }
@@ -161,6 +162,24 @@ class _VerifyUpdatedWalletViewState
         child: Column(
           children: [
             Text(
+              "Ensure your reshare ID matches that of each other participant",
+              style: STextStyles.pageTitleH2(context),
+            ),
+            const _Div(),
+            DetailItem(
+              title: "ID",
+              detail: reshareId,
+              button: Util.isDesktop
+                  ? IconCopyButton(
+                      data: reshareId,
+                    )
+                  : SimpleCopyButton(
+                      data: reshareId,
+                    ),
+            ),
+            const _Div(),
+            const _Div(),
+            Text(
               "Back up your keys and config",
               style: STextStyles.pageTitleH2(context),
             ),
@@ -191,7 +210,7 @@ class _VerifyUpdatedWalletViewState
             if (!Util.isDesktop) const Spacer(),
             const _Div(),
             PrimaryButton(
-              label: "I have backed up this info",
+              label: "Confirm",
               onPressed: _onPressed,
             ),
           ],

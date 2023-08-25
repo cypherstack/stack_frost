@@ -486,18 +486,27 @@ class FrostWallet extends CoinServiceAPI
 
   Future<void> updateWithResharedData({
     required String serializedKeys,
-    required String reshareConfig,
+    required String multisigConfig,
   }) async {
     await _saveSerializedKeys(serializedKeys);
-    await _saveReshareConfig(reshareConfig);
+    await _saveMultisigConfig(multisigConfig);
 
-    final data = Frost.extractResharerConfigData(
-      resharerConfig: reshareConfig,
+    await saveThreshold(
+      frost.getThresholdFromKeys(
+        serializedKeys: serializedKeys,
+      ),
     );
 
-    await saveThreshold(data.newThreshold);
+    final myNameIndex = frost.getParticipantIndexFromKeys(
+      serializedKeys: serializedKeys,
+    );
+    final participants = Frost.getParticipants(
+      multisigConfig: multisigConfig,
+    );
+    final myName = participants[myNameIndex];
 
-    await updateParticipants(data.newParticipants);
+    await updateParticipants(participants);
+    await saveMyName(myName);
   }
 
   Future<void> recoverFromSerializedKeys({
@@ -579,15 +588,6 @@ class FrostWallet extends CoinServiceAPI
   Future<void> _saveMultisigConfig(String multisigConfig) async =>
       await _secureStore.write(
         key: "{$walletId}_multisigConfig",
-        value: multisigConfig,
-      );
-
-  Future<String?> get reshareConfig async => await _secureStore.read(
-        key: "{$walletId}_reshareConfig",
-      );
-  Future<void> _saveReshareConfig(String multisigConfig) async =>
-      await _secureStore.write(
-        key: "{$walletId}_reshareConfig",
         value: multisigConfig,
       );
 

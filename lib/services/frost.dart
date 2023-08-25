@@ -468,6 +468,7 @@ abstract class Frost {
   }) {
     try {
       final result = startReshared(
+        newMultisigName: '',
         myName: myName,
         resharerConfig: resharerConfig,
         resharerStarts: resharerStarts,
@@ -504,8 +505,11 @@ abstract class Frost {
     }
   }
 
-  /// returns new serialized wallet keys
-  static String finishReshared({
+  static ({
+    String multisigConfig,
+    String serializedKeys,
+    String resharedId,
+  }) finishReshared({
     required StartResharedRes prior,
     required List<String> resharerCompletes,
   }) {
