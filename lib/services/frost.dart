@@ -504,6 +504,7 @@ abstract class Frost {
     }
   }
 
+  /// returns new serialized wallet keys
   static String finishReshared({
     required StartResharedRes prior,
     required List<String> resharerCompletes,

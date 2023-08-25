@@ -1,9 +1,10 @@
+import 'dart:ffi';
+
 import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/step_2/continue_resharing_view.dart';
 import 'package:stackfrost/pages/wallet_view/transaction_views/transaction_details_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
@@ -28,28 +29,29 @@ import 'package:stackfrost/widgets/stack_dialog.dart';
 import 'package:stackfrost/widgets/stack_text_field.dart';
 import 'package:stackfrost/widgets/textfield_icon_button.dart';
 
-class BeginResharingView extends ConsumerStatefulWidget {
-  const BeginResharingView({
+class ContinueResharingView extends ConsumerStatefulWidget {
+  const ContinueResharingView({
     super.key,
     required this.walletId,
   });
 
-  static const String routeName = "/beginResharingView";
+  static const String routeName = "/continueResharingView";
 
   final String walletId;
 
   @override
-  ConsumerState<BeginResharingView> createState() => _BeginResharingViewState();
+  ConsumerState<ContinueResharingView> createState() =>
+      _ContinueResharingViewState();
 }
 
-class _BeginResharingViewState extends ConsumerState<BeginResharingView> {
+class _ContinueResharingViewState extends ConsumerState<ContinueResharingView> {
   final List<TextEditingController> controllers = [];
   final List<FocusNode> focusNodes = [];
 
   late final List<String> resharerNamesWithoutMe;
   late final String myName;
   late final int myResharerIndex;
-  late final String myResharerStart;
+  late final String myEncryptionKey;
 
   final List<bool> fieldIsEmptyFlags = [];
 
@@ -61,22 +63,21 @@ class _BeginResharingViewState extends ConsumerState<BeginResharingView> {
     _buttonLock = true;
 
     try {
-      // collect resharer strings and insert my own at the correct index
-      final resharerStarts = controllers.map((e) => e.text).toList();
-      resharerStarts.insert(myResharerIndex, myResharerStart);
+      // collect encryptionKeys strings and insert my own at the correct index
+      final encryptionKeys = controllers.map((e) => e.text).toList();
+      encryptionKeys.insert(myResharerIndex, myEncryptionKey);
 
-      final result = Frost.beginReshared(
-        myName: myName,
-        resharerConfig: ref.read(pFrostResharerConfig)!,
-        resharerStarts: resharerStarts,
+      final result = Frost.finishResharer(
+        machine: ref.read(pFrostResharerData)!.machine.ref,
+        encryptionKeysOfResharedTo: encryptionKeys,
       );
 
-      ref.read(pFrostResharedData.state).state = result;
+      ref.read(pFrostResharerComplete.state).state = result;
 
-      await Navigator.of(context).pushNamed(
-        ContinueResharingView.routeName,
-        arguments: widget.walletId,
-      );
+      // await Navigator.of(context).pushNamed(
+      //   ContinueResharingView.routeName,
+      //   arguments:   widget.walletId,
+      // );
     } catch (e, s) {
       Logging.instance.log(
         "$e\n$s",
@@ -99,7 +100,7 @@ class _BeginResharingViewState extends ConsumerState<BeginResharingView> {
   @override
   void initState() {
     myName = ref.read(pFrostMyName)!;
-    myResharerStart = ref.read(pFrostResharerData)!.resharerStart;
+    myEncryptionKey = ref.read(pFrostResharedData)!.resharedStart;
 
     resharerNamesWithoutMe = ref.read(pFrostResharers).keys.toList();
 
@@ -156,7 +157,7 @@ class _BeginResharingViewState extends ConsumerState<BeginResharingView> {
                 },
               ),
               title: Text(
-                "Resharers",
+                "Encryption keys",
                 style: STextStyles.navBarTitle(context),
               ),
             ),
@@ -189,7 +190,7 @@ class _BeginResharingViewState extends ConsumerState<BeginResharingView> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   QrImageView(
-                    data: myResharerStart,
+                    data: myEncryptionKey,
                     size: 220,
                     backgroundColor:
                         Theme.of(context).extension<StackColors>()!.background,
@@ -202,14 +203,14 @@ class _BeginResharingViewState extends ConsumerState<BeginResharingView> {
             ),
             const _Div(),
             DetailItem(
-              title: "My resharer",
-              detail: myResharerStart,
+              title: "My encryption key",
+              detail: myEncryptionKey,
               button: Util.isDesktop
                   ? IconCopyButton(
-                      data: myResharerStart,
+                      data: myEncryptionKey,
                     )
                   : SimpleCopyButton(
-                      data: myResharerStart,
+                      data: myEncryptionKey,
                     ),
             ),
             const _Div(),
@@ -229,7 +230,7 @@ class _BeginResharingViewState extends ConsumerState<BeginResharingView> {
                             Constants.size.circularBorderRadius,
                           ),
                           child: TextField(
-                            key: Key("frostResharerTextFieldKey_$i"),
+                            key: Key("frostEncryptionKeyTextFieldKey_$i"),
                             controller: controllers[i],
                             focusNode: focusNodes[i],
                             readOnly: false,
@@ -245,7 +246,7 @@ class _BeginResharingViewState extends ConsumerState<BeginResharingView> {
                             decoration: standardInputDecoration(
                               "Enter "
                               "${resharerNamesWithoutMe[i]}"
-                              "'s resharer",
+                              "'s encryption key",
                               focusNodes[i],
                               context,
                             ).copyWith(
@@ -267,9 +268,9 @@ class _BeginResharingViewState extends ConsumerState<BeginResharingView> {
                                       !fieldIsEmptyFlags[i]
                                           ? TextFieldIconButton(
                                               semanticsLabel:
-                                                  "Clear Button. Clears The Resharer Field Input.",
+                                                  "Clear Button. Clears The Encryption Key Field Input.",
                                               key: Key(
-                                                  "frostResharerClearButtonKey_$i"),
+                                                  "frostEncryptionKeyClearButtonKey_$i"),
                                               onTap: () {
                                                 controllers[i].text = "";
 
@@ -281,9 +282,9 @@ class _BeginResharingViewState extends ConsumerState<BeginResharingView> {
                                             )
                                           : TextFieldIconButton(
                                               semanticsLabel:
-                                                  "Paste Button. Pastes From Clipboard To Resharer Field Input.",
+                                                  "Paste Button. Pastes From Clipboard To Encryption Key Field Input.",
                                               key: Key(
-                                                  "frostResharerPasteButtonKey_$i"),
+                                                  "frostEncryptionKeyPasteButtonKey_$i"),
                                               onTap: () async {
                                                 final ClipboardData? data =
                                                     await Clipboard.getData(

@@ -100,6 +100,7 @@ import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/re
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/step_1/complete_reshare_config_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/step_1/display_reshare_config_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/step_2/begin_resharing_view.dart';
+import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/step_2/continue_resharing_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_backup_views/wallet_backup_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_network_settings_view/wallet_network_settings_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_settings_view.dart';
@@ -1058,6 +1059,20 @@ class RouteGenerator {
           return getRoute(
             shouldUseMaterialRoute: useMaterialPageRoute,
             builder: (_) => BeginResharingView(
+              walletId: args,
+            ),
+            settings: RouteSettings(
+              name: settings.name,
+            ),
+          );
+        }
+        return _routeError("${settings.name} invalid args: ${args.toString()}");
+
+      case ContinueResharingView.routeName:
+        if (args is String) {
+          return getRoute(
+            shouldUseMaterialRoute: useMaterialPageRoute,
+            builder: (_) => ContinueResharingView(
               walletId: args,
             ),
             settings: RouteSettings(

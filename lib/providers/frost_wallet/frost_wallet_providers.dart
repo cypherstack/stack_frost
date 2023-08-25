@@ -64,3 +64,5 @@ final pFrostResharedData = StateProvider<
       String resharedStart,
       Pointer<StartResharedRes> prior,
     })?>((ref) => null);
+
+final pFrostResharerComplete = StateProvider<String?>((ref) => null);
