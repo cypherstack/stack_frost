@@ -101,6 +101,8 @@ import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/re
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/step_1/display_reshare_config_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/step_2/begin_resharing_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/step_2/continue_resharing_view.dart';
+import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/step_2/finish_resharing_view.dart';
+import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/step_2/verify_updated_wallet_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_backup_views/wallet_backup_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_network_settings_view/wallet_network_settings_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_settings_view.dart';
@@ -1073,6 +1075,34 @@ class RouteGenerator {
           return getRoute(
             shouldUseMaterialRoute: useMaterialPageRoute,
             builder: (_) => ContinueResharingView(
+              walletId: args,
+            ),
+            settings: RouteSettings(
+              name: settings.name,
+            ),
+          );
+        }
+        return _routeError("${settings.name} invalid args: ${args.toString()}");
+
+      case FinishResharingView.routeName:
+        if (args is String) {
+          return getRoute(
+            shouldUseMaterialRoute: useMaterialPageRoute,
+            builder: (_) => FinishResharingView(
+              walletId: args,
+            ),
+            settings: RouteSettings(
+              name: settings.name,
+            ),
+          );
+        }
+        return _routeError("${settings.name} invalid args: ${args.toString()}");
+
+      case VerifyUpdatedWalletView.routeName:
+        if (args is String) {
+          return getRoute(
+            shouldUseMaterialRoute: useMaterialPageRoute,
+            builder: (_) => VerifyUpdatedWalletView(
               walletId: args,
             ),
             settings: RouteSettings(
