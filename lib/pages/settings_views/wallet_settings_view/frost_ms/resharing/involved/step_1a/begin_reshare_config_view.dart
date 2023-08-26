@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/step_1a/complete_reshare_config_view.dart';
+import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/involved/step_1a/complete_reshare_config_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
 import 'package:stackfrost/providers/global/wallets_provider.dart';
@@ -36,9 +36,11 @@ class _BeginReshareConfigViewState
   late final int currentThreshold;
   late final List<String> currentParticipants;
 
+  final Map<String, int> pFrostResharersMap = {};
+
   @override
   void initState() {
-    ref.read(pFrostResharers).removeWhere((key, value) => true);
+    ref.read(pFrostResharingData).reset();
 
     final wallet = ref
         .read(walletsChangeNotifierProvider)
@@ -47,9 +49,6 @@ class _BeginReshareConfigViewState
 
     currentThreshold = wallet.threshold;
     currentParticipants = wallet.participants;
-
-    // ref.read(pFrostResharers)[ref.read(pFrostMyName)!] =
-    //     currentParticipants.indexOf(ref.read(pFrostMyName)!);
 
     super.initState();
   }
@@ -134,13 +133,11 @@ class _BeginReshareConfigViewState
                         ),
                       ),
                       onPressed: () {
-                        if (ref.read(pFrostResharers)[currentParticipants[i]] ==
+                        if (pFrostResharersMap[currentParticipants[i]] ==
                             null) {
-                          ref.read(pFrostResharers)[currentParticipants[i]] = i;
+                          pFrostResharersMap[currentParticipants[i]] = i;
                         } else {
-                          ref
-                              .read(pFrostResharers)
-                              .remove(currentParticipants[i]);
+                          pFrostResharersMap.remove(currentParticipants[i]);
                         }
 
                         setState(() {});
@@ -151,7 +148,7 @@ class _BeginReshareConfigViewState
                           child: Row(
                             children: [
                               Checkbox(
-                                value: ref.watch(pFrostResharers)[
+                                value: pFrostResharersMap[
                                         currentParticipants[i]] ==
                                     i,
                                 onChanged: (bool? value) {},
@@ -177,11 +174,15 @@ class _BeginReshareConfigViewState
             ),
             PrimaryButton(
               label: "Continue",
-              enabled: ref.watch(pFrostResharers).length >= currentThreshold,
+              enabled: pFrostResharersMap.length >= currentThreshold,
               onPressed: () async {
                 await Navigator.of(context).pushNamed(
                   CompleteReshareConfigView.routeName,
-                  arguments: widget.walletId,
+                  arguments: (
+                    walletId: widget.walletId,
+                    resharers:
+                        pFrostResharersMap.values.toList(growable: false),
+                  ),
                 );
               },
             ),

@@ -19,6 +19,7 @@ import 'package:stackfrost/pages/add_wallet_views/frost_ms/new/import_new_frost_
 import 'package:stackfrost/pages/add_wallet_views/frost_ms/restore/restore_frost_ms_wallet_view.dart';
 import 'package:stackfrost/pages/add_wallet_views/new_wallet_recovery_phrase_warning_view/new_wallet_recovery_phrase_warning_view.dart';
 import 'package:stackfrost/pages/add_wallet_views/restore_wallet_view/restore_options_view/restore_options_view.dart';
+import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/new/new_import_resharer_config_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
 import 'package:stackfrost/providers/global/wallets_service_provider.dart';
 import 'package:stackfrost/providers/ui/verify_recovery_phrase/mnemonic_word_count_state_provider.dart';
@@ -398,7 +399,7 @@ class _NameYourWalletViewState extends ConsumerState<NameYourWalletView> {
                           height: 12,
                         ),
                         SecondaryButton(
-                          label: "Import config",
+                          label: "Import multisig config",
                           enabled: _nextEnabled,
                           onPressed: () async {
                             final walletsService =
@@ -419,6 +420,39 @@ class _NameYourWalletViewState extends ConsumerState<NameYourWalletView> {
                             } else if (mounted) {
                               await Navigator.of(context).pushNamed(
                                 ImportNewFrostMsWalletView.routeName,
+                                arguments: (
+                                  walletName: name,
+                                  coin: coin,
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                        const SizedBox(
+                          height: 12,
+                        ),
+                        SecondaryButton(
+                          label: "Import resharer config",
+                          enabled: _nextEnabled,
+                          onPressed: () async {
+                            final walletsService =
+                                ref.read(walletsServiceChangeNotifierProvider);
+                            final name = textEditingController.text;
+
+                            if (await walletsService.checkForDuplicate(name)) {
+                              if (mounted) {
+                                unawaited(
+                                  showFloatingFlushBar(
+                                    type: FlushBarType.warning,
+                                    message: "Wallet name already in use.",
+                                    iconAsset: Assets.svg.circleAlert,
+                                    context: context,
+                                  ),
+                                );
+                              }
+                            } else if (mounted) {
+                              await Navigator.of(context).pushNamed(
+                                NewImportResharerConfigView.routeName,
                                 arguments: (
                                   walletName: name,
                                   coin: coin,

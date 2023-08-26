@@ -4,6 +4,8 @@ import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frostdart/frostdart_bindings_generated.dart';
 import 'package:stackfrost/models/tx_data.dart';
+import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
+import 'package:stackfrost/services/frost.dart';
 
 // =================== wallet creation =========================================
 final pFrostMultisigConfig = StateProvider<String?>((ref) => null);
@@ -50,26 +52,53 @@ final pFrostSelectParticipantsUnordered =
     StateProvider<List<String>?>((ref) => null);
 
 // ========================= resharing =========================================
-final pFrostResharers = Provider<Map<String, int>>((ref) => {});
-final pFrostResharerConfig = StateProvider<String?>((ref) => null);
+final pFrostResharingData = Provider((ref) => _ResharingData());
 
-final pFrostResharerData = StateProvider<
-    ({
-      String resharerStart,
-      Pointer<StartResharerRes> machine,
-    })?>((ref) => null);
+class _ResharingData {
+  String? myName;
 
-final pFrostResharedData = StateProvider<
-    ({
-      String resharedStart,
-      Pointer<StartResharedRes> prior,
-    })?>((ref) => null);
+  // resharer encoded config string
+  String? resharerConfig;
+  ({
+    int newThreshold,
+    List<int> resharers,
+    List<String> newParticipants,
+  })? get configData => resharerConfig != null
+      ? Frost.extractResharerConfigData(resharerConfig: resharerConfig!)
+      : null;
 
-final pFrostResharerComplete = StateProvider<String?>((ref) => null);
+  // resharer start string (for sharing) and machine
+  ({
+    String resharerStart,
+    Pointer<StartResharerRes> machine,
+  })? startResharerData;
 
-final pFrostReshareNewWalletData = StateProvider<
-    ({
-      String multisigConfig,
-      String serializedKeys,
-      String resharedId,
-    })?>((ref) => null);
+  // reshared start string (for sharing) and machine
+  ({
+    String resharedStart,
+    Pointer<StartResharedRes> prior,
+  })? startResharedData;
+
+  // resharer complete string (for sharing)
+  String? resharerComplete;
+
+  // new keys and config with an ID
+  ({
+    String multisigConfig,
+    String serializedKeys,
+    String resharedId,
+  })? newWalletData;
+
+  /// Incomplete wallet which must only be used by new participants added to wallet
+  FrostWallet? incompleteWallet;
+
+  // reset/clear all data
+  void reset() {
+    resharerConfig = null;
+    startResharerData = null;
+    startResharedData = null;
+    resharerComplete = null;
+    newWalletData = null;
+    incompleteWallet = null;
+  }
+}

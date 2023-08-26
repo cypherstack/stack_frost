@@ -468,7 +468,7 @@ abstract class Frost {
   }) {
     try {
       final result = startReshared(
-        newMultisigName: '',
+        newMultisigName: 'unused_property',
         myName: myName,
         resharerConfig: resharerConfig,
         resharerStarts: resharerStarts,
@@ -479,7 +479,7 @@ abstract class Frost {
       );
     } catch (e, s) {
       Logging.instance.log(
-        "beingReshared failed: $e\n$s",
+        "beginReshared failed: $e\n$s",
         level: LogLevel.Fatal,
       );
       rethrow;
@@ -552,35 +552,41 @@ abstract class Frost {
     required String resharerConfig,
   }) {
     try {
-      final configPointer = decodedResharerConfig(
-        resharerConfig: resharerConfig,
-      );
-
       final newThreshold = resharerNewThreshold(
-        resharerConfigPointer: configPointer,
+        resharerConfigPointer: decodedResharerConfig(
+          resharerConfig: resharerConfig,
+        ),
       );
 
       final resharersCount = resharerResharers(
-        resharerConfigPointer: configPointer,
+        resharerConfigPointer: decodedResharerConfig(
+          resharerConfig: resharerConfig,
+        ),
       );
       final List<int> resharers = [];
       for (int i = 0; i < resharersCount; i++) {
         resharers.add(
           resharerResharer(
-            resharerConfigPointer: configPointer,
+            resharerConfigPointer: decodedResharerConfig(
+              resharerConfig: resharerConfig,
+            ),
             index: i,
           ),
         );
       }
 
       final newParticipantsCount = resharerNewParticipants(
-        resharerConfigPointer: configPointer,
+        resharerConfigPointer: decodedResharerConfig(
+          resharerConfig: resharerConfig,
+        ),
       );
       final List<String> newParticipants = [];
       for (int i = 0; i < newParticipantsCount; i++) {
         newParticipants.add(
           resharerNewParticipant(
-            resharerConfigPointer: configPointer,
+            resharerConfigPointer: decodedResharerConfig(
+              resharerConfig: resharerConfig,
+            ),
             index: i,
           ),
         );

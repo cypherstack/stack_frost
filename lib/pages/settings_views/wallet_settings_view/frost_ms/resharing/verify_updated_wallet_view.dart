@@ -6,7 +6,9 @@ import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/desktop_wallet_view.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
 import 'package:stackfrost/providers/global/wallets_provider.dart';
+import 'package:stackfrost/providers/global/wallets_service_provider.dart';
 import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
+import 'package:stackfrost/services/coins/manager.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/utilities/logger.dart';
 import 'package:stackfrost/utilities/show_loading.dart';
@@ -53,31 +55,60 @@ class _VerifyUpdatedWalletViewState
     try {
       Exception? ex;
 
-      await showLoading(
-        whileFuture: (ref
-                .read(walletsChangeNotifierProvider)
-                .getManager(widget.walletId)
-                .wallet as FrostWallet)
-            .updateWithResharedData(
-          serializedKeys: serializedKeys,
-          multisigConfig: config,
-        ),
-        context: context,
-        message: "Updating wallet data",
-        isDesktop: Util.isDesktop,
-        onException: (e) => ex = e,
-      );
+      final FrostWallet wallet;
+      final bool isNew;
 
-      if (ex != null) {
-        throw ex!;
+      if (ref.read(pFrostResharingData).incompleteWallet != null &&
+          ref.read(pFrostResharingData).incompleteWallet!.walletId ==
+              widget.walletId) {
+        wallet = ref.read(pFrostResharingData).incompleteWallet!;
+        isNew = true;
+        final manager = Manager(wallet);
+        await ref
+            .read(walletsServiceChangeNotifierProvider)
+            .setMnemonicVerified(
+              walletId: manager.walletId,
+            );
+        ref.read(walletsChangeNotifierProvider.notifier).addWallet(
+              walletId: manager!.walletId,
+              manager: manager,
+            );
+      } else {
+        wallet = ref
+            .read(walletsChangeNotifierProvider)
+            .getManager(widget.walletId)
+            .wallet as FrostWallet;
+        isNew = false;
       }
 
       if (mounted) {
-        Navigator.of(context).popUntil(
-          ModalRoute.withName(
-            Util.isDesktop ? DesktopWalletView.routeName : WalletView.routeName,
+        await showLoading(
+          whileFuture: wallet.updateWithResharedData(
+            serializedKeys: serializedKeys,
+            multisigConfig: config,
+            isNewWallet: isNew,
           ),
+          context: context,
+          message: isNew ? "Creating wallet" : "Updating wallet data",
+          isDesktop: Util.isDesktop,
+          onException: (e) => ex = e,
         );
+
+        if (ex != null) {
+          throw ex!;
+        }
+
+        if (mounted) {
+          ref.read(pFrostResharingData).reset();
+
+          Navigator.of(context).popUntil(
+            ModalRoute.withName(
+              Util.isDesktop
+                  ? DesktopWalletView.routeName
+                  : WalletView.routeName,
+            ),
+          );
+        }
       }
     } catch (e, s) {
       Logging.instance.log(
@@ -100,8 +131,10 @@ class _VerifyUpdatedWalletViewState
 
   @override
   void initState() {
-    config = ref.read(pFrostReshareNewWalletData)!.multisigConfig;
-    serializedKeys = ref.read(pFrostReshareNewWalletData)!.serializedKeys;
+    config = ref.read(pFrostResharingData).newWalletData!.multisigConfig;
+    serializedKeys =
+        ref.read(pFrostResharingData).newWalletData!.serializedKeys;
+    reshareId = ref.read(pFrostResharingData).newWalletData!.resharedId;
     super.initState();
   }
 

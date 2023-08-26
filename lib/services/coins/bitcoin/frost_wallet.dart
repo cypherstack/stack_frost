@@ -487,26 +487,35 @@ class FrostWallet extends CoinServiceAPI
   Future<void> updateWithResharedData({
     required String serializedKeys,
     required String multisigConfig,
+    required bool isNewWallet,
   }) async {
-    await _saveSerializedKeys(serializedKeys);
-    await _saveMultisigConfig(multisigConfig);
-
-    await saveThreshold(
-      frost.getThresholdFromKeys(
+    if (isNewWallet) {
+      await recoverFromSerializedKeys(
         serializedKeys: serializedKeys,
-      ),
-    );
+        multisigConfig: multisigConfig,
+        isRescan: false,
+      );
+    } else {
+      await _saveSerializedKeys(serializedKeys);
+      await _saveMultisigConfig(multisigConfig);
 
-    final myNameIndex = frost.getParticipantIndexFromKeys(
-      serializedKeys: serializedKeys,
-    );
-    final participants = Frost.getParticipants(
-      multisigConfig: multisigConfig,
-    );
-    final myName = participants[myNameIndex];
+      await saveThreshold(
+        frost.getThresholdFromKeys(
+          serializedKeys: serializedKeys,
+        ),
+      );
 
-    await updateParticipants(participants);
-    await saveMyName(myName);
+      final myNameIndex = frost.getParticipantIndexFromKeys(
+        serializedKeys: serializedKeys,
+      );
+      final participants = Frost.getParticipants(
+        multisigConfig: multisigConfig,
+      );
+      final myName = participants[myNameIndex];
+
+      await updateParticipants(participants);
+      await saveMyName(myName);
+    }
   }
 
   Future<void> recoverFromSerializedKeys({
@@ -564,7 +573,7 @@ class FrostWallet extends CoinServiceAPI
       ]);
     } catch (e, s) {
       Logging.instance.log(
-        "recoverFromSerializedKeys failed to deserialize keys: $e\n$s",
+        "recoverFromSerializedKeys failed: $e\n$s",
         level: LogLevel.Fatal,
       );
       rethrow;

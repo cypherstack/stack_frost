@@ -2,9 +2,7 @@ import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:qr_flutter/qr_flutter.dart';
-import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/step_2/continue_resharing_view.dart';
-import 'package:stackfrost/pages/wallet_view/transaction_views/transaction_details_view.dart';
+import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/new/new_continue_sharing_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
 import 'package:stackfrost/services/frost.dart';
@@ -16,11 +14,9 @@ import 'package:stackfrost/utilities/util.dart';
 import 'package:stackfrost/widgets/background.dart';
 import 'package:stackfrost/widgets/conditional_parent.dart';
 import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
-import 'package:stackfrost/widgets/custom_buttons/simple_copy_button.dart';
 import 'package:stackfrost/widgets/desktop/desktop_app_bar.dart';
 import 'package:stackfrost/widgets/desktop/desktop_scaffold.dart';
 import 'package:stackfrost/widgets/desktop/primary_button.dart';
-import 'package:stackfrost/widgets/detail_item.dart';
 import 'package:stackfrost/widgets/icon_widgets/clipboard_icon.dart';
 import 'package:stackfrost/widgets/icon_widgets/qrcode_icon.dart';
 import 'package:stackfrost/widgets/icon_widgets/x_icon.dart';
@@ -28,28 +24,26 @@ import 'package:stackfrost/widgets/stack_dialog.dart';
 import 'package:stackfrost/widgets/stack_text_field.dart';
 import 'package:stackfrost/widgets/textfield_icon_button.dart';
 
-class BeginResharingView extends ConsumerStatefulWidget {
-  const BeginResharingView({
+class NewStartResharingView extends ConsumerStatefulWidget {
+  const NewStartResharingView({
     super.key,
     required this.walletId,
   });
 
-  static const String routeName = "/beginResharingView";
+  static const String routeName = "/newStartResharingView";
 
   final String walletId;
 
   @override
-  ConsumerState<BeginResharingView> createState() => _BeginResharingViewState();
+  ConsumerState<NewStartResharingView> createState() =>
+      _NewStartResharingViewState();
 }
 
-class _BeginResharingViewState extends ConsumerState<BeginResharingView> {
+class _NewStartResharingViewState extends ConsumerState<NewStartResharingView> {
   final List<TextEditingController> controllers = [];
   final List<FocusNode> focusNodes = [];
 
-  late final List<String> resharerNamesWithoutMe;
-  late final String myName;
-  late final int myResharerIndex;
-  late final String myResharerStart;
+  late final List<int> resharerIndexes;
 
   final List<bool> fieldIsEmptyFlags = [];
 
@@ -61,20 +55,19 @@ class _BeginResharingViewState extends ConsumerState<BeginResharingView> {
     _buttonLock = true;
 
     try {
-      // collect resharer strings and insert my own at the correct index
+      // collect resharer strings
       final resharerStarts = controllers.map((e) => e.text).toList();
-      resharerStarts.insert(myResharerIndex, myResharerStart);
 
       final result = Frost.beginReshared(
-        myName: myName,
-        resharerConfig: ref.read(pFrostResharerConfig)!,
+        myName: ref.read(pFrostResharingData).myName!,
+        resharerConfig: ref.read(pFrostResharingData).resharerConfig!,
         resharerStarts: resharerStarts,
       );
 
-      ref.read(pFrostResharedData.state).state = result;
+      ref.read(pFrostResharingData).startResharedData = result;
 
       await Navigator.of(context).pushNamed(
-        ContinueResharingView.routeName,
+        NewContinueSharingView.routeName,
         arguments: widget.walletId,
       );
     } catch (e, s) {
@@ -98,17 +91,9 @@ class _BeginResharingViewState extends ConsumerState<BeginResharingView> {
 
   @override
   void initState() {
-    myName = ref.read(pFrostMyName)!;
-    myResharerStart = ref.read(pFrostResharerData)!.resharerStart;
+    resharerIndexes = ref.read(pFrostResharingData).configData!.resharers;
 
-    resharerNamesWithoutMe = ref.read(pFrostResharers).keys.toList();
-
-    myResharerIndex = resharerNamesWithoutMe.indexOf(myName);
-
-    // remove my name for now as we don't need a text field for it
-    resharerNamesWithoutMe.remove(myName);
-
-    for (int i = 0; i < resharerNamesWithoutMe.length; i++) {
+    for (int i = 0; i < resharerIndexes.length; i++) {
       controllers.add(TextEditingController());
       focusNodes.add(FocusNode());
       fieldIsEmptyFlags.add(true);
@@ -183,41 +168,11 @@ class _BeginResharingViewState extends ConsumerState<BeginResharingView> {
         ),
         child: Column(
           children: [
-            SizedBox(
-              height: 220,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  QrImageView(
-                    data: myResharerStart,
-                    size: 220,
-                    backgroundColor:
-                        Theme.of(context).extension<StackColors>()!.background,
-                    foregroundColor: Theme.of(context)
-                        .extension<StackColors>()!
-                        .accentColorDark,
-                  ),
-                ],
-              ),
-            ),
-            const _Div(),
-            DetailItem(
-              title: "My resharer",
-              detail: myResharerStart,
-              button: Util.isDesktop
-                  ? IconCopyButton(
-                      data: myResharerStart,
-                    )
-                  : SimpleCopyButton(
-                      data: myResharerStart,
-                    ),
-            ),
-            const _Div(),
             Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                for (int i = 0; i < resharerNamesWithoutMe.length; i++)
+                for (int i = 0; i < resharerIndexes.length; i++)
                   Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -243,8 +198,8 @@ class _BeginResharingViewState extends ConsumerState<BeginResharingView> {
                               });
                             },
                             decoration: standardInputDecoration(
-                              "Enter "
-                              "${resharerNamesWithoutMe[i]}"
+                              "Enter index "
+                              "${resharerIndexes[i]}"
                               "'s resharer",
                               focusNodes[i],
                               context,

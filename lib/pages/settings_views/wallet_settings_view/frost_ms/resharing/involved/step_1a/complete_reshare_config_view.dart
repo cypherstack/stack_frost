@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/step_1a/display_reshare_config_view.dart';
+import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/involved/step_1a/display_reshare_config_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
 import 'package:stackfrost/providers/global/wallets_provider.dart';
@@ -22,11 +22,13 @@ final class CompleteReshareConfigView extends ConsumerStatefulWidget {
   const CompleteReshareConfigView({
     super.key,
     required this.walletId,
+    required this.resharers,
   });
 
   static const String routeName = "/completeReshareConfigView";
 
   final String walletId;
+  final List<int> resharers;
 
   @override
   ConsumerState<CompleteReshareConfigView> createState() =>
@@ -242,11 +244,12 @@ class _CompleteReshareConfigViewState
 
                 final config = Frost.createResharerConfig(
                   newThreshold: int.parse(_newThresholdController.text),
-                  resharers: ref.read(pFrostResharers).values.toList(),
+                  resharers: widget.resharers,
                   newParticipants: controllers.map((e) => e.text).toList(),
                 );
 
-                ref.read(pFrostResharerConfig.notifier).state = config;
+                ref.read(pFrostResharingData).myName = wallet.myName;
+                ref.read(pFrostResharingData).resharerConfig = config;
 
                 await Navigator.of(context).pushNamed(
                   DisplayReshareConfigView.routeName,

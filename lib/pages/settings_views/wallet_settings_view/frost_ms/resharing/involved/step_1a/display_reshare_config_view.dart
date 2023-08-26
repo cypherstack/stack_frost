@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/step_2/begin_resharing_view.dart';
+import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/involved/step_2/begin_resharing_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
 import 'package:stackfrost/providers/global/wallets_provider.dart';
@@ -57,10 +57,10 @@ class _DisplayReshareConfigViewState
       if (mounted) {
         final result = Frost.beginResharer(
           serializedKeys: serializedKeys!,
-          config: ref.read(pFrostResharerConfig)!,
+          config: ref.read(pFrostResharingData).resharerConfig!,
         );
 
-        ref.read(pFrostResharerData.state).state = result;
+        ref.read(pFrostResharingData).startResharerData = result;
 
         await Navigator.of(context).pushNamed(
           BeginResharingView.routeName,
@@ -87,8 +87,18 @@ class _DisplayReshareConfigViewState
 
   @override
   void initState() {
-    iAmInvolved =
-        ref.read(pFrostResharers).keys.contains(ref.read(pFrostMyName)!);
+    final wallet = ref
+        .read(walletsChangeNotifierProvider)
+        .getManager(widget.walletId)
+        .wallet as FrostWallet;
+
+    final myOldIndex = wallet.participants.indexOf(wallet.myName);
+
+    iAmInvolved = ref
+        .read(pFrostResharingData)
+        .configData!
+        .resharers
+        .contains(myOldIndex);
     super.initState();
   }
 
@@ -155,7 +165,7 @@ class _DisplayReshareConfigViewState
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   QrImageView(
-                    data: ref.watch(pFrostResharerConfig.state).state!,
+                    data: ref.watch(pFrostResharingData).resharerConfig!,
                     size: 220,
                     backgroundColor:
                         Theme.of(context).extension<StackColors>()!.background,
@@ -171,7 +181,7 @@ class _DisplayReshareConfigViewState
             ),
             RoundedWhiteContainer(
               child: SelectableText(
-                ref.watch(pFrostResharerConfig.state).state!,
+                ref.watch(pFrostResharingData).resharerConfig!,
                 style: STextStyles.itemSubtitle(context),
               ),
             ),
