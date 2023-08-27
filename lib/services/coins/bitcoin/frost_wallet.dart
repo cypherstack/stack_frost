@@ -489,32 +489,32 @@ class FrostWallet extends CoinServiceAPI
     required String multisigConfig,
     required bool isNewWallet,
   }) async {
+    await _saveSerializedKeys(serializedKeys);
+    await _saveMultisigConfig(multisigConfig);
+
+    await saveThreshold(
+      frost.getThresholdFromKeys(
+        serializedKeys: serializedKeys,
+      ),
+    );
+
+    final myNameIndex = frost.getParticipantIndexFromKeys(
+      serializedKeys: serializedKeys,
+    );
+    final participants = Frost.getParticipants(
+      multisigConfig: multisigConfig,
+    );
+    final myName = participants[myNameIndex];
+
+    await updateParticipants(participants);
+    await saveMyName(myName);
+
     if (isNewWallet) {
       await recoverFromSerializedKeys(
         serializedKeys: serializedKeys,
         multisigConfig: multisigConfig,
         isRescan: false,
       );
-    } else {
-      await _saveSerializedKeys(serializedKeys);
-      await _saveMultisigConfig(multisigConfig);
-
-      await saveThreshold(
-        frost.getThresholdFromKeys(
-          serializedKeys: serializedKeys,
-        ),
-      );
-
-      final myNameIndex = frost.getParticipantIndexFromKeys(
-        serializedKeys: serializedKeys,
-      );
-      final participants = Frost.getParticipants(
-        multisigConfig: multisigConfig,
-      );
-      final myName = participants[myNameIndex];
-
-      await updateParticipants(participants);
-      await saveMyName(myName);
     }
   }
 
