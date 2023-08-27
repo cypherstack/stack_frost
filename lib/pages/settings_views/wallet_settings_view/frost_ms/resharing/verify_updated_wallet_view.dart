@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:stackfrost/pages/home_view/home_view.dart';
 import 'package:stackfrost/pages/wallet_view/transaction_views/transaction_details_view.dart';
 import 'package:stackfrost/pages/wallet_view/wallet_view.dart';
+import 'package:stackfrost/pages_desktop_specific/desktop_home_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/desktop_wallet_view.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
@@ -103,9 +105,13 @@ class _VerifyUpdatedWalletViewState
 
           Navigator.of(context).popUntil(
             ModalRoute.withName(
-              Util.isDesktop
-                  ? DesktopWalletView.routeName
-                  : WalletView.routeName,
+              isNew
+                  ? Util.isDesktop
+                      ? DesktopHomeView.routeName
+                      : HomeView.routeName
+                  : Util.isDesktop
+                      ? DesktopWalletView.routeName
+                      : WalletView.routeName,
             ),
           );
         }
