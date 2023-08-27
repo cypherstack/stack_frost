@@ -118,8 +118,7 @@ class _FinishResharingViewState extends ConsumerState<FinishResharingView> {
       myResharerComplete = null;
       myResharerIndexIndex = null;
     } else {
-      myResharerComplete =
-          ref.read(pFrostResharingData).startResharedData!.resharedStart;
+      myResharerComplete = ref.read(pFrostResharingData).resharerComplete!;
 
       final wallet = ref
           .read(walletsChangeNotifierProvider)
