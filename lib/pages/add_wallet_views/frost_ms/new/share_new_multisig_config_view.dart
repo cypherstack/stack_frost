@@ -101,7 +101,8 @@ class _ShareNewMultisigConfigViewState
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   QrImageView(
-                    data: ref.watch(pFrostMultisigConfig.state).state!,
+                    data:
+                        ref.watch(pFrostMultisigConfig.state).state ?? "Error",
                     size: 220,
                     backgroundColor:
                         Theme.of(context).extension<StackColors>()!.background,
