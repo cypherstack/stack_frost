@@ -458,6 +458,7 @@ abstract class Frost {
     }
   }
 
+  /// expects [resharerStarts] of length equal to resharers.
   static ({
     String resharedStart,
     Pointer<StartResharedRes> prior,
@@ -486,6 +487,7 @@ abstract class Frost {
     }
   }
 
+  /// expects [encryptionKeysOfResharedTo] of length equal to new participants
   static String finishResharer({
     required StartResharerRes machine,
     required List<String> encryptionKeysOfResharedTo,
@@ -505,6 +507,7 @@ abstract class Frost {
     }
   }
 
+  /// expects [resharerCompletes] of length equal to resharers
   static ({
     String multisigConfig,
     String serializedKeys,
