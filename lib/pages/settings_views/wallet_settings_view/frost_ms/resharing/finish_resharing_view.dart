@@ -7,7 +7,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/verify_updated_wallet_view.dart';
 import 'package:stackfrost/pages/wallet_view/transaction_views/transaction_details_view.dart';
+import 'package:stackfrost/pages/wallet_view/wallet_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
+import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/desktop_wallet_view.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
 import 'package:stackfrost/providers/global/wallets_provider.dart';
 import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
@@ -55,6 +57,7 @@ class _FinishResharingViewState extends ConsumerState<FinishResharingView> {
   late final String myName;
   late final int? myResharerIndexIndex;
   late final String? myResharerComplete;
+  late final bool amOutgoingParticipant;
 
   final List<bool> fieldIsEmptyFlags = [];
 
@@ -66,23 +69,32 @@ class _FinishResharingViewState extends ConsumerState<FinishResharingView> {
     _buttonLock = true;
 
     try {
-      // collect resharer completes strings and insert my own at the correct index
-      final resharerCompletes = controllers.map((e) => e.text).toList();
-      if (myResharerIndexIndex != null && myResharerComplete != null) {
-        resharerCompletes.insert(myResharerIndexIndex!, myResharerComplete!);
+      if (amOutgoingParticipant) {
+        ref.read(pFrostResharingData).reset();
+        Navigator.of(context).popUntil(
+          ModalRoute.withName(
+            Util.isDesktop ? DesktopWalletView.routeName : WalletView.routeName,
+          ),
+        );
+      } else {
+        // collect resharer completes strings and insert my own at the correct index
+        final resharerCompletes = controllers.map((e) => e.text).toList();
+        if (myResharerIndexIndex != null && myResharerComplete != null) {
+          resharerCompletes.insert(myResharerIndexIndex!, myResharerComplete!);
+        }
+
+        final data = Frost.finishReshared(
+          prior: ref.read(pFrostResharingData).startResharedData!.prior.ref,
+          resharerCompletes: resharerCompletes,
+        );
+
+        ref.read(pFrostResharingData).newWalletData = data;
+
+        await Navigator.of(context).pushNamed(
+          VerifyUpdatedWalletView.routeName,
+          arguments: widget.walletId,
+        );
       }
-
-      final data = Frost.finishReshared(
-        prior: ref.read(pFrostResharingData).startResharedData!.prior.ref,
-        resharerCompletes: resharerCompletes,
-      );
-
-      ref.read(pFrostResharingData).newWalletData = data;
-
-      await Navigator.of(context).pushNamed(
-        VerifyUpdatedWalletView.routeName,
-        arguments: widget.walletId,
-      );
     } catch (e, s) {
       Logging.instance.log(
         "$e\n$s",
@@ -117,6 +129,7 @@ class _FinishResharingViewState extends ConsumerState<FinishResharingView> {
     if (amNewParticipant) {
       myResharerComplete = null;
       myResharerIndexIndex = null;
+      amOutgoingParticipant = false;
     } else {
       myResharerComplete = ref.read(pFrostResharingData).resharerComplete!;
 
@@ -124,13 +137,20 @@ class _FinishResharingViewState extends ConsumerState<FinishResharingView> {
           .read(walletsChangeNotifierProvider)
           .getManager(widget.walletId)
           .wallet as FrostWallet;
-      final myOldIndex = wallet.participants.indexOf(wallet.myName);
+      final myOldIndex =
+          wallet.participants.indexOf(ref.read(pFrostResharingData).myName!);
 
       myResharerIndexIndex = resharerIndexes.indexOf(myOldIndex);
       if (myResharerIndexIndex! >= 0) {
         // remove my name for now as we don't need a text field for it
         resharerIndexes.removeAt(myResharerIndexIndex!);
       }
+
+      amOutgoingParticipant = !ref
+          .read(pFrostResharingData)
+          .configData!
+          .newParticipants
+          .contains(ref.read(pFrostResharingData).myName!);
     }
 
     for (int i = 0; i < resharerIndexes.length; i++) {
@@ -240,87 +260,121 @@ class _FinishResharingViewState extends ConsumerState<FinishResharingView> {
                         data: myResharerComplete!,
                       ),
               ),
-            const _Div(),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                for (int i = 0; i < resharerIndexes.length; i++)
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(
-                            Constants.size.circularBorderRadius,
-                          ),
-                          child: TextField(
-                            key: Key("frostEncryptionKeyTextFieldKey_$i"),
-                            controller: controllers[i],
-                            focusNode: focusNodes[i],
-                            readOnly: false,
-                            autocorrect: false,
-                            enableSuggestions: false,
-                            style: STextStyles.field(context),
-                            onChanged: (_) {
-                              setState(() {
-                                fieldIsEmptyFlags[i] =
-                                    controllers[i].text.isEmpty;
-                              });
-                            },
-                            decoration: standardInputDecoration(
-                              "Enter index "
-                              "${resharerIndexes[i]}"
-                              "'s resharer complete",
-                              focusNodes[i],
-                              context,
-                            ).copyWith(
-                              contentPadding: const EdgeInsets.only(
-                                left: 16,
-                                top: 6,
-                                bottom: 8,
-                                right: 5,
-                              ),
-                              suffixIcon: Padding(
-                                padding: fieldIsEmptyFlags[i]
-                                    ? const EdgeInsets.only(right: 8)
-                                    : const EdgeInsets.only(right: 0),
-                                child: UnconstrainedBox(
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    children: [
-                                      !fieldIsEmptyFlags[i]
-                                          ? TextFieldIconButton(
-                                              semanticsLabel:
-                                                  "Clear Button. Clears The Encryption Key Field Input.",
-                                              key: Key(
-                                                  "frostEncryptionKeyClearButtonKey_$i"),
-                                              onTap: () {
-                                                controllers[i].text = "";
+            if (!amOutgoingParticipant) const _Div(),
+            if (!amOutgoingParticipant)
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (int i = 0; i < resharerIndexes.length; i++)
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(
+                              Constants.size.circularBorderRadius,
+                            ),
+                            child: TextField(
+                              key: Key("frostEncryptionKeyTextFieldKey_$i"),
+                              controller: controllers[i],
+                              focusNode: focusNodes[i],
+                              readOnly: false,
+                              autocorrect: false,
+                              enableSuggestions: false,
+                              style: STextStyles.field(context),
+                              onChanged: (_) {
+                                setState(() {
+                                  fieldIsEmptyFlags[i] =
+                                      controllers[i].text.isEmpty;
+                                });
+                              },
+                              decoration: standardInputDecoration(
+                                "Enter index "
+                                "${resharerIndexes[i]}"
+                                "'s resharer complete",
+                                focusNodes[i],
+                                context,
+                              ).copyWith(
+                                contentPadding: const EdgeInsets.only(
+                                  left: 16,
+                                  top: 6,
+                                  bottom: 8,
+                                  right: 5,
+                                ),
+                                suffixIcon: Padding(
+                                  padding: fieldIsEmptyFlags[i]
+                                      ? const EdgeInsets.only(right: 8)
+                                      : const EdgeInsets.only(right: 0),
+                                  child: UnconstrainedBox(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: [
+                                        !fieldIsEmptyFlags[i]
+                                            ? TextFieldIconButton(
+                                                semanticsLabel:
+                                                    "Clear Button. Clears The Encryption Key Field Input.",
+                                                key: Key(
+                                                    "frostEncryptionKeyClearButtonKey_$i"),
+                                                onTap: () {
+                                                  controllers[i].text = "";
 
-                                                setState(() {
-                                                  fieldIsEmptyFlags[i] = true;
-                                                });
-                                              },
-                                              child: const XIcon(),
-                                            )
-                                          : TextFieldIconButton(
-                                              semanticsLabel:
-                                                  "Paste Button. Pastes From Clipboard To Encryption Key Field Input.",
-                                              key: Key(
-                                                  "frostEncryptionKeyPasteButtonKey_$i"),
-                                              onTap: () async {
-                                                final ClipboardData? data =
-                                                    await Clipboard.getData(
-                                                        Clipboard.kTextPlain);
-                                                if (data?.text != null &&
-                                                    data!.text!.isNotEmpty) {
-                                                  controllers[i].text =
-                                                      data.text!.trim();
+                                                  setState(() {
+                                                    fieldIsEmptyFlags[i] = true;
+                                                  });
+                                                },
+                                                child: const XIcon(),
+                                              )
+                                            : TextFieldIconButton(
+                                                semanticsLabel:
+                                                    "Paste Button. Pastes From Clipboard To Encryption Key Field Input.",
+                                                key: Key(
+                                                    "frostEncryptionKeyPasteButtonKey_$i"),
+                                                onTap: () async {
+                                                  final ClipboardData? data =
+                                                      await Clipboard.getData(
+                                                          Clipboard.kTextPlain);
+                                                  if (data?.text != null &&
+                                                      data!.text!.isNotEmpty) {
+                                                    controllers[i].text =
+                                                        data.text!.trim();
+                                                  }
+
+                                                  setState(() {
+                                                    fieldIsEmptyFlags[i] =
+                                                        controllers[i]
+                                                            .text
+                                                            .isEmpty;
+                                                  });
+                                                },
+                                                child: fieldIsEmptyFlags[i]
+                                                    ? const ClipboardIcon()
+                                                    : const XIcon(),
+                                              ),
+                                        if (fieldIsEmptyFlags[i])
+                                          TextFieldIconButton(
+                                            semanticsLabel: "Scan QR Button. "
+                                                "Opens Camera For Scanning QR Code.",
+                                            key: Key("frostScanQrButtonKey_$i"),
+                                            onTap: () async {
+                                              try {
+                                                if (FocusScope.of(context)
+                                                    .hasFocus) {
+                                                  FocusScope.of(context)
+                                                      .unfocus();
+                                                  await Future<void>.delayed(
+                                                      const Duration(
+                                                          milliseconds: 75));
                                                 }
+
+                                                final qrResult =
+                                                    await BarcodeScanner.scan();
+
+                                                controllers[i].text =
+                                                    qrResult.rawContent;
 
                                                 setState(() {
                                                   fieldIsEmptyFlags[i] =
@@ -328,64 +382,34 @@ class _FinishResharingViewState extends ConsumerState<FinishResharingView> {
                                                           .text
                                                           .isEmpty;
                                                 });
-                                              },
-                                              child: fieldIsEmptyFlags[i]
-                                                  ? const ClipboardIcon()
-                                                  : const XIcon(),
-                                            ),
-                                      if (fieldIsEmptyFlags[i])
-                                        TextFieldIconButton(
-                                          semanticsLabel: "Scan QR Button. "
-                                              "Opens Camera For Scanning QR Code.",
-                                          key: Key("frostScanQrButtonKey_$i"),
-                                          onTap: () async {
-                                            try {
-                                              if (FocusScope.of(context)
-                                                  .hasFocus) {
-                                                FocusScope.of(context)
-                                                    .unfocus();
-                                                await Future<void>.delayed(
-                                                    const Duration(
-                                                        milliseconds: 75));
+                                              } on PlatformException catch (e, s) {
+                                                Logging.instance.log(
+                                                  "Failed to get camera permissions "
+                                                  "while trying to scan qr code: $e\n$s",
+                                                  level: LogLevel.Warning,
+                                                );
                                               }
-
-                                              final qrResult =
-                                                  await BarcodeScanner.scan();
-
-                                              controllers[i].text =
-                                                  qrResult.rawContent;
-
-                                              setState(() {
-                                                fieldIsEmptyFlags[i] =
-                                                    controllers[i].text.isEmpty;
-                                              });
-                                            } on PlatformException catch (e, s) {
-                                              Logging.instance.log(
-                                                "Failed to get camera permissions "
-                                                "while trying to scan qr code: $e\n$s",
-                                                level: LogLevel.Warning,
-                                              );
-                                            }
-                                          },
-                                          child: const QrCodeIcon(),
-                                        ),
-                                    ],
+                                            },
+                                            child: const QrCodeIcon(),
+                                          ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-              ],
-            ),
+                      ],
+                    ),
+                ],
+              ),
             if (!Util.isDesktop) const Spacer(),
             const _Div(),
             PrimaryButton(
-              label: "Complete",
-              enabled: !fieldIsEmptyFlags.reduce((v, e) => v |= e),
+              label: amOutgoingParticipant ? "Exit" : "Complete",
+              enabled: amOutgoingParticipant ||
+                  !fieldIsEmptyFlags.reduce((v, e) => v |= e),
               onPressed: _onPressed,
             ),
           ],

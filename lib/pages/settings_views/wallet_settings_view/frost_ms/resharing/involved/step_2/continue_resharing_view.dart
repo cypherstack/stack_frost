@@ -49,9 +49,10 @@ class _ContinueResharingViewState extends ConsumerState<ContinueResharingView> {
   final List<TextEditingController> controllers = [];
   final List<FocusNode> focusNodes = [];
 
-  late final List<String> participants;
+  late final List<String> newParticipants;
   late final int myIndex;
-  late final String myEncryptionKey;
+  late final String? myEncryptionKey;
+  late final bool amOutgoingParticipant;
 
   final List<bool> fieldIsEmptyFlags = [];
 
@@ -65,7 +66,9 @@ class _ContinueResharingViewState extends ConsumerState<ContinueResharingView> {
     try {
       // collect encryptionKeys strings and insert my own at the correct index
       final encryptionKeys = controllers.map((e) => e.text).toList();
-      encryptionKeys.insert(myIndex, myEncryptionKey);
+      if (!amOutgoingParticipant) {
+        encryptionKeys.insert(myIndex, myEncryptionKey!);
+      }
 
       final result = Frost.finishResharer(
         machine: ref.read(pFrostResharingData).startResharerData!.machine.ref,
@@ -100,17 +103,25 @@ class _ContinueResharingViewState extends ConsumerState<ContinueResharingView> {
   @override
   void initState() {
     myEncryptionKey =
-        ref.read(pFrostResharingData).startResharedData!.resharedStart;
+        ref.read(pFrostResharingData).startResharedData?.resharedStart;
 
-    participants = ref.read(pFrostResharingData).configData!.newParticipants;
-    myIndex = participants.indexOf(ref.read(pFrostResharingData).myName!);
+    newParticipants = ref.read(pFrostResharingData).configData!.newParticipants;
+    myIndex = newParticipants.indexOf(ref.read(pFrostResharingData).myName!);
 
     if (myIndex >= 0) {
       // remove my name for now as we don't need a text field for it
-      participants.removeAt(myIndex);
+      newParticipants.removeAt(myIndex);
     }
 
-    for (int i = 0; i < participants.length; i++) {
+    if (myEncryptionKey == null && myIndex == -1) {
+      amOutgoingParticipant = true;
+    } else if (myEncryptionKey != null && myIndex >= 0) {
+      amOutgoingParticipant = false;
+    } else {
+      throw Exception("Invalid resharing state");
+    }
+
+    for (int i = 0; i < newParticipants.length; i++) {
       controllers.add(TextEditingController());
       focusNodes.add(FocusNode());
       fieldIsEmptyFlags.add(true);
@@ -185,41 +196,44 @@ class _ContinueResharingViewState extends ConsumerState<ContinueResharingView> {
         ),
         child: Column(
           children: [
-            SizedBox(
-              height: 220,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  QrImageView(
-                    data: myEncryptionKey,
-                    size: 220,
-                    backgroundColor:
-                        Theme.of(context).extension<StackColors>()!.background,
-                    foregroundColor: Theme.of(context)
-                        .extension<StackColors>()!
-                        .accentColorDark,
-                  ),
-                ],
-              ),
-            ),
-            const _Div(),
-            DetailItem(
-              title: "My encryption key",
-              detail: myEncryptionKey,
-              button: Util.isDesktop
-                  ? IconCopyButton(
-                      data: myEncryptionKey,
-                    )
-                  : SimpleCopyButton(
-                      data: myEncryptionKey,
+            if (!amOutgoingParticipant)
+              SizedBox(
+                height: 220,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    QrImageView(
+                      data: myEncryptionKey!,
+                      size: 220,
+                      backgroundColor: Theme.of(context)
+                          .extension<StackColors>()!
+                          .background,
+                      foregroundColor: Theme.of(context)
+                          .extension<StackColors>()!
+                          .accentColorDark,
                     ),
-            ),
-            const _Div(),
+                  ],
+                ),
+              ),
+            if (!amOutgoingParticipant) const _Div(),
+            if (!amOutgoingParticipant)
+              DetailItem(
+                title: "My encryption key",
+                detail: myEncryptionKey!,
+                button: Util.isDesktop
+                    ? IconCopyButton(
+                        data: myEncryptionKey!,
+                      )
+                    : SimpleCopyButton(
+                        data: myEncryptionKey!,
+                      ),
+              ),
+            if (!amOutgoingParticipant) const _Div(),
             Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                for (int i = 0; i < participants.length; i++)
+                for (int i = 0; i < newParticipants.length; i++)
                   Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -246,7 +260,7 @@ class _ContinueResharingViewState extends ConsumerState<ContinueResharingView> {
                             },
                             decoration: standardInputDecoration(
                               "Enter "
-                              "${participants[i]}"
+                              "${newParticipants[i]}"
                               "'s encryption key",
                               focusNodes[i],
                               context,

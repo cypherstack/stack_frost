@@ -51,10 +51,12 @@ class _BeginResharingViewState extends ConsumerState<BeginResharingView> {
   late final List<int> resharerIndexes;
   late final int myResharerIndexIndex;
   late final String myResharerStart;
+  late final bool amOutgoingParticipant;
 
   final List<bool> fieldIsEmptyFlags = [];
 
   bool _buttonLock = false;
+
   Future<void> _onPressed() async {
     if (_buttonLock) {
       return;
@@ -62,21 +64,22 @@ class _BeginResharingViewState extends ConsumerState<BeginResharingView> {
     _buttonLock = true;
 
     try {
-      // collect resharer strings
-      final resharerStarts = controllers.map((e) => e.text).toList();
-      if (myResharerIndexIndex >= 0) {
-        // only insert my own at the correct index if I am a resharer
-        resharerStarts.insert(myResharerIndexIndex, myResharerStart);
+      if (!amOutgoingParticipant) {
+        // collect resharer strings
+        final resharerStarts = controllers.map((e) => e.text).toList();
+        if (myResharerIndexIndex >= 0) {
+          // only insert my own at the correct index if I am a resharer
+          resharerStarts.insert(myResharerIndexIndex, myResharerStart);
+        }
+
+        final result = Frost.beginReshared(
+          myName: ref.read(pFrostResharingData).myName!,
+          resharerConfig: ref.read(pFrostResharingData).resharerConfig!,
+          resharerStarts: resharerStarts,
+        );
+
+        ref.read(pFrostResharingData).startResharedData = result;
       }
-
-      final result = Frost.beginReshared(
-        myName: ref.read(pFrostResharingData).myName!,
-        resharerConfig: ref.read(pFrostResharingData).resharerConfig!,
-        resharerStarts: resharerStarts,
-      );
-
-      ref.read(pFrostResharingData).startResharedData = result;
-
       await Navigator.of(context).pushNamed(
         ContinueResharingView.routeName,
         arguments: widget.walletId,
@@ -106,7 +109,8 @@ class _BeginResharingViewState extends ConsumerState<BeginResharingView> {
         .read(walletsChangeNotifierProvider)
         .getManager(widget.walletId)
         .wallet as FrostWallet;
-    final myOldIndex = wallet.participants.indexOf(wallet.myName);
+    final myOldIndex =
+        wallet.participants.indexOf(ref.read(pFrostResharingData).myName!);
 
     myResharerStart =
         ref.read(pFrostResharingData).startResharerData!.resharerStart;
@@ -117,6 +121,12 @@ class _BeginResharingViewState extends ConsumerState<BeginResharingView> {
       // remove my name for now as we don't need a text field for it
       resharerIndexes.removeAt(myResharerIndexIndex);
     }
+
+    amOutgoingParticipant = !ref
+        .read(pFrostResharingData)
+        .configData!
+        .newParticipants
+        .contains(ref.read(pFrostResharingData).myName!);
 
     for (int i = 0; i < resharerIndexes.length; i++) {
       controllers.add(TextEditingController());
@@ -368,7 +378,8 @@ class _BeginResharingViewState extends ConsumerState<BeginResharingView> {
             const _Div(),
             PrimaryButton(
               label: "Continue",
-              enabled: !fieldIsEmptyFlags.reduce((v, e) => v |= e),
+              enabled: amOutgoingParticipant ||
+                  !fieldIsEmptyFlags.reduce((v, e) => v |= e),
               onPressed: _onPressed,
             ),
           ],
