@@ -112,7 +112,7 @@ class _NewContinueSharingViewState
             ),
             const _Div(),
             DetailItem(
-              title: "My reshared start",
+              title: "My encryption key",
               detail: ref
                   .watch(pFrostResharingData)
                   .startResharedData!

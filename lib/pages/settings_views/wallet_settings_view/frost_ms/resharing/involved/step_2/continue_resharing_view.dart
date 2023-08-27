@@ -9,8 +9,6 @@ import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/re
 import 'package:stackfrost/pages/wallet_view/transaction_views/transaction_details_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
-import 'package:stackfrost/providers/global/wallets_provider.dart';
-import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
 import 'package:stackfrost/services/frost.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/utilities/constants.dart';
@@ -51,8 +49,8 @@ class _ContinueResharingViewState extends ConsumerState<ContinueResharingView> {
   final List<TextEditingController> controllers = [];
   final List<FocusNode> focusNodes = [];
 
-  late final List<int> resharerIndexes;
-  late final int myResharerIndexIndex;
+  late final List<String> participants;
+  late final int myIndex;
   late final String myEncryptionKey;
 
   final List<bool> fieldIsEmptyFlags = [];
@@ -67,7 +65,7 @@ class _ContinueResharingViewState extends ConsumerState<ContinueResharingView> {
     try {
       // collect encryptionKeys strings and insert my own at the correct index
       final encryptionKeys = controllers.map((e) => e.text).toList();
-      encryptionKeys.insert(myResharerIndexIndex, myEncryptionKey);
+      encryptionKeys.insert(myIndex, myEncryptionKey);
 
       final result = Frost.finishResharer(
         machine: ref.read(pFrostResharingData).startResharerData!.machine.ref,
@@ -101,24 +99,18 @@ class _ContinueResharingViewState extends ConsumerState<ContinueResharingView> {
 
   @override
   void initState() {
-    final wallet = ref
-        .read(walletsChangeNotifierProvider)
-        .getManager(widget.walletId)
-        .wallet as FrostWallet;
-    final myOldIndex = wallet.participants.indexOf(wallet.myName);
-
     myEncryptionKey =
-        ref.read(pFrostResharingData).startResharerData!.resharerStart;
+        ref.read(pFrostResharingData).startResharedData!.resharedStart;
 
-    resharerIndexes = ref.read(pFrostResharingData).configData!.resharers;
-    myResharerIndexIndex = resharerIndexes.indexOf(myOldIndex);
+    participants = ref.read(pFrostResharingData).configData!.newParticipants;
+    myIndex = participants.indexOf(ref.read(pFrostResharingData).myName!);
 
-    if (myResharerIndexIndex >= 0) {
+    if (myIndex >= 0) {
       // remove my name for now as we don't need a text field for it
-      resharerIndexes.removeAt(myResharerIndexIndex);
+      participants.removeAt(myIndex);
     }
 
-    for (int i = 0; i < resharerIndexes.length; i++) {
+    for (int i = 0; i < participants.length; i++) {
       controllers.add(TextEditingController());
       focusNodes.add(FocusNode());
       fieldIsEmptyFlags.add(true);
@@ -227,7 +219,7 @@ class _ContinueResharingViewState extends ConsumerState<ContinueResharingView> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                for (int i = 0; i < resharerIndexes.length; i++)
+                for (int i = 0; i < participants.length; i++)
                   Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -253,8 +245,8 @@ class _ContinueResharingViewState extends ConsumerState<ContinueResharingView> {
                               });
                             },
                             decoration: standardInputDecoration(
-                              "Enter index "
-                              "${resharerIndexes[i]}"
+                              "Enter "
+                              "${participants[i]}"
                               "'s encryption key",
                               focusNodes[i],
                               context,
