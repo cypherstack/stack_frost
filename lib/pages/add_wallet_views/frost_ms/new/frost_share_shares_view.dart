@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:stackfrost/pages/add_wallet_views/frost_ms/new/confirm_new_frost_ms_wallet_creation_view.dart';
-import 'package:stackfrost/pages/add_wallet_views/frost_ms/new/dialogs/quit_frost_ms_wallet_creation_dialog.dart';
+import 'package:stackfrost/pages/home_view/home_view.dart';
 import 'package:stackfrost/pages/wallet_view/transaction_views/transaction_details_view.dart';
 import 'package:stackfrost/pages_desktop_specific/desktop_home_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
@@ -24,6 +24,7 @@ import 'package:stackfrost/widgets/desktop/desktop_app_bar.dart';
 import 'package:stackfrost/widgets/desktop/desktop_scaffold.dart';
 import 'package:stackfrost/widgets/desktop/primary_button.dart';
 import 'package:stackfrost/widgets/detail_item.dart';
+import 'package:stackfrost/widgets/dialogs/frost_interruption_dialog.dart';
 import 'package:stackfrost/widgets/icon_widgets/clipboard_icon.dart';
 import 'package:stackfrost/widgets/icon_widgets/qrcode_icon.dart';
 import 'package:stackfrost/widgets/icon_widgets/x_icon.dart';
@@ -92,17 +93,14 @@ class _FrostShareSharesViewState extends ConsumerState<FrostShareSharesView> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        final result = await showDialog<bool>(
+        await showDialog<void>(
           context: context,
-          builder: (_) => const QuitFrostMSWalletProcessDialog(
-            type: FrostQuitDialogType.walletCreation,
+          builder: (_) => FrostInterruptionDialog(
+            type: FrostInterruptionDialogType.walletCreation,
+            popUntilOnYesRouteName:
+                Util.isDesktop ? DesktopHomeView.routeName : HomeView.routeName,
           ),
         );
-
-        if (result == true && mounted) {
-          Navigator.of(context).pop();
-          Navigator.of(context).pop();
-        }
         return false;
       },
       child: ConditionalParent(
@@ -113,33 +111,24 @@ class _FrostShareSharesViewState extends ConsumerState<FrostShareSharesView> {
             isCompactHeight: false,
             leading: AppBarBackButton(
               onPressed: () async {
-                final result = await showDialog<bool>(
+                await showDialog<void>(
                   context: context,
-                  builder: (_) => const QuitFrostMSWalletProcessDialog(
-                    type: FrostQuitDialogType.walletCreation,
+                  builder: (_) => const FrostInterruptionDialog(
+                    type: FrostInterruptionDialogType.walletCreation,
+                    popUntilOnYesRouteName: DesktopHomeView.routeName,
                   ),
                 );
-
-                if (result == true && mounted) {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).pop();
-                }
               },
             ),
             trailing: ExitToMyStackButton(
               onPressed: () async {
-                final result = await showDialog<bool>(
+                await showDialog<void>(
                   context: context,
-                  builder: (_) => const QuitFrostMSWalletProcessDialog(
-                    type: FrostQuitDialogType.walletCreation,
+                  builder: (_) => const FrostInterruptionDialog(
+                    type: FrostInterruptionDialogType.walletCreation,
+                    popUntilOnYesRouteName: DesktopHomeView.routeName,
                   ),
                 );
-
-                if (result == true && mounted) {
-                  Navigator.of(context).popUntil(
-                    ModalRoute.withName(DesktopHomeView.routeName),
-                  );
-                }
               },
             ),
           ),
@@ -157,17 +146,13 @@ class _FrostShareSharesViewState extends ConsumerState<FrostShareSharesView> {
               appBar: AppBar(
                 leading: AppBarBackButton(
                   onPressed: () async {
-                    final result = await showDialog<bool>(
+                    await showDialog<void>(
                       context: context,
-                      builder: (_) => const QuitFrostMSWalletProcessDialog(
-                        type: FrostQuitDialogType.walletCreation,
+                      builder: (_) => const FrostInterruptionDialog(
+                        type: FrostInterruptionDialogType.walletCreation,
+                        popUntilOnYesRouteName: HomeView.routeName,
                       ),
                     );
-
-                    if (result == true && mounted) {
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop();
-                    }
                   },
                 ),
                 title: Text(

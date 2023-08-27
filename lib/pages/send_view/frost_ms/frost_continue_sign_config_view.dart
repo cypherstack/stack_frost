@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:stackfrost/pages/add_wallet_views/frost_ms/new/dialogs/quit_frost_ms_wallet_creation_dialog.dart';
 import 'package:stackfrost/pages/send_view/frost_ms/frost_complete_sign_view.dart';
 import 'package:stackfrost/pages/wallet_view/transaction_views/transaction_details_view.dart';
+import 'package:stackfrost/pages/wallet_view/wallet_view.dart';
+import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/desktop_wallet_view.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
 import 'package:stackfrost/providers/global/wallets_provider.dart';
 import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
@@ -23,6 +24,7 @@ import 'package:stackfrost/widgets/desktop/desktop_app_bar.dart';
 import 'package:stackfrost/widgets/desktop/desktop_scaffold.dart';
 import 'package:stackfrost/widgets/desktop/primary_button.dart';
 import 'package:stackfrost/widgets/detail_item.dart';
+import 'package:stackfrost/widgets/dialogs/frost_interruption_dialog.dart';
 import 'package:stackfrost/widgets/icon_widgets/clipboard_icon.dart';
 import 'package:stackfrost/widgets/icon_widgets/qrcode_icon.dart';
 import 'package:stackfrost/widgets/icon_widgets/x_icon.dart';
@@ -100,17 +102,15 @@ class _FrostContinueSignViewState extends ConsumerState<FrostContinueSignView> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        final result = await showDialog<bool>(
+        await showDialog<void>(
           context: context,
-          builder: (_) => const QuitFrostMSWalletProcessDialog(
-            type: FrostQuitDialogType.transactionCreation,
+          builder: (_) => FrostInterruptionDialog(
+            type: FrostInterruptionDialogType.transactionCreation,
+            popUntilOnYesRouteName: Util.isDesktop
+                ? DesktopWalletView.routeName
+                : WalletView.routeName,
           ),
         );
-
-        if (result == true && mounted) {
-          Navigator.of(context).pop();
-          Navigator.of(context).pop();
-        }
         return false;
       },
       child: ConditionalParent(
@@ -121,17 +121,13 @@ class _FrostContinueSignViewState extends ConsumerState<FrostContinueSignView> {
             isCompactHeight: false,
             leading: AppBarBackButton(
               onPressed: () async {
-                final result = await showDialog<bool>(
+                await showDialog<void>(
                   context: context,
-                  builder: (_) => const QuitFrostMSWalletProcessDialog(
-                    type: FrostQuitDialogType.transactionCreation,
+                  builder: (_) => const FrostInterruptionDialog(
+                    type: FrostInterruptionDialogType.transactionCreation,
+                    popUntilOnYesRouteName: DesktopWalletView.routeName,
                   ),
                 );
-
-                if (result == true && mounted) {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).pop();
-                }
               },
             ),
           ),
@@ -149,17 +145,13 @@ class _FrostContinueSignViewState extends ConsumerState<FrostContinueSignView> {
               appBar: AppBar(
                 leading: AppBarBackButton(
                   onPressed: () async {
-                    final result = await showDialog<bool>(
+                    await showDialog<void>(
                       context: context,
-                      builder: (_) => const QuitFrostMSWalletProcessDialog(
-                        type: FrostQuitDialogType.walletCreation,
+                      builder: (_) => const FrostInterruptionDialog(
+                        type: FrostInterruptionDialogType.transactionCreation,
+                        popUntilOnYesRouteName: WalletView.routeName,
                       ),
                     );
-
-                    if (result == true && mounted) {
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop();
-                    }
                   },
                 ),
                 title: Text(
