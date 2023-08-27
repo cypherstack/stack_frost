@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/involved/step_2/begin_resharing_view.dart';
-import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
 import 'package:stackfrost/providers/global/wallets_provider.dart';
 import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
@@ -121,7 +120,6 @@ class _ImportReshareConfigViewState
         appBar: const DesktopAppBar(
           isCompactHeight: false,
           leading: AppBarBackButton(),
-          trailing: ExitToMyStackButton(),
         ),
         body: SizedBox(
           width: 480,
@@ -135,11 +133,7 @@ class _ImportReshareConfigViewState
             backgroundColor:
                 Theme.of(context).extension<StackColors>()!.background,
             appBar: AppBar(
-              leading: AppBarBackButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
+              leading: const AppBarBackButton(),
               title: Text(
                 "Import FROST reshare config",
                 style: STextStyles.navBarTitle(context),

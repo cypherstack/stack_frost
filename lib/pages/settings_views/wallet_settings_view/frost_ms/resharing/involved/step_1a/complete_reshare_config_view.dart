@@ -8,6 +8,7 @@ import 'package:stackfrost/providers/global/wallets_provider.dart';
 import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
 import 'package:stackfrost/services/frost.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/logger.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
 import 'package:stackfrost/utilities/util.dart';
 import 'package:stackfrost/widgets/background.dart';
@@ -43,6 +44,62 @@ class _CompleteReshareConfigViewState
   final List<TextEditingController> controllers = [];
 
   int _participantsCount = 0;
+
+  bool _buttonLock = false;
+
+  Future<void> _onPressed() async {
+    if (_buttonLock) {
+      return;
+    }
+    _buttonLock = true;
+
+    try {
+      final wallet = ref
+          .read(walletsChangeNotifierProvider)
+          .getManager(widget.walletId)
+          .wallet as FrostWallet;
+      final validationMessage = _validateInputData(wallet);
+
+      if (validationMessage != "valid") {
+        return await showDialog<void>(
+          context: context,
+          builder: (_) => StackOkDialog(
+            title: validationMessage,
+            desktopPopRootNavigator: Util.isDesktop,
+          ),
+        );
+      }
+
+      final config = Frost.createResharerConfig(
+        newThreshold: int.parse(_newThresholdController.text),
+        resharers: widget.resharers,
+        newParticipants: controllers.map((e) => e.text).toList(),
+      );
+
+      ref.read(pFrostResharingData).myName = wallet.myName;
+      ref.read(pFrostResharingData).resharerConfig = config;
+
+      await Navigator.of(context).pushNamed(
+        DisplayReshareConfigView.routeName,
+        arguments: widget.walletId,
+      );
+    } catch (e, s) {
+      Logging.instance.log(
+        "$e\n$s",
+        level: LogLevel.Fatal,
+      );
+
+      await showDialog<void>(
+        context: context,
+        builder: (_) => StackOkDialog(
+          title: e.toString(),
+          desktopPopRootNavigator: Util.isDesktop,
+        ),
+      );
+    } finally {
+      _buttonLock = false;
+    }
+  }
 
   String _validateInputData(FrostWallet wallet) {
     final threshold = int.tryParse(_newThresholdController.text);
@@ -226,35 +283,7 @@ class _CompleteReshareConfigViewState
                 if (FocusScope.of(context).hasFocus) {
                   FocusScope.of(context).unfocus();
                 }
-                final wallet = ref
-                    .read(walletsChangeNotifierProvider)
-                    .getManager(widget.walletId)
-                    .wallet as FrostWallet;
-                final validationMessage = _validateInputData(wallet);
-
-                if (validationMessage != "valid") {
-                  return await showDialog<void>(
-                    context: context,
-                    builder: (_) => StackOkDialog(
-                      title: validationMessage,
-                      desktopPopRootNavigator: Util.isDesktop,
-                    ),
-                  );
-                }
-
-                final config = Frost.createResharerConfig(
-                  newThreshold: int.parse(_newThresholdController.text),
-                  resharers: widget.resharers,
-                  newParticipants: controllers.map((e) => e.text).toList(),
-                );
-
-                ref.read(pFrostResharingData).myName = wallet.myName;
-                ref.read(pFrostResharingData).resharerConfig = config;
-
-                await Navigator.of(context).pushNamed(
-                  DisplayReshareConfigView.routeName,
-                  arguments: widget.walletId,
-                );
+                await _onPressed();
               },
             ),
           ],

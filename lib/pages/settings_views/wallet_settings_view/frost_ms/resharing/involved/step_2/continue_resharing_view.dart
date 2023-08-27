@@ -7,7 +7,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/finish_resharing_view.dart';
 import 'package:stackfrost/pages/wallet_view/transaction_views/transaction_details_view.dart';
-import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
+import 'package:stackfrost/pages/wallet_view/wallet_view.dart';
+import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/desktop_wallet_view.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
 import 'package:stackfrost/services/frost.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
@@ -23,6 +24,7 @@ import 'package:stackfrost/widgets/desktop/desktop_app_bar.dart';
 import 'package:stackfrost/widgets/desktop/desktop_scaffold.dart';
 import 'package:stackfrost/widgets/desktop/primary_button.dart';
 import 'package:stackfrost/widgets/detail_item.dart';
+import 'package:stackfrost/widgets/dialogs/frost_interruption_dialog.dart';
 import 'package:stackfrost/widgets/icon_widgets/clipboard_icon.dart';
 import 'package:stackfrost/widgets/icon_widgets/qrcode_icon.dart';
 import 'package:stackfrost/widgets/icon_widgets/x_icon.dart';
@@ -142,173 +144,235 @@ class _ContinueResharingViewState extends ConsumerState<ContinueResharingView> {
 
   @override
   Widget build(BuildContext context) {
-    return ConditionalParent(
-      condition: Util.isDesktop,
-      builder: (child) => DesktopScaffold(
-        background: Theme.of(context).extension<StackColors>()!.background,
-        appBar: const DesktopAppBar(
-          isCompactHeight: false,
-          leading: AppBarBackButton(),
-          trailing: ExitToMyStackButton(),
-        ),
-        body: SizedBox(
-          width: 480,
-          child: child,
-        ),
-      ),
+    return WillPopScope(
+      onWillPop: () async {
+        await showDialog<void>(
+          context: context,
+          builder: (_) => FrostInterruptionDialog(
+            type: FrostInterruptionDialogType.resharing,
+            popUntilOnYesRouteName: Util.isDesktop
+                ? DesktopWalletView.routeName
+                : WalletView.routeName,
+          ),
+        );
+        return false;
+      },
       child: ConditionalParent(
-        condition: !Util.isDesktop,
-        builder: (child) => Background(
-          child: Scaffold(
-            backgroundColor:
-                Theme.of(context).extension<StackColors>()!.background,
-            appBar: AppBar(
-              leading: AppBarBackButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              title: Text(
-                "Encryption keys",
-                style: STextStyles.navBarTitle(context),
-              ),
+        condition: Util.isDesktop,
+        builder: (child) => DesktopScaffold(
+          background: Theme.of(context).extension<StackColors>()!.background,
+          appBar: DesktopAppBar(
+            isCompactHeight: false,
+            leading: AppBarBackButton(
+              onPressed: () async {
+                await showDialog<void>(
+                  context: context,
+                  builder: (_) => const FrostInterruptionDialog(
+                    type: FrostInterruptionDialogType.resharing,
+                    popUntilOnYesRouteName: DesktopWalletView.routeName,
+                  ),
+                );
+              },
             ),
-            body: SafeArea(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  return SingleChildScrollView(
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minHeight: constraints.maxHeight,
+          ),
+          body: SizedBox(
+            width: 480,
+            child: child,
+          ),
+        ),
+        child: ConditionalParent(
+          condition: !Util.isDesktop,
+          builder: (child) => Background(
+            child: Scaffold(
+              backgroundColor:
+                  Theme.of(context).extension<StackColors>()!.background,
+              appBar: AppBar(
+                leading: AppBarBackButton(
+                  onPressed: () async {
+                    await showDialog<void>(
+                      context: context,
+                      builder: (_) => const FrostInterruptionDialog(
+                        type: FrostInterruptionDialogType.resharing,
+                        popUntilOnYesRouteName: WalletView.routeName,
                       ),
-                      child: IntrinsicHeight(
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: child,
+                    );
+                  },
+                ),
+                title: Text(
+                  "Encryption keys",
+                  style: STextStyles.navBarTitle(context),
+                ),
+              ),
+              body: SafeArea(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: constraints.maxHeight,
+                        ),
+                        child: IntrinsicHeight(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: child,
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
             ),
           ),
-        ),
-        child: Column(
-          children: [
-            if (!amOutgoingParticipant)
-              SizedBox(
-                height: 220,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    QrImageView(
-                      data: myEncryptionKey!,
-                      size: 220,
-                      backgroundColor: Theme.of(context)
-                          .extension<StackColors>()!
-                          .background,
-                      foregroundColor: Theme.of(context)
-                          .extension<StackColors>()!
-                          .accentColorDark,
-                    ),
-                  ],
-                ),
-              ),
-            if (!amOutgoingParticipant) const _Div(),
-            if (!amOutgoingParticipant)
-              DetailItem(
-                title: "My encryption key",
-                detail: myEncryptionKey!,
-                button: Util.isDesktop
-                    ? IconCopyButton(
-                        data: myEncryptionKey!,
-                      )
-                    : SimpleCopyButton(
-                        data: myEncryptionKey!,
-                      ),
-              ),
-            if (!amOutgoingParticipant) const _Div(),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                for (int i = 0; i < newParticipants.length; i++)
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+          child: Column(
+            children: [
+              if (!amOutgoingParticipant)
+                SizedBox(
+                  height: 220,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(
-                            Constants.size.circularBorderRadius,
-                          ),
-                          child: TextField(
-                            key: Key("frostEncryptionKeyTextFieldKey_$i"),
-                            controller: controllers[i],
-                            focusNode: focusNodes[i],
-                            readOnly: false,
-                            autocorrect: false,
-                            enableSuggestions: false,
-                            style: STextStyles.field(context),
-                            onChanged: (_) {
-                              setState(() {
-                                fieldIsEmptyFlags[i] =
-                                    controllers[i].text.isEmpty;
-                              });
-                            },
-                            decoration: standardInputDecoration(
-                              "Enter "
-                              "${newParticipants[i]}"
-                              "'s encryption key",
-                              focusNodes[i],
-                              context,
-                            ).copyWith(
-                              contentPadding: const EdgeInsets.only(
-                                left: 16,
-                                top: 6,
-                                bottom: 8,
-                                right: 5,
-                              ),
-                              suffixIcon: Padding(
-                                padding: fieldIsEmptyFlags[i]
-                                    ? const EdgeInsets.only(right: 8)
-                                    : const EdgeInsets.only(right: 0),
-                                child: UnconstrainedBox(
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    children: [
-                                      !fieldIsEmptyFlags[i]
-                                          ? TextFieldIconButton(
-                                              semanticsLabel:
-                                                  "Clear Button. Clears The Encryption Key Field Input.",
-                                              key: Key(
-                                                  "frostEncryptionKeyClearButtonKey_$i"),
-                                              onTap: () {
-                                                controllers[i].text = "";
+                      QrImageView(
+                        data: myEncryptionKey!,
+                        size: 220,
+                        backgroundColor: Theme.of(context)
+                            .extension<StackColors>()!
+                            .background,
+                        foregroundColor: Theme.of(context)
+                            .extension<StackColors>()!
+                            .accentColorDark,
+                      ),
+                    ],
+                  ),
+                ),
+              if (!amOutgoingParticipant) const _Div(),
+              if (!amOutgoingParticipant)
+                DetailItem(
+                  title: "My encryption key",
+                  detail: myEncryptionKey!,
+                  button: Util.isDesktop
+                      ? IconCopyButton(
+                          data: myEncryptionKey!,
+                        )
+                      : SimpleCopyButton(
+                          data: myEncryptionKey!,
+                        ),
+                ),
+              if (!amOutgoingParticipant) const _Div(),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (int i = 0; i < newParticipants.length; i++)
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(
+                              Constants.size.circularBorderRadius,
+                            ),
+                            child: TextField(
+                              key: Key("frostEncryptionKeyTextFieldKey_$i"),
+                              controller: controllers[i],
+                              focusNode: focusNodes[i],
+                              readOnly: false,
+                              autocorrect: false,
+                              enableSuggestions: false,
+                              style: STextStyles.field(context),
+                              onChanged: (_) {
+                                setState(() {
+                                  fieldIsEmptyFlags[i] =
+                                      controllers[i].text.isEmpty;
+                                });
+                              },
+                              decoration: standardInputDecoration(
+                                "Enter "
+                                "${newParticipants[i]}"
+                                "'s encryption key",
+                                focusNodes[i],
+                                context,
+                              ).copyWith(
+                                contentPadding: const EdgeInsets.only(
+                                  left: 16,
+                                  top: 6,
+                                  bottom: 8,
+                                  right: 5,
+                                ),
+                                suffixIcon: Padding(
+                                  padding: fieldIsEmptyFlags[i]
+                                      ? const EdgeInsets.only(right: 8)
+                                      : const EdgeInsets.only(right: 0),
+                                  child: UnconstrainedBox(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: [
+                                        !fieldIsEmptyFlags[i]
+                                            ? TextFieldIconButton(
+                                                semanticsLabel:
+                                                    "Clear Button. Clears The Encryption Key Field Input.",
+                                                key: Key(
+                                                    "frostEncryptionKeyClearButtonKey_$i"),
+                                                onTap: () {
+                                                  controllers[i].text = "";
 
-                                                setState(() {
-                                                  fieldIsEmptyFlags[i] = true;
-                                                });
-                                              },
-                                              child: const XIcon(),
-                                            )
-                                          : TextFieldIconButton(
-                                              semanticsLabel:
-                                                  "Paste Button. Pastes From Clipboard To Encryption Key Field Input.",
-                                              key: Key(
-                                                  "frostEncryptionKeyPasteButtonKey_$i"),
-                                              onTap: () async {
-                                                final ClipboardData? data =
-                                                    await Clipboard.getData(
-                                                        Clipboard.kTextPlain);
-                                                if (data?.text != null &&
-                                                    data!.text!.isNotEmpty) {
-                                                  controllers[i].text =
-                                                      data.text!.trim();
+                                                  setState(() {
+                                                    fieldIsEmptyFlags[i] = true;
+                                                  });
+                                                },
+                                                child: const XIcon(),
+                                              )
+                                            : TextFieldIconButton(
+                                                semanticsLabel:
+                                                    "Paste Button. Pastes From Clipboard To Encryption Key Field Input.",
+                                                key: Key(
+                                                    "frostEncryptionKeyPasteButtonKey_$i"),
+                                                onTap: () async {
+                                                  final ClipboardData? data =
+                                                      await Clipboard.getData(
+                                                          Clipboard.kTextPlain);
+                                                  if (data?.text != null &&
+                                                      data!.text!.isNotEmpty) {
+                                                    controllers[i].text =
+                                                        data.text!.trim();
+                                                  }
+
+                                                  setState(() {
+                                                    fieldIsEmptyFlags[i] =
+                                                        controllers[i]
+                                                            .text
+                                                            .isEmpty;
+                                                  });
+                                                },
+                                                child: fieldIsEmptyFlags[i]
+                                                    ? const ClipboardIcon()
+                                                    : const XIcon(),
+                                              ),
+                                        if (fieldIsEmptyFlags[i])
+                                          TextFieldIconButton(
+                                            semanticsLabel: "Scan QR Button. "
+                                                "Opens Camera For Scanning QR Code.",
+                                            key: Key(
+                                                "frostCommitmentsScanQrButtonKey_$i"),
+                                            onTap: () async {
+                                              try {
+                                                if (FocusScope.of(context)
+                                                    .hasFocus) {
+                                                  FocusScope.of(context)
+                                                      .unfocus();
+                                                  await Future<void>.delayed(
+                                                      const Duration(
+                                                          milliseconds: 75));
                                                 }
+
+                                                final qrResult =
+                                                    await BarcodeScanner.scan();
+
+                                                controllers[i].text =
+                                                    qrResult.rawContent;
 
                                                 setState(() {
                                                   fieldIsEmptyFlags[i] =
@@ -316,68 +380,37 @@ class _ContinueResharingViewState extends ConsumerState<ContinueResharingView> {
                                                           .text
                                                           .isEmpty;
                                                 });
-                                              },
-                                              child: fieldIsEmptyFlags[i]
-                                                  ? const ClipboardIcon()
-                                                  : const XIcon(),
-                                            ),
-                                      if (fieldIsEmptyFlags[i])
-                                        TextFieldIconButton(
-                                          semanticsLabel: "Scan QR Button. "
-                                              "Opens Camera For Scanning QR Code.",
-                                          key: Key(
-                                              "frostCommitmentsScanQrButtonKey_$i"),
-                                          onTap: () async {
-                                            try {
-                                              if (FocusScope.of(context)
-                                                  .hasFocus) {
-                                                FocusScope.of(context)
-                                                    .unfocus();
-                                                await Future<void>.delayed(
-                                                    const Duration(
-                                                        milliseconds: 75));
+                                              } on PlatformException catch (e, s) {
+                                                Logging.instance.log(
+                                                  "Failed to get camera permissions "
+                                                  "while trying to scan qr code: $e\n$s",
+                                                  level: LogLevel.Warning,
+                                                );
                                               }
-
-                                              final qrResult =
-                                                  await BarcodeScanner.scan();
-
-                                              controllers[i].text =
-                                                  qrResult.rawContent;
-
-                                              setState(() {
-                                                fieldIsEmptyFlags[i] =
-                                                    controllers[i].text.isEmpty;
-                                              });
-                                            } on PlatformException catch (e, s) {
-                                              Logging.instance.log(
-                                                "Failed to get camera permissions "
-                                                "while trying to scan qr code: $e\n$s",
-                                                level: LogLevel.Warning,
-                                              );
-                                            }
-                                          },
-                                          child: const QrCodeIcon(),
-                                        ),
-                                    ],
+                                            },
+                                            child: const QrCodeIcon(),
+                                          ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-              ],
-            ),
-            if (!Util.isDesktop) const Spacer(),
-            const _Div(),
-            PrimaryButton(
-              label: "Continue",
-              enabled: !fieldIsEmptyFlags.reduce((v, e) => v |= e),
-              onPressed: _onPressed,
-            ),
-          ],
+                      ],
+                    ),
+                ],
+              ),
+              if (!Util.isDesktop) const Spacer(),
+              const _Div(),
+              PrimaryButton(
+                label: "Continue",
+                enabled: !fieldIsEmptyFlags.reduce((v, e) => v |= e),
+                onPressed: _onPressed,
+              ),
+            ],
+          ),
         ),
       ),
     );
