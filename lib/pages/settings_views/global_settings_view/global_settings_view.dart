@@ -17,9 +17,7 @@ import 'package:stackfrost/pages/settings_views/global_settings_view/appearance_
 import 'package:stackfrost/pages/settings_views/global_settings_view/delete_account_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/manage_nodes_views/manage_nodes_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/security_views/security_view.dart';
-import 'package:stackfrost/pages/settings_views/global_settings_view/startup_preferences/startup_preferences_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/support_view.dart';
-import 'package:stackfrost/pages/settings_views/global_settings_view/syncing_preferences_views/syncing_preferences_view.dart';
 import 'package:stackfrost/pages/settings_views/sub_widgets/settings_list_button.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/utilities/assets.dart';
@@ -94,30 +92,6 @@ class GlobalSettingsView extends StatelessWidget {
                                   onPressed: () {
                                     Navigator.of(context)
                                         .pushNamed(ManageNodesView.routeName);
-                                  },
-                                ),
-                                const SizedBox(
-                                  height: 8,
-                                ),
-                                SettingsListButton(
-                                  iconAssetName: Assets.svg.arrowRotate,
-                                  iconSize: 18,
-                                  title: "Syncing preferences",
-                                  onPressed: () {
-                                    Navigator.of(context).pushNamed(
-                                        SyncingPreferencesView.routeName);
-                                  },
-                                ),
-                                const SizedBox(
-                                  height: 8,
-                                ),
-                                SettingsListButton(
-                                  iconAssetName: Assets.svg.arrowUpRight,
-                                  iconSize: 16,
-                                  title: "Startup",
-                                  onPressed: () {
-                                    Navigator.of(context).pushNamed(
-                                        StartupPreferencesView.routeName);
                                   },
                                 ),
                                 const SizedBox(
