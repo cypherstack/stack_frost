@@ -395,7 +395,7 @@ class Prefs extends ChangeNotifier {
 
   // show testnet coins
 
-  bool _showTestNetCoins = false;
+  bool _showTestNetCoins = true;
 
   bool get showTestNetCoins => _showTestNetCoins;
 
