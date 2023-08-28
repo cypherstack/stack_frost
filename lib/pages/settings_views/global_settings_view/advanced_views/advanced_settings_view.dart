@@ -153,7 +153,7 @@ class AdvancedSettingsView extends StatelessWidget {
                       onPressed: () {
                         Navigator.of(context).pushNamed(
                           StackPrivacyCalls.routeName,
-                          arguments: true,
+                          arguments: false,
                         );
                       },
                       child: Padding(

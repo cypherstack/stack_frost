@@ -613,7 +613,7 @@ class Prefs extends ChangeNotifier {
 
   // incognito mode off by default
   // allow external network calls such as exchange data and price info
-  bool _externalCalls = true;
+  bool _externalCalls = false;
 
   bool get externalCalls => _externalCalls;
 
@@ -634,16 +634,16 @@ class Prefs extends ChangeNotifier {
   Future<bool> _getHasExternalCalls() async {
     return await DB.instance.get<dynamic>(
             boxName: DB.boxNamePrefs, key: "externalCalls") as bool? ??
-        true;
+        false;
   }
 
   Future<bool> isExternalCallsSet() async {
-    if (await DB.instance
-            .get<dynamic>(boxName: DB.boxNamePrefs, key: "externalCalls") ==
-        null) {
-      return false;
-    }
-    return true;
+    // if (await DB.instance
+    //         .get<dynamic>(boxName: DB.boxNamePrefs, key: "externalCalls") ==
+    //     null) {
+    //   return false;
+    // }
+    return false;
   }
 
   String? _userId;
