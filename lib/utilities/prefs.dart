@@ -160,7 +160,7 @@ class Prefs extends ChangeNotifier {
 
   // sync type
 
-  SyncingType _syncType = SyncingType.allWalletsOnStartup;
+  SyncingType _syncType = SyncingType.currentWalletOnly;
 
   SyncingType get syncType => _syncType;
 
@@ -178,7 +178,7 @@ class Prefs extends ChangeNotifier {
   Future<SyncingType> _getSyncType() async {
     final int index = await DB.instance.get<dynamic>(
             boxName: DB.boxNamePrefs, key: "syncTypeIndex") as int? ??
-        SyncingType.allWalletsOnStartup.index;
+        SyncingType.currentWalletOnly.index;
     return SyncingType.values[index];
   }
 

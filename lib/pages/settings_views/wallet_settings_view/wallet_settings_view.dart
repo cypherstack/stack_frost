@@ -17,7 +17,6 @@ import 'package:stackfrost/pages/address_book_views/address_book_view.dart';
 import 'package:stackfrost/pages/home_view/home_view.dart';
 import 'package:stackfrost/pages/pinpad_views/lock_screen_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/advanced_views/debug_view.dart';
-import 'package:stackfrost/pages/settings_views/global_settings_view/syncing_preferences_views/syncing_preferences_view.dart';
 import 'package:stackfrost/pages/settings_views/sub_widgets/settings_list_button.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/frost_ms_options_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_backup_views/wallet_backup_view.dart';
@@ -331,17 +330,6 @@ class _WalletSettingsViewState extends ConsumerState<WalletSettingsView> {
                                           .routeName,
                                       arguments: walletId,
                                     );
-                                  },
-                                ),
-                                const SizedBox(
-                                  height: 8,
-                                ),
-                                SettingsListButton(
-                                  iconAssetName: Assets.svg.arrowRotate,
-                                  title: "Syncing preferences",
-                                  onPressed: () {
-                                    Navigator.of(context).pushNamed(
-                                        SyncingPreferencesView.routeName);
                                   },
                                 ),
                                 if (xPubEnabled)

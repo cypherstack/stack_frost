@@ -92,7 +92,6 @@ import 'package:stackfrost/pages/settings_views/global_settings_view/startup_pre
 import 'package:stackfrost/pages/settings_views/global_settings_view/startup_preferences/startup_wallet_selection_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/support_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/syncing_preferences_views/syncing_options_view.dart';
-import 'package:stackfrost/pages/settings_views/global_settings_view/syncing_preferences_views/syncing_preferences_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/syncing_preferences_views/wallet_syncing_options_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/frost_ms_options_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/frost_participants_view.dart';
@@ -414,12 +413,6 @@ class RouteGenerator {
         return getRoute(
             shouldUseMaterialRoute: useMaterialPageRoute,
             builder: (_) => const AppearanceSettingsView(),
-            settings: RouteSettings(name: settings.name));
-
-      case SyncingPreferencesView.routeName:
-        return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => const SyncingPreferencesView(),
             settings: RouteSettings(name: settings.name));
 
       case StartupPreferencesView.routeName:
