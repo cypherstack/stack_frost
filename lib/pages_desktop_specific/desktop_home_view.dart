@@ -16,7 +16,6 @@ import 'package:stackfrost/pages_desktop_specific/my_stack_view/my_stack_view.da
 import 'package:stackfrost/pages_desktop_specific/notifications/desktop_notifications_view.dart';
 import 'package:stackfrost/pages_desktop_specific/settings/desktop_settings_view.dart';
 import 'package:stackfrost/pages_desktop_specific/settings/settings_menu/desktop_about_view.dart';
-import 'package:stackfrost/pages_desktop_specific/settings/settings_menu/desktop_support_view.dart';
 import 'package:stackfrost/providers/desktop/current_desktop_menu_item.dart';
 import 'package:stackfrost/providers/global/auto_swb_service_provider.dart';
 import 'package:stackfrost/providers/global/notifications_provider.dart';
@@ -74,11 +73,6 @@ class _DesktopHomeViewState extends ConsumerState<DesktopHomeView> {
       key: Key("desktopSettingHomeKey"),
       onGenerateRoute: RouteGenerator.generateRoute,
       initialRoute: DesktopSettingsView.routeName,
-    ),
-    DesktopMenuItemId.support: const Navigator(
-      key: Key("desktopSupportHomeKey"),
-      onGenerateRoute: RouteGenerator.generateRoute,
-      initialRoute: DesktopSupportView.routeName,
     ),
     DesktopMenuItemId.about: const Navigator(
       key: Key("desktopAboutHomeKey"),

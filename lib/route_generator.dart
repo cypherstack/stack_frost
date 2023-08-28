@@ -90,7 +90,6 @@ import 'package:stackfrost/pages/settings_views/global_settings_view/stack_backu
 import 'package:stackfrost/pages/settings_views/global_settings_view/stack_backup_views/stack_backup_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/startup_preferences/startup_preferences_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/startup_preferences/startup_wallet_selection_view.dart';
-import 'package:stackfrost/pages/settings_views/global_settings_view/support_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/syncing_preferences_views/syncing_options_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/syncing_preferences_views/wallet_syncing_options_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/frost_ms_options_view.dart';
@@ -145,7 +144,6 @@ import 'package:stackfrost/pages_desktop_specific/settings/settings_menu/appeara
 import 'package:stackfrost/pages_desktop_specific/settings/settings_menu/backup_and_restore/backup_and_restore_settings.dart';
 import 'package:stackfrost/pages_desktop_specific/settings/settings_menu/currency_settings/currency_settings.dart';
 import 'package:stackfrost/pages_desktop_specific/settings/settings_menu/desktop_about_view.dart';
-import 'package:stackfrost/pages_desktop_specific/settings/settings_menu/desktop_support_view.dart';
 import 'package:stackfrost/pages_desktop_specific/settings/settings_menu/language_settings/language_settings.dart';
 import 'package:stackfrost/pages_desktop_specific/settings/settings_menu/nodes_settings.dart';
 import 'package:stackfrost/pages_desktop_specific/settings/settings_menu/security_settings.dart';
@@ -449,12 +447,6 @@ class RouteGenerator {
         return getRoute(
             shouldUseMaterialRoute: useMaterialPageRoute,
             builder: (_) => const AdvancedSettingsView(),
-            settings: RouteSettings(name: settings.name));
-
-      case SupportView.routeName:
-        return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => const SupportView(),
             settings: RouteSettings(name: settings.name));
 
       case AddAddressBookEntryView.routeName:
@@ -1684,12 +1676,6 @@ class RouteGenerator {
         return getRoute(
             shouldUseMaterialRoute: useMaterialPageRoute,
             builder: (_) => const AdvancedSettings(),
-            settings: RouteSettings(name: settings.name));
-
-      case DesktopSupportView.routeName:
-        return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => const DesktopSupportView(),
             settings: RouteSettings(name: settings.name));
 
       case DesktopAboutView.routeName:

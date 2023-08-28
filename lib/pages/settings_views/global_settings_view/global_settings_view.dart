@@ -17,7 +17,6 @@ import 'package:stackfrost/pages/settings_views/global_settings_view/appearance_
 import 'package:stackfrost/pages/settings_views/global_settings_view/delete_account_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/manage_nodes_views/manage_nodes_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/security_views/security_view.dart';
-import 'package:stackfrost/pages/settings_views/global_settings_view/support_view.dart';
 import 'package:stackfrost/pages/settings_views/sub_widgets/settings_list_button.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/utilities/assets.dart';
@@ -143,18 +142,6 @@ class GlobalSettingsView extends StatelessWidget {
                                   onPressed: () {
                                     Navigator.of(context).pushNamed(
                                         AdvancedSettingsView.routeName);
-                                  },
-                                ),
-                                const SizedBox(
-                                  height: 8,
-                                ),
-                                SettingsListButton(
-                                  iconAssetName: Assets.svg.questionMessage,
-                                  iconSize: 16,
-                                  title: "Support",
-                                  onPressed: () {
-                                    Navigator.of(context)
-                                        .pushNamed(SupportView.routeName);
                                   },
                                 ),
                                 // TextButton(
