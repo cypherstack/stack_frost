@@ -197,7 +197,7 @@ flutter:
   #  - images/a_dot_ham.jpeg
   assets:
     - assets/images/splash.png
-    - assets/icon/icon.png
+    - assets/icon/app_icon_alpha.png
     - google_fonts/
     - assets/svg/circle-check.svg
     - assets/svg/clipboard.svg

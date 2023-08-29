@@ -191,6 +191,7 @@ class _PNG {
   const _PNG();
 
   String get splash => "assets/images/splash.png";
+  String get icon => "assets/icon/app_icon_alpha.png";
 
   String get glasses => "assets/images/glasses.png";
   String get glassesHidden => "assets/images/glasses-hidden.png";
