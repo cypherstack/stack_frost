@@ -14,7 +14,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:stackfrost/pages/stack_privacy_calls.dart';
+import 'package:stackfrost/pages/pinpad_views/create_pin_view.dart';
 import 'package:stackfrost/pages_desktop_specific/password/create_password_view.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/themes/theme_providers.dart';
@@ -286,10 +286,10 @@ class GetStartedButton extends StatelessWidget {
                 .extension<StackColors>()!
                 .getPrimaryEnabledButtonStyle(context),
             onPressed: () {
-              Prefs.instance.externalCalls = true;
+              Prefs.instance.externalCalls = false;
+              Prefs.instance.showTestNetCoins = true;
               Navigator.of(context).pushNamed(
-                StackPrivacyCalls.routeName,
-                arguments: false,
+                CreatePinView.routeName,
               );
             },
             child: Text(
@@ -306,8 +306,7 @@ class GetStartedButton extends StatelessWidget {
                   .getPrimaryEnabledButtonStyle(context),
               onPressed: () {
                 Navigator.of(context).pushNamed(
-                  StackPrivacyCalls.routeName,
-                  arguments: false,
+                  CreatePasswordView.routeName,
                 );
               },
               child: Text(

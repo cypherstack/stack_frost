@@ -413,7 +413,7 @@ class Prefs extends ChangeNotifier {
   Future<bool> _getShowTestNetCoins() async {
     return await DB.instance.get<dynamic>(
             boxName: DB.boxNamePrefs, key: "showTestNetCoins") as bool? ??
-        false;
+        true;
   }
 
   // auto backup
@@ -611,7 +611,7 @@ class Prefs extends ChangeNotifier {
         boxName: DB.boxNamePrefs, key: "startupWalletId") as String?;
   }
 
-  // incognito mode off by default
+  // incognito mode on by default
   // allow external network calls such as exchange data and price info
   bool _externalCalls = false;
 

@@ -13,7 +13,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/advanced_views/debug_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/advanced_views/manage_coin_units/manage_coin_units_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/advanced_views/manage_explorer_view.dart';
-import 'package:stackfrost/pages/stack_privacy_calls.dart';
 import 'package:stackfrost/providers/global/prefs_provider.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/utilities/constants.dart';
@@ -123,62 +122,6 @@ class AdvancedSettingsView extends StatelessWidget {
                                       .read(prefsChangeNotifierProvider)
                                       .enableCoinControl = newValue;
                                 },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(
-                height: 8,
-              ),
-              RoundedWhiteContainer(
-                padding: const EdgeInsets.all(0),
-                child: Consumer(
-                  builder: (_, ref, __) {
-                    final externalCalls = ref.watch(
-                      prefsChangeNotifierProvider
-                          .select((value) => value.externalCalls),
-                    );
-                    return RawMaterialButton(
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          Constants.size.circularBorderRadius,
-                        ),
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pushNamed(
-                          StackPrivacyCalls.routeName,
-                          arguments: false,
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 20,
-                        ),
-                        child: Row(
-                          children: [
-                            RichText(
-                              textAlign: TextAlign.left,
-                              text: TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: "Stack Experience",
-                                    style: STextStyles.titleBold12(context),
-                                  ),
-                                  TextSpan(
-                                    text: externalCalls
-                                        ? "\nEasy crypto"
-                                        : "\nIncognito",
-                                    style: STextStyles.label(context)
-                                        .copyWith(fontSize: 15.0),
-                                  )
-                                ],
                               ),
                             ),
                           ],

@@ -111,7 +111,6 @@ import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_sett
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_settings_wallet_settings/rename_wallet_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_settings_wallet_settings/wallet_settings_wallet_settings_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_settings_wallet_settings/xpub_view.dart';
-import 'package:stackfrost/pages/stack_privacy_calls.dart';
 import 'package:stackfrost/pages/wallet_view/transaction_views/all_transactions_view.dart';
 import 'package:stackfrost/pages/wallet_view/transaction_views/edit_note_view.dart';
 import 'package:stackfrost/pages/wallet_view/transaction_views/transaction_details_view.dart';
@@ -200,19 +199,6 @@ class RouteGenerator {
         return getRoute(
             shouldUseMaterialRoute: useMaterialPageRoute,
             builder: (_) => const CreatePinView(),
-            settings: RouteSettings(name: settings.name));
-
-      case StackPrivacyCalls.routeName:
-        if (args is bool) {
-          return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => StackPrivacyCalls(isSettings: args),
-            settings: RouteSettings(name: settings.name),
-          );
-        }
-        return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => const StackPrivacyCalls(isSettings: false),
             settings: RouteSettings(name: settings.name));
 
       case ChooseCoinView.routeName:
