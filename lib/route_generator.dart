@@ -45,7 +45,6 @@ import 'package:stackfrost/pages/generic/single_field_edit_view.dart';
 import 'package:stackfrost/pages/home_view/home_view.dart';
 import 'package:stackfrost/pages/intro_view.dart';
 import 'package:stackfrost/pages/manage_favorites_view/manage_favorites_view.dart';
-import 'package:stackfrost/pages/notification_views/notifications_view.dart';
 import 'package:stackfrost/pages/pinpad_views/create_pin_view.dart';
 import 'package:stackfrost/pages/receive_view/addresses/address_details_view.dart';
 import 'package:stackfrost/pages/receive_view/addresses/edit_address_label_view.dart';
@@ -69,7 +68,6 @@ import 'package:stackfrost/pages/settings_views/global_settings_view/advanced_vi
 import 'package:stackfrost/pages/settings_views/global_settings_view/appearance_settings/appearance_settings_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/appearance_settings/manage_themes.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/appearance_settings/system_brightness_theme_selection_view.dart';
-import 'package:stackfrost/pages/settings_views/global_settings_view/currency_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/delete_account_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/global_settings_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/hidden_settings.dart';
@@ -142,7 +140,6 @@ import 'package:stackfrost/pages_desktop_specific/settings/desktop_settings_view
 import 'package:stackfrost/pages_desktop_specific/settings/settings_menu/advanced_settings/advanced_settings.dart';
 import 'package:stackfrost/pages_desktop_specific/settings/settings_menu/appearance_settings/appearance_settings.dart';
 import 'package:stackfrost/pages_desktop_specific/settings/settings_menu/backup_and_restore/backup_and_restore_settings.dart';
-import 'package:stackfrost/pages_desktop_specific/settings/settings_menu/currency_settings/currency_settings.dart';
 import 'package:stackfrost/pages_desktop_specific/settings/settings_menu/desktop_about_view.dart';
 import 'package:stackfrost/pages_desktop_specific/settings/settings_menu/language_settings/language_settings.dart';
 import 'package:stackfrost/pages_desktop_specific/settings/settings_menu/nodes_settings.dart';
@@ -367,12 +364,6 @@ class RouteGenerator {
         return getRoute(
             shouldUseMaterialRoute: useMaterialPageRoute,
             builder: (_) => const ChangePinView(),
-            settings: RouteSettings(name: settings.name));
-
-      case BaseCurrencySettingsView.routeName:
-        return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => const BaseCurrencySettingsView(),
             settings: RouteSettings(name: settings.name));
 
       case LanguageSettingsView.routeName:
@@ -1437,20 +1428,6 @@ class RouteGenerator {
         }
         return _routeError("${settings.name} invalid args: ${args.toString()}");
 
-      case NotificationsView.routeName:
-        if (args is String?) {
-          return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => NotificationsView(
-              walletId: args,
-            ),
-            settings: RouteSettings(
-              name: settings.name,
-            ),
-          );
-        }
-        return _routeError("${settings.name} invalid args: ${args.toString()}");
-
       case WalletSettingsView.routeName:
         if (args
             is Tuple4<String, Coin, WalletSyncStatus, NodeConnectionStatus>) {
@@ -1634,12 +1611,6 @@ class RouteGenerator {
         return getRoute(
             shouldUseMaterialRoute: useMaterialPageRoute,
             builder: (_) => const SecuritySettings(),
-            settings: RouteSettings(name: settings.name));
-
-      case CurrencySettings.routeName:
-        return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => const CurrencySettings(),
             settings: RouteSettings(name: settings.name));
 
       case LanguageOptionSettings.routeName:
