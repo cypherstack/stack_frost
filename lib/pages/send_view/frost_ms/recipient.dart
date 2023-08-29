@@ -2,7 +2,6 @@ import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackfrost/pages/address_book_views/address_book_view.dart';
 import 'package:stackfrost/providers/global/locale_provider.dart';
 import 'package:stackfrost/providers/global/prefs_provider.dart';
 import 'package:stackfrost/providers/global/price_provider.dart';
@@ -20,7 +19,6 @@ import 'package:stackfrost/utilities/logger.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
 import 'package:stackfrost/utilities/util.dart';
 import 'package:stackfrost/widgets/custom_buttons/blue_text_button.dart';
-import 'package:stackfrost/widgets/icon_widgets/addressbook_icon.dart';
 import 'package:stackfrost/widgets/icon_widgets/clipboard_icon.dart';
 import 'package:stackfrost/widgets/icon_widgets/qrcode_icon.dart';
 import 'package:stackfrost/widgets/icon_widgets/x_icon.dart';
@@ -243,21 +241,6 @@ class _RecipientState extends ConsumerState<Recipient> {
                                     ? const ClipboardIcon()
                                     : const XIcon(),
                               ),
-                        if (_addressIsEmpty)
-                          TextFieldIconButton(
-                            semanticsLabel: "Address Book Button. "
-                                "Opens Address Book For Address Field.",
-                            key: const Key(
-                              "sendViewAddressBookButtonKey",
-                            ),
-                            onTap: () {
-                              Navigator.of(context).pushNamed(
-                                AddressBookView.routeName,
-                                arguments: widget.coin,
-                              );
-                            },
-                            child: const AddressBookIcon(),
-                          ),
                         if (_addressIsEmpty)
                           TextFieldIconButton(
                             semanticsLabel: "Scan QR Button. "
