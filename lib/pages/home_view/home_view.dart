@@ -9,20 +9,16 @@
  */
 
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:stackfrost/pages/notification_views/notifications_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/global_settings_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/hidden_settings.dart';
 import 'package:stackfrost/pages/wallets_view/wallets_view.dart';
 import 'package:stackfrost/providers/global/notifications_provider.dart';
 import 'package:stackfrost/providers/ui/home_view_index_provider.dart';
-import 'package:stackfrost/providers/ui/unread_notifications_provider.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
-import 'package:stackfrost/themes/theme_providers.dart';
 import 'package:stackfrost/utilities/assets.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
 import 'package:stackfrost/widgets/animated_widgets/rotate_icon.dart';
@@ -188,87 +184,6 @@ class _HomeViewState extends ConsumerState<HomeView> {
               ],
             ),
             actions: [
-              Padding(
-                padding: const EdgeInsets.only(
-                  top: 10,
-                  bottom: 10,
-                  right: 10,
-                ),
-                child: AspectRatio(
-                  aspectRatio: 1,
-                  child: AppBarIconButton(
-                    semanticsLabel:
-                        "Notifications Button. Takes To Notifications Page.",
-                    key: const Key("walletsViewAlertsButton"),
-                    size: 36,
-                    shadows: const [],
-                    color: Theme.of(context)
-                        .extension<StackColors>()!
-                        .backgroundAppBar,
-                    icon: ref.watch(notificationsProvider
-                            .select((value) => value.hasUnreadNotifications))
-                        ? SvgPicture.file(
-                            File(
-                              ref.watch(
-                                themeProvider.select(
-                                  (value) => value.assets.bellNew,
-                                ),
-                              ),
-                            ),
-                            width: 20,
-                            height: 20,
-                            color: ref.watch(notificationsProvider.select(
-                                    (value) => value.hasUnreadNotifications))
-                                ? null
-                                : Theme.of(context)
-                                    .extension<StackColors>()!
-                                    .topNavIconPrimary,
-                          )
-                        : SvgPicture.asset(
-                            Assets.svg.bell,
-                            width: 20,
-                            height: 20,
-                            color: ref.watch(notificationsProvider.select(
-                                    (value) => value.hasUnreadNotifications))
-                                ? null
-                                : Theme.of(context)
-                                    .extension<StackColors>()!
-                                    .topNavIconPrimary,
-                          ),
-                    onPressed: () {
-                      // reset unread state
-                      ref.refresh(unreadNotificationsStateProvider);
-
-                      Navigator.of(context)
-                          .pushNamed(NotificationsView.routeName)
-                          .then((_) {
-                        final Set<int> unreadNotificationIds = ref
-                            .read(unreadNotificationsStateProvider.state)
-                            .state;
-                        if (unreadNotificationIds.isEmpty) return;
-
-                        List<Future<void>> futures = [];
-                        for (int i = 0;
-                            i < unreadNotificationIds.length - 1;
-                            i++) {
-                          futures.add(ref
-                              .read(notificationsProvider)
-                              .markAsRead(
-                                  unreadNotificationIds.elementAt(i), false));
-                        }
-
-                        // wait for multiple to update if any
-                        Future.wait(futures).then((_) {
-                          // only notify listeners once
-                          ref
-                              .read(notificationsProvider)
-                              .markAsRead(unreadNotificationIds.last, true);
-                        });
-                      });
-                    },
-                  ),
-                ),
-              ),
               Padding(
                 padding: const EdgeInsets.only(
                   top: 10,

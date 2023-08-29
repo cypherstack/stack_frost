@@ -17,7 +17,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:stackfrost/pages/coin_control/coin_control_view.dart';
 import 'package:stackfrost/pages/home_view/home_view.dart';
-import 'package:stackfrost/pages/notification_views/notifications_view.dart';
 import 'package:stackfrost/pages/receive_view/receive_view.dart';
 import 'package:stackfrost/pages/send_view/frost_ms/frost_send_view.dart';
 import 'package:stackfrost/pages/send_view/send_view.dart';
@@ -29,7 +28,6 @@ import 'package:stackfrost/pages/wallet_view/transaction_views/all_transactions_
 import 'package:stackfrost/providers/global/auto_swb_service_provider.dart';
 import 'package:stackfrost/providers/providers.dart';
 import 'package:stackfrost/providers/ui/transaction_filter_provider.dart';
-import 'package:stackfrost/providers/ui/unread_notifications_provider.dart';
 import 'package:stackfrost/providers/wallet/public_private_balance_state_provider.dart';
 import 'package:stackfrost/providers/wallet/wallet_balance_toggle_state_provider.dart';
 import 'package:stackfrost/services/coins/manager.dart';
@@ -38,7 +36,6 @@ import 'package:stackfrost/services/event_bus/events/global/wallet_sync_status_c
 import 'package:stackfrost/services/event_bus/global_event_bus.dart';
 import 'package:stackfrost/themes/coin_icon_provider.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
-import 'package:stackfrost/themes/theme_providers.dart';
 import 'package:stackfrost/utilities/assets.dart';
 import 'package:stackfrost/utilities/clipboard_interface.dart';
 import 'package:stackfrost/utilities/constants.dart';
@@ -427,95 +424,6 @@ class _WalletViewState extends ConsumerState<WalletView> {
                                 _currentNodeStatus,
                               ),
                             );
-                          },
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(
-                        top: 10,
-                        bottom: 10,
-                        right: 10,
-                      ),
-                      child: AspectRatio(
-                        aspectRatio: 1,
-                        child: AppBarIconButton(
-                          semanticsLabel:
-                              "Notifications Button. Takes To Notifications Page.",
-                          key: const Key("walletViewAlertsButton"),
-                          size: 36,
-                          shadows: const [],
-                          color: Theme.of(context)
-                              .extension<StackColors>()!
-                              .background,
-                          icon: ref.watch(notificationsProvider.select(
-                                  (value) => value
-                                      .hasUnreadNotificationsFor(walletId)))
-                              ? SvgPicture.file(
-                                  File(
-                                    ref.watch(
-                                      themeProvider.select(
-                                        (value) => value.assets.bellNew,
-                                      ),
-                                    ),
-                                  ),
-                                  width: 20,
-                                  height: 20,
-                                  color: ref.watch(notificationsProvider.select(
-                                          (value) =>
-                                              value.hasUnreadNotificationsFor(
-                                                  walletId)))
-                                      ? null
-                                      : Theme.of(context)
-                                          .extension<StackColors>()!
-                                          .topNavIconPrimary,
-                                )
-                              : SvgPicture.asset(
-                                  Assets.svg.bell,
-                                  width: 20,
-                                  height: 20,
-                                  color: ref.watch(notificationsProvider.select(
-                                          (value) =>
-                                              value.hasUnreadNotificationsFor(
-                                                  walletId)))
-                                      ? null
-                                      : Theme.of(context)
-                                          .extension<StackColors>()!
-                                          .topNavIconPrimary,
-                                ),
-                          onPressed: () {
-                            // reset unread state
-                            ref.refresh(unreadNotificationsStateProvider);
-
-                            Navigator.of(context)
-                                .pushNamed(
-                              NotificationsView.routeName,
-                              arguments: walletId,
-                            )
-                                .then((_) {
-                              final Set<int> unreadNotificationIds = ref
-                                  .read(unreadNotificationsStateProvider.state)
-                                  .state;
-                              if (unreadNotificationIds.isEmpty) return;
-
-                              List<Future<dynamic>> futures = [];
-                              for (int i = 0;
-                                  i < unreadNotificationIds.length - 1;
-                                  i++) {
-                                futures.add(ref
-                                    .read(notificationsProvider)
-                                    .markAsRead(
-                                        unreadNotificationIds.elementAt(i),
-                                        false));
-                              }
-
-                              // wait for multiple to update if any
-                              Future.wait(futures).then((_) {
-                                // only notify listeners once
-                                ref.read(notificationsProvider).markAsRead(
-                                    unreadNotificationIds.last, true);
-                              });
-                            });
                           },
                         ),
                       ),
