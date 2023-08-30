@@ -17,15 +17,52 @@ import 'package:lottie/lottie.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/themes/theme_providers.dart';
 import 'package:stackfrost/utilities/assets.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
 import 'package:stackfrost/widgets/background.dart';
 import 'package:stackfrost/widgets/conditional_parent.dart';
 import 'package:stackfrost/widgets/rounded_container.dart';
 
-class LoadingView extends ConsumerWidget {
-  const LoadingView({Key? key}) : super(key: key);
+class LoadingView extends ConsumerStatefulWidget {
+  const LoadingView({
+    Key? key,
+    this.overridePngImage,
+  }) : super(key: key);
+
+  final String? overridePngImage;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<LoadingView> createState() => _LoadingViewState();
+}
+
+class _LoadingViewState extends ConsumerState<LoadingView>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  CrossFadeState _fadeState = CrossFadeState.showFirst;
+
+  @override
+  void initState() {
+    _controller = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    )..repeat();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      setState(() {
+        _fadeState = CrossFadeState.showSecond;
+      });
+    });
+
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final width = min(size.width, size.height) * 0.5;
 
@@ -49,27 +86,52 @@ class LoadingView extends ConsumerWidget {
                 height: width * 1.35,
                 child: child,
               ),
-              child: SizedBox(
-                width: width,
-                child: assetPath != null
-                    ? Image.file(
-                        File(
-                          assetPath,
+              child: widget.overridePngImage == null
+                  ? SizedBox(
+                      width: width,
+                      child: assetPath != null
+                          ? Image.file(
+                              File(
+                                assetPath,
+                              ),
+                            )
+                          : Lottie.asset(
+                              Assets.lottie.test2,
+                              animate: true,
+                              repeat: true,
+                            ),
+                    )
+                  : Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        RotationTransition(
+                          turns:
+                              Tween(begin: 0.0, end: 1.0).animate(_controller),
+                          child: AnimatedCrossFade(
+                            duration: const Duration(seconds: 2),
+                            firstChild: SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.7,
+                              height: MediaQuery.of(context).size.width * 0.7,
+                            ),
+                            secondChild: Image(
+                              image: AssetImage(
+                                widget.overridePngImage!,
+                              ),
+                              width: MediaQuery.of(context).size.width * 0.7,
+                            ),
+                            crossFadeState: _fadeState,
+                          ),
                         ),
-                      )
-                    : Lottie.asset(
-                        Assets.lottie.test2,
-                        animate: true,
-                        repeat: true,
-                      ),
-              ),
+                        const SizedBox(
+                          height: 32,
+                        ),
+                        Text(
+                          "Stack Frost",
+                          style: STextStyles.pageTitleH2(context),
+                        ),
+                      ],
+                    ),
             ),
-            // child: Image(
-            //   image: AssetImage(
-            //     Assets.png.splash,
-            //   ),
-            //   width: MediaQuery.of(context).size.width * 0.5,
-            // ),
           ),
         ),
       ),

@@ -43,7 +43,6 @@ import 'package:stackfrost/pages/address_book_views/subviews/edit_contact_name_e
 import 'package:stackfrost/pages/coin_control/utxo_details_view.dart';
 import 'package:stackfrost/pages/generic/single_field_edit_view.dart';
 import 'package:stackfrost/pages/home_view/home_view.dart';
-import 'package:stackfrost/pages/intro_view.dart';
 import 'package:stackfrost/pages/manage_favorites_view/manage_favorites_view.dart';
 import 'package:stackfrost/pages/pinpad_views/create_pin_view.dart';
 import 'package:stackfrost/pages/receive_view/addresses/address_details_view.dart';
@@ -166,12 +165,6 @@ class RouteGenerator {
     final args = settings.arguments;
 
     switch (settings.name) {
-      case IntroView.routeName:
-        return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => const IntroView(),
-            settings: RouteSettings(name: settings.name));
-
       case DeleteAccountView.routeName:
         return getRoute(
             shouldUseMaterialRoute: useMaterialPageRoute,

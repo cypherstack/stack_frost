@@ -10,7 +10,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:stackfrost/db/hive/db.dart';
-import 'package:stackfrost/pages/intro_view.dart';
+import 'package:stackfrost/pages/pinpad_views/create_pin_view.dart';
+import 'package:stackfrost/pages_desktop_specific/password/create_password_view.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
 import 'package:stackfrost/utilities/util.dart';
@@ -65,7 +66,9 @@ class _DeleteAccountViewState extends State<DeleteAccountView> {
 
             if (mounted) {
               await Navigator.of(context).pushNamedAndRemoveUntil(
-                IntroView.routeName,
+                Util.isDesktop
+                    ? CreatePasswordView.routeName
+                    : CreatePinView.routeName,
                 (route) => false,
               );
             }

@@ -31,11 +31,11 @@ import 'package:stackfrost/models/node_model.dart';
 import 'package:stackfrost/models/notification_model.dart';
 import 'package:stackfrost/models/trade_wallet_lookup.dart';
 import 'package:stackfrost/pages/home_view/home_view.dart';
-import 'package:stackfrost/pages/intro_view.dart';
 import 'package:stackfrost/pages/loading_view.dart';
 import 'package:stackfrost/pages/pinpad_views/create_pin_view.dart';
 import 'package:stackfrost/pages/pinpad_views/lock_screen_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/stack_backup_views/restore_from_encrypted_string_view.dart';
+import 'package:stackfrost/pages_desktop_specific/password/create_password_view.dart';
 import 'package:stackfrost/pages_desktop_specific/password/desktop_login_view.dart';
 import 'package:stackfrost/providers/desktop/storage_crypto_handler_provider.dart';
 import 'package:stackfrost/providers/global/auto_swb_service_provider.dart';
@@ -51,6 +51,7 @@ import 'package:stackfrost/services/notifications_service.dart';
 import 'package:stackfrost/services/trade_service.dart';
 import 'package:stackfrost/themes/theme_providers.dart';
 import 'package:stackfrost/themes/theme_service.dart';
+import 'package:stackfrost/utilities/assets.dart';
 import 'package:stackfrost/utilities/constants.dart';
 import 'package:stackfrost/utilities/db_version_migration.dart';
 import 'package:stackfrost/utilities/enums/backup_frequency_type.dart';
@@ -671,7 +672,12 @@ class _MaterialAppWithThemeState extends ConsumerState<MaterialAppWithTheme>
       home: CryptoNotifications(
         child: Util.isDesktop
             ? FutureBuilder(
-                future: loadShared(),
+                future: Future.wait([
+                  loadShared(),
+                  Future<void>.delayed(
+                    const Duration(seconds: 3),
+                  ),
+                ]),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
                     if (_desktopHasPassword) {
@@ -689,15 +695,22 @@ class _MaterialAppWithThemeState extends ConsumerState<MaterialAppWithTheme>
                         load: load,
                       );
                     } else {
-                      return const IntroView();
+                      return const CreatePasswordView();
                     }
                   } else {
-                    return const LoadingView();
+                    return LoadingView(
+                      overridePngImage: Assets.png.icon,
+                    );
                   }
                 },
               )
             : FutureBuilder(
-                future: load(),
+                future: Future.wait([
+                  load(),
+                  Future<void>.delayed(
+                    const Duration(seconds: 4),
+                  ),
+                ]),
                 builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
                     // FlutterNativeSplash.remove();
@@ -724,14 +737,16 @@ class _MaterialAppWithThemeState extends ConsumerState<MaterialAppWithTheme>
                         biometricsCancelButtonString: "Cancel",
                       );
                     } else {
-                      return const IntroView();
+                      return const CreatePinView();
                     }
                   } else {
                     // CURRENTLY DISABLED as cannot be animated
                     // technically not needed as FlutterNativeSplash will overlay
                     // anything returned here until the future completes but
                     // FutureBuilder requires you to return something
-                    return const LoadingView();
+                    return LoadingView(
+                      overridePngImage: Assets.png.icon,
+                    );
                   }
                 },
               ),

@@ -18,7 +18,7 @@ import 'package:hive/hive.dart';
 import 'package:isar/isar.dart';
 import 'package:stackfrost/db/hive/db.dart';
 import 'package:stackfrost/notifications/show_flush_bar.dart';
-import 'package:stackfrost/pages/intro_view.dart';
+import 'package:stackfrost/pages_desktop_specific/password/create_password_view.dart';
 import 'package:stackfrost/themes/theme_providers.dart';
 import 'package:stackfrost/utilities/logger.dart';
 import 'package:stackfrost/utilities/stack_file_system.dart';
@@ -203,7 +203,7 @@ class _ForgotPasswordDesktopViewState
                         );
                         if (mounted) {
                           await Navigator.of(context).pushNamedAndRemoveUntil(
-                            IntroView.routeName,
+                            CreatePasswordView.routeName,
                             (_) => false,
                           );
                         }
