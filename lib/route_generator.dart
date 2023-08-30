@@ -664,7 +664,12 @@ class RouteGenerator {
         } else if (args is ({
           String walletId,
           List<String> mnemonic,
-          ({String myName, String config, String keys}) frostWalletData,
+          ({
+            String myName,
+            String config,
+            String keys,
+            ({String config, String keys})? prevGen,
+          }) frostWalletData,
         })) {
           return getRoute(
             shouldUseMaterialRoute: useMaterialPageRoute,
