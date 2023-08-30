@@ -14,14 +14,17 @@ import 'package:event_bus/event_bus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stackfrost/pages/home_view/home_view.dart';
+import 'package:stackfrost/pages/pinpad_views/lock_screen_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/advanced_views/debug_view.dart';
 import 'package:stackfrost/pages/settings_views/sub_widgets/settings_list_button.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/frost_ms_options_view.dart';
+import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_backup_views/wallet_backup_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_network_settings_view/wallet_network_settings_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_settings_wallet_settings/wallet_settings_wallet_settings_view.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_settings_wallet_settings/xpub_view.dart';
 import 'package:stackfrost/providers/global/wallets_provider.dart';
 import 'package:stackfrost/providers/ui/transaction_filter_provider.dart';
+import 'package:stackfrost/route_generator.dart';
 import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
 import 'package:stackfrost/services/event_bus/events/global/node_connection_status_changed_event.dart';
 import 'package:stackfrost/services/event_bus/events/global/wallet_sync_status_changed_event.dart';
@@ -219,89 +222,102 @@ class _WalletSettingsViewState extends ConsumerState<WalletSettingsView> {
                                 const SizedBox(
                                   height: 8,
                                 ),
-                                // Consumer(
-                                //   builder: (_, ref, __) {
-                                //     return SettingsListButton(
-                                //       iconAssetName: Assets.svg.lock,
-                                //       iconSize: 16,
-                                //       title: "Wallet backup",
-                                //       onPressed: () async {
-                                //         final wallet = ref
-                                //             .read(walletsChangeNotifierProvider)
-                                //             .getManager(walletId)
-                                //             .wallet;
-                                //
-                                //         ({
-                                //           String myName,
-                                //           String config,
-                                //           String keys,
-                                //         })? frostWalletData;
-                                //
-                                //         List<Future<dynamic>> futures = [
-                                //           wallet.mnemonic,
-                                //         ];
-                                //
-                                //         if (wallet is FrostWallet) {
-                                //           futures.addAll(
-                                //             [
-                                //               wallet.getSerializedKeys,
-                                //               wallet.multisigConfig,
-                                //             ],
-                                //           );
-                                //         }
-                                //
-                                //         final results =
-                                //             await Future.wait(futures);
-                                //
-                                //         final List<String> mnemonic =
-                                //             results.first as List<String>;
-                                //
-                                //         if (results.length == 3) {
-                                //           frostWalletData = (
-                                //             myName:
-                                //                 (wallet as FrostWallet).myName,
-                                //             config: results[2],
-                                //             keys: results[1],
-                                //           );
-                                //         }
-                                //
-                                //         if (mounted) {
-                                //           await Navigator.push(
-                                //             context,
-                                //             RouteGenerator.getRoute(
-                                //               shouldUseMaterialRoute:
-                                //                   RouteGenerator
-                                //                       .useMaterialPageRoute,
-                                //               builder: (_) => LockscreenView(
-                                //                 routeOnSuccessArguments: (
-                                //                   walletId: walletId,
-                                //                   mnemonic: mnemonic,
-                                //                   frostWalletData:
-                                //                       frostWalletData,
-                                //                 ),
-                                //                 showBackButton: true,
-                                //                 routeOnSuccess:
-                                //                     WalletBackupView.routeName,
-                                //                 biometricsCancelButtonString:
-                                //                     "CANCEL",
-                                //                 biometricsLocalizedReason:
-                                //                     "Authenticate to view recovery phrase",
-                                //                 biometricsAuthenticationTitle:
-                                //                     "View recovery phrase",
-                                //               ),
-                                //               settings: const RouteSettings(
-                                //                   name:
-                                //                       "/viewRecoverPhraseLockscreen"),
-                                //             ),
-                                //           );
-                                //         }
-                                //       },
-                                //     );
-                                //   },
-                                // ),
-                                // const SizedBox(
-                                //   height: 8,
-                                // ),
+                                Consumer(
+                                  builder: (_, ref, __) {
+                                    return SettingsListButton(
+                                      iconAssetName: Assets.svg.lock,
+                                      iconSize: 16,
+                                      title: "Wallet backup",
+                                      onPressed: () async {
+                                        final wallet = ref
+                                            .read(walletsChangeNotifierProvider)
+                                            .getManager(walletId)
+                                            .wallet;
+
+                                        ({
+                                          String myName,
+                                          String config,
+                                          String keys,
+                                          ({
+                                            String config,
+                                            String keys
+                                          })? prevGen,
+                                        })? frostWalletData;
+
+                                        List<Future<dynamic>> futures = [
+                                          wallet.mnemonic,
+                                        ];
+
+                                        if (wallet is FrostWallet) {
+                                          futures.addAll(
+                                            [
+                                              wallet.getSerializedKeys,
+                                              wallet.multisigConfig,
+                                              wallet.getSerializedKeysPrevGen,
+                                              wallet.multisigConfigPrevGen,
+                                            ],
+                                          );
+                                        }
+
+                                        final results =
+                                            await Future.wait(futures);
+
+                                        final List<String> mnemonic =
+                                            results.first as List<String>;
+
+                                        if (results.length == 3) {
+                                          frostWalletData = (
+                                            myName:
+                                                (wallet as FrostWallet).myName,
+                                            config: results[2],
+                                            keys: results[1],
+                                            prevGen: results[3] == null ||
+                                                    results[4] == null
+                                                ? null
+                                                : (
+                                                    config: results[3],
+                                                    keys: results[4],
+                                                  ),
+                                          );
+                                        }
+
+                                        if (mounted) {
+                                          await Navigator.push(
+                                            context,
+                                            RouteGenerator.getRoute(
+                                              shouldUseMaterialRoute:
+                                                  RouteGenerator
+                                                      .useMaterialPageRoute,
+                                              builder: (_) => LockscreenView(
+                                                routeOnSuccessArguments: (
+                                                  walletId: walletId,
+                                                  mnemonic: mnemonic,
+                                                  frostWalletData:
+                                                      frostWalletData,
+                                                ),
+                                                showBackButton: true,
+                                                routeOnSuccess:
+                                                    WalletBackupView.routeName,
+                                                biometricsCancelButtonString:
+                                                    "CANCEL",
+                                                biometricsLocalizedReason:
+                                                    "Authenticate to view recovery info",
+                                                biometricsAuthenticationTitle:
+                                                    "View recovery phrase",
+                                              ),
+                                              settings: const RouteSettings(
+                                                  name:
+                                                      "/viewRecoverPhraseLockscreen"),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                    );
+                                  },
+                                ),
+                                const SizedBox(
+                                  height: 8,
+                                ),
                                 SettingsListButton(
                                   iconAssetName: Assets.svg.downloadFolder,
                                   title: "Wallet settings",

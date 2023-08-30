@@ -45,7 +45,12 @@ class WalletBackupView extends ConsumerWidget {
   static const String routeName = "/walletBackup";
 
   final String walletId;
-  final ({String myName, String config, String keys})? frostWalletData;
+  final ({
+    String myName,
+    String config,
+    String keys,
+    ({String config, String keys})? prevGen,
+  })? frostWalletData;
   final List<String> mnemonic;
   final ClipboardInterface clipboardInterface;
 
@@ -54,6 +59,7 @@ class WalletBackupView extends ConsumerWidget {
     debugPrint("BUILD: $runtimeType");
 
     final bool frost = frostWalletData != null;
+    final prevGen = frostWalletData?.prevGen != null;
 
     return Background(
       child: Scaffold(
@@ -166,6 +172,45 @@ class WalletBackupView extends ConsumerWidget {
                               data: frostWalletData!.keys,
                             ),
                     ),
+                    if (prevGen)
+                      const SizedBox(
+                        height: 24,
+                      ),
+                    if (prevGen)
+                      RoundedWhiteContainer(
+                        child: Text(
+                          "Previous generation info",
+                          style: STextStyles.label(context),
+                        ),
+                      ),
+                    if (prevGen)
+                      DetailItem(
+                        title: "Previous multisig config",
+                        detail: frostWalletData!.prevGen!.config,
+                        button: Util.isDesktop
+                            ? IconCopyButton(
+                                data: frostWalletData!.prevGen!.config,
+                              )
+                            : SimpleCopyButton(
+                                data: frostWalletData!.prevGen!.config,
+                              ),
+                      ),
+                    if (prevGen)
+                      const SizedBox(
+                        height: 16,
+                      ),
+                    if (prevGen)
+                      DetailItem(
+                        title: "Previous keys",
+                        detail: frostWalletData!.prevGen!.keys,
+                        button: Util.isDesktop
+                            ? IconCopyButton(
+                                data: frostWalletData!.prevGen!.keys,
+                              )
+                            : SimpleCopyButton(
+                                data: frostWalletData!.prevGen!.keys,
+                              ),
+                      ),
                   ],
                 )
               : Column(

@@ -585,20 +585,57 @@ class FrostWallet extends CoinServiceAPI
   Future<String?> get getSerializedKeys async => await _secureStore.read(
         key: "{$walletId}_serializedFROSTKeys",
       );
-  Future<void> _saveSerializedKeys(String keys) async =>
+  Future<void> _saveSerializedKeys(String keys) async {
+    final current = await getSerializedKeys;
+
+    if (current == null) {
+      // do nothing
+    } else if (current == keys) {
+      // should never occur
+    } else {
+      // save current as prev gen before updating current
       await _secureStore.write(
-        key: "{$walletId}_serializedFROSTKeys",
-        value: keys,
+        key: "{$walletId}_serializedFROSTKeysPrevGen",
+        value: current,
+      );
+    }
+
+    await _secureStore.write(
+      key: "{$walletId}_serializedFROSTKeys",
+      value: keys,
+    );
+  }
+
+  Future<String?> get getSerializedKeysPrevGen async => await _secureStore.read(
+        key: "{$walletId}_serializedFROSTKeysPrevGen",
       );
 
   Future<String?> get multisigConfig async => await _secureStore.read(
         key: "{$walletId}_multisigConfig",
       );
-  Future<void> _saveMultisigConfig(String multisigConfig) async =>
-      await _secureStore.write(
-        key: "{$walletId}_multisigConfig",
-        value: multisigConfig,
+  Future<String?> get multisigConfigPrevGen async => await _secureStore.read(
+        key: "{$walletId}_multisigConfigPrevGen",
       );
+  Future<void> _saveMultisigConfig(String multisigConfig) async {
+    final current = await this.multisigConfig;
+
+    if (current == null) {
+      // do nothing
+    } else if (current == multisigConfig) {
+      // should never occur
+    } else {
+      // save current as prev gen before updating current
+      await _secureStore.write(
+        key: "{$walletId}_multisigConfigPrevGen",
+        value: current,
+      );
+    }
+
+    await _secureStore.write(
+      key: "{$walletId}_multisigConfig",
+      value: multisigConfig,
+    );
+  }
 
   Future<Uint8List?> get multisigId async {
     final id = await _secureStore.read(
