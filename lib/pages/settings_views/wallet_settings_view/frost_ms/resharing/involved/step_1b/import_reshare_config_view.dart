@@ -2,6 +2,7 @@ import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:frostdart/frostdart.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/involved/step_2/begin_resharing_view.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
 import 'package:stackfrost/providers/global/wallets_provider.dart';
@@ -9,6 +10,7 @@ import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
 import 'package:stackfrost/services/frost.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/utilities/constants.dart';
+import 'package:stackfrost/utilities/format.dart';
 import 'package:stackfrost/utilities/logger.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
 import 'package:stackfrost/utilities/util.dart';
@@ -64,6 +66,25 @@ class _ImportReshareConfigViewState
       ref.read(pFrostResharingData).reset();
       ref.read(pFrostResharingData).myName = wallet.myName;
       ref.read(pFrostResharingData).resharerConfig = configFieldController.text;
+
+      String? salt;
+      try {
+        salt = Format.uint8listToString(
+          resharerSalt(
+            resharerConfig: ref.read(pFrostResharingData).resharerConfig!,
+          ),
+        );
+      } catch (_) {
+        throw Exception("Bad resharer config");
+      }
+
+      if (wallet.knownSalts.contains(salt)) {
+        throw Exception("Duplicate config salt");
+      } else {
+        final salts = wallet.knownSalts;
+        salts.add(salt);
+        await wallet.updateKnownSalts(salts);
+      }
 
       final serializedKeys = await wallet.getSerializedKeys;
       if (mounted) {

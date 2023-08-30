@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:frostdart/frostdart.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/involved/step_1a/display_reshare_config_view.dart';
 import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
@@ -8,6 +9,7 @@ import 'package:stackfrost/providers/global/wallets_provider.dart';
 import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
 import 'package:stackfrost/services/frost.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/format.dart';
 import 'package:stackfrost/utilities/logger.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
 import 'package:stackfrost/utilities/util.dart';
@@ -76,13 +78,33 @@ class _CompleteReshareConfigViewState
         newParticipants: controllers.map((e) => e.text).toList(),
       );
 
+      final salt = Format.uint8listToString(
+        resharerSalt(resharerConfig: config),
+      );
+
+      if (wallet.knownSalts.contains(salt)) {
+        return await showDialog<void>(
+          context: context,
+          builder: (_) => StackOkDialog(
+            title: "Duplicate config salt",
+            desktopPopRootNavigator: Util.isDesktop,
+          ),
+        );
+      } else {
+        final salts = wallet.knownSalts;
+        salts.add(salt);
+        await wallet.updateKnownSalts(salts);
+      }
+
       ref.read(pFrostResharingData).myName = wallet.myName;
       ref.read(pFrostResharingData).resharerConfig = config;
 
-      await Navigator.of(context).pushNamed(
-        DisplayReshareConfigView.routeName,
-        arguments: widget.walletId,
-      );
+      if (mounted) {
+        await Navigator.of(context).pushNamed(
+          DisplayReshareConfigView.routeName,
+          arguments: widget.walletId,
+        );
+      }
     } catch (e, s) {
       Logging.instance.log(
         "$e\n$s",
