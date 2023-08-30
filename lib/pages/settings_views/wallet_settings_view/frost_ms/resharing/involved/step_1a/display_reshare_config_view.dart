@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/involved/step_2/begin_resharing_view.dart';
+import 'package:stackfrost/pages/wallet_view/transaction_views/transaction_details_view.dart';
 import 'package:stackfrost/providers/frost_wallet/frost_wallet_providers.dart';
 import 'package:stackfrost/providers/global/wallets_provider.dart';
 import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
@@ -13,10 +14,11 @@ import 'package:stackfrost/utilities/util.dart';
 import 'package:stackfrost/widgets/background.dart';
 import 'package:stackfrost/widgets/conditional_parent.dart';
 import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
+import 'package:stackfrost/widgets/custom_buttons/simple_copy_button.dart';
 import 'package:stackfrost/widgets/desktop/desktop_app_bar.dart';
 import 'package:stackfrost/widgets/desktop/desktop_scaffold.dart';
 import 'package:stackfrost/widgets/desktop/primary_button.dart';
-import 'package:stackfrost/widgets/rounded_white_container.dart';
+import 'package:stackfrost/widgets/detail_item.dart';
 import 'package:stackfrost/widgets/stack_dialog.dart';
 
 class DisplayReshareConfigView extends ConsumerStatefulWidget {
@@ -177,11 +179,16 @@ class _DisplayReshareConfigViewState
             const SizedBox(
               height: 32,
             ),
-            RoundedWhiteContainer(
-              child: SelectableText(
-                ref.watch(pFrostResharingData).resharerConfig!,
-                style: STextStyles.itemSubtitle(context),
-              ),
+            DetailItem(
+              title: "Config",
+              detail: ref.watch(pFrostResharingData).resharerConfig!,
+              button: Util.isDesktop
+                  ? IconCopyButton(
+                      data: ref.watch(pFrostResharingData).resharerConfig!,
+                    )
+                  : SimpleCopyButton(
+                      data: ref.watch(pFrostResharingData).resharerConfig!,
+                    ),
             ),
             SizedBox(
               height: Util.isDesktop ? 64 : 16,
