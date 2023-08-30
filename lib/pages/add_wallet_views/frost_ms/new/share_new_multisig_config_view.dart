@@ -118,7 +118,7 @@ class _ShareNewMultisigConfigViewState
             ),
             DetailItem(
               title: "Encoded config",
-              detail: ref.watch(pFrostMultisigConfig.state).state!,
+              detail: ref.watch(pFrostMultisigConfig.state).state ?? "Error",
               button: Util.isDesktop
                   ? IconCopyButton(
                       data: ref.watch(pFrostMultisigConfig.state).state!,
