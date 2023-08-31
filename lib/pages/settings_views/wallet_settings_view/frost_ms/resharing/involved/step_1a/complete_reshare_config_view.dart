@@ -282,6 +282,15 @@ class _CompleteReshareConfigViewState
               height: 16,
             ),
             if (controllers.isNotEmpty)
+              Text(
+                "Participants",
+                style: STextStyles.label(context),
+              ),
+            if (controllers.isNotEmpty)
+              const SizedBox(
+                height: 10,
+              ),
+            if (controllers.isNotEmpty)
               Column(
                 children: [
                   for (int i = 0; i < controllers.length; i++)
