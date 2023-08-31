@@ -23,7 +23,6 @@ import 'package:stackfrost/utilities/biometrics.dart';
 import 'package:stackfrost/utilities/flutter_secure_storage_interface.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
 import 'package:stackfrost/widgets/background.dart';
-import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackfrost/widgets/custom_pin_put/custom_pin_put.dart';
 
 class CreatePinView extends ConsumerStatefulWidget {
@@ -95,19 +94,19 @@ class _CreatePinViewState extends ConsumerState<CreatePinView> {
     return Background(
       child: Scaffold(
         backgroundColor: Theme.of(context).extension<StackColors>()!.background,
-        appBar: AppBar(
-          leading: AppBarBackButton(
-            onPressed: () async {
-              if (FocusScope.of(context).hasFocus) {
-                FocusScope.of(context).unfocus();
-                await Future<void>.delayed(const Duration(milliseconds: 70));
-              }
-              if (mounted) {
-                Navigator.of(context).pop(widget.popOnSuccess);
-              }
-            },
-          ),
-        ),
+        // appBar: AppBar(
+        //   leading: AppBarBackButton(
+        //     onPressed: () async {
+        //       if (FocusScope.of(context).hasFocus) {
+        //         FocusScope.of(context).unfocus();
+        //         await Future<void>.delayed(const Duration(milliseconds: 70));
+        //       }
+        //       if (mounted) {
+        //         Navigator.of(context).pop(widget.popOnSuccess);
+        //       }
+        //     },
+        //   ),
+        // ),
         body: SafeArea(
           child: PageView(
             controller: _pageController,
