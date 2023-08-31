@@ -265,7 +265,7 @@ class _WalletSettingsViewState extends ConsumerState<WalletSettingsView> {
                                         final List<String> mnemonic =
                                             results.first as List<String>;
 
-                                        if (results.length == 3) {
+                                        if (results.length == 5) {
                                           frostWalletData = (
                                             myName:
                                                 (wallet as FrostWallet).myName,

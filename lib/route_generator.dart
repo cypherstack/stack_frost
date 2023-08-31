@@ -662,7 +662,7 @@ class RouteGenerator {
             String config,
             String keys,
             ({String config, String keys})? prevGen,
-          }) frostWalletData,
+          })? frostWalletData,
         })) {
           return getRoute(
             shouldUseMaterialRoute: useMaterialPageRoute,
