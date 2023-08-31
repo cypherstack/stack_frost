@@ -121,10 +121,12 @@ class _ShareNewMultisigConfigViewState
               detail: ref.watch(pFrostMultisigConfig.state).state ?? "Error",
               button: Util.isDesktop
                   ? IconCopyButton(
-                      data: ref.watch(pFrostMultisigConfig.state).state!,
+                      data: ref.watch(pFrostMultisigConfig.state).state ??
+                          "Error",
                     )
                   : SimpleCopyButton(
-                      data: ref.watch(pFrostMultisigConfig.state).state!,
+                      data: ref.watch(pFrostMultisigConfig.state).state ??
+                          "Error",
                     ),
             ),
             SizedBox(
