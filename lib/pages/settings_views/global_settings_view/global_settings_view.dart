@@ -11,6 +11,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:stackfrost/pages/settings_views/global_settings_view/about_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/advanced_views/advanced_settings_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/delete_account_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/manage_nodes_views/manage_nodes_view.dart';
@@ -118,18 +119,18 @@ class GlobalSettingsView extends StatelessWidget {
                                           DeleteAccountView.routeName);
                                     },
                                   ),
-                                // const SizedBox(
-                                //   height: 8,
-                                // ),
-                                // SettingsListButton(
-                                //   iconAssetName: Assets.svg.ellipsis,
-                                //   iconSize: 18,
-                                //   title: "About",
-                                //   onPressed: () {
-                                //     Navigator.of(context)
-                                //         .pushNamed(AboutView.routeName);
-                                //   },
-                                // ),
+                                const SizedBox(
+                                  height: 8,
+                                ),
+                                SettingsListButton(
+                                  iconAssetName: Assets.svg.ellipsis,
+                                  iconSize: 18,
+                                  title: "About",
+                                  onPressed: () {
+                                    Navigator.of(context)
+                                        .pushNamed(AboutView.routeName);
+                                  },
+                                ),
                                 const SizedBox(
                                   height: 8,
                                 ),
