@@ -140,8 +140,11 @@ mixin ElectrumXParsing {
     Address transactionAddress = txData["address"] as Address;
 
     TransactionType type;
-    Amount amount;
-    if (mySentFromAddresses.isNotEmpty && myReceivedOnAddresses.isNotEmpty) {
+    Amount amount =
+        amountSentFromWallet - amountReceivedInWallet - fee - changeAmount;
+    if (mySentFromAddresses.isNotEmpty &&
+        myReceivedOnAddresses.isNotEmpty &&
+        amount.raw == BigInt.zero) {
       // tx is sent to self
       type = TransactionType.sentToSelf;
 
@@ -152,6 +155,10 @@ mixin ElectrumXParsing {
       // outgoing tx
       type = TransactionType.outgoing;
       amount = amountSentFromWallet - changeAmount - fee;
+
+      // normally amountReceivedInWallet should be zero but when using the
+      // receiving address as a change address as we do in frost...
+      amount = amount - amountReceivedInWallet;
 
       // non wallet addresses found in tx outputs
       final nonWalletOutAddresses = outputAddresses.difference(
