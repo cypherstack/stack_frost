@@ -64,7 +64,6 @@ import 'package:stackfrost/pages/settings_views/global_settings_view/advanced_vi
 import 'package:stackfrost/pages/settings_views/global_settings_view/advanced_views/manage_coin_units/edit_coin_units_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/advanced_views/manage_coin_units/manage_coin_units_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/advanced_views/manage_explorer_view.dart';
-import 'package:stackfrost/pages/settings_views/global_settings_view/appearance_settings/appearance_settings_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/appearance_settings/manage_themes.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/appearance_settings/system_brightness_theme_selection_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/delete_account_view.dart';
@@ -377,11 +376,11 @@ class RouteGenerator {
         }
         return _routeError("${settings.name} invalid args: ${args.toString()}");
 
-      case AppearanceSettingsView.routeName:
-        return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => const AppearanceSettingsView(),
-            settings: RouteSettings(name: settings.name));
+      // case AppearanceSettingsView.routeName:
+      //   return getRoute(
+      //       shouldUseMaterialRoute: useMaterialPageRoute,
+      //       builder: (_) => const AppearanceSettingsView(),
+      //       settings: RouteSettings(name: settings.name));
 
       case StartupPreferencesView.routeName:
         return getRoute(

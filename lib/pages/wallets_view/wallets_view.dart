@@ -22,13 +22,15 @@ class WalletsView extends ConsumerWidget {
 
   static const routeName = "/wallets";
 
+  static const showFavorites = false;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     debugPrint("BUILD: $runtimeType");
     final hasWallets = ref.watch(walletsChangeNotifierProvider).hasWallets;
 
-    final showFavorites = ref.watch(prefsChangeNotifierProvider
-        .select((value) => value.showFavoriteWallets));
+    // final showFavorites = ref.watch(prefsChangeNotifierProvider
+    //     .select((value) => value.showFavoriteWallets));
 
     return SafeArea(
       child: hasWallets
@@ -37,15 +39,15 @@ class WalletsView extends ConsumerWidget {
                 top:
                     ref.watch(themeProvider).themeId == "fruit_sorbet" ? 6 : 20,
               ),
-              child: Column(
+              child: const Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  if (showFavorites) const FavoriteWallets(),
+                  if (showFavorites) FavoriteWallets(),
                   if (showFavorites)
-                    const SizedBox(
+                    SizedBox(
                       height: 20,
                     ),
-                  const Expanded(
+                  Expanded(
                     child: Padding(
                       padding: EdgeInsets.symmetric(
                         horizontal: 16,

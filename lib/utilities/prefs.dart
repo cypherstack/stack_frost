@@ -34,7 +34,6 @@ class Prefs extends ChangeNotifier {
       _useBiometrics = await _getUseBiometrics();
       _hasPin = await _getHasPin();
       _language = await _getPreferredLanguage();
-      _showFavoriteWallets = await _getShowFavoriteWallets();
       _wifiOnly = await _getUseWifiOnly();
       _syncType = await _getSyncType();
       _walletIdsSyncOnStartup = await _getWalletIdsSyncOnStartup();
@@ -201,29 +200,6 @@ class Prefs extends ChangeNotifier {
     return await DB.instance
             .get<dynamic>(boxName: DB.boxNamePrefs, key: "wifiOnly") as bool? ??
         false;
-  }
-
-  // show favorites
-
-  bool _showFavoriteWallets = true;
-
-  bool get showFavoriteWallets => _showFavoriteWallets;
-
-  set showFavoriteWallets(bool showFavoriteWallets) {
-    if (_showFavoriteWallets != showFavoriteWallets) {
-      DB.instance.put<dynamic>(
-          boxName: DB.boxNamePrefs,
-          key: "showFavoriteWallets",
-          value: showFavoriteWallets);
-      _showFavoriteWallets = showFavoriteWallets;
-      notifyListeners();
-    }
-  }
-
-  Future<bool> _getShowFavoriteWallets() async {
-    return await DB.instance.get<dynamic>(
-            boxName: DB.boxNamePrefs, key: "showFavoriteWallets") as bool? ??
-        true;
   }
 
   // language

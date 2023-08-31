@@ -24,7 +24,6 @@ import 'package:stackfrost/themes/theme_service.dart';
 import 'package:stackfrost/utilities/assets.dart';
 import 'package:stackfrost/utilities/constants.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
-import 'package:stackfrost/widgets/custom_buttons/draggable_switch_button.dart';
 import 'package:stackfrost/widgets/rounded_white_container.dart';
 import 'package:tuple/tuple.dart';
 
@@ -89,44 +88,6 @@ class _AppearanceOptionSettings
                           ),
                         ),
                       ],
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.all(10.0),
-                      child: Divider(
-                        thickness: 0.5,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Display favorite wallets",
-                            style: STextStyles.desktopTextExtraSmall(context)
-                                .copyWith(
-                                    color: Theme.of(context)
-                                        .extension<StackColors>()!
-                                        .textDark),
-                            textAlign: TextAlign.left,
-                          ),
-                          SizedBox(
-                            height: 20,
-                            width: 40,
-                            child: DraggableSwitchButton(
-                              isOn: ref.watch(
-                                prefsChangeNotifierProvider.select(
-                                    (value) => value.showFavoriteWallets),
-                              ),
-                              onValueChanged: (newValue) {
-                                ref
-                                    .read(prefsChangeNotifierProvider)
-                                    .showFavoriteWallets = newValue;
-                              },
-                            ),
-                          )
-                        ],
-                      ),
                     ),
                     const Padding(
                       padding: EdgeInsets.all(10.0),

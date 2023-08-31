@@ -12,7 +12,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/advanced_views/advanced_settings_view.dart';
-import 'package:stackfrost/pages/settings_views/global_settings_view/appearance_settings/appearance_settings_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/delete_account_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/manage_nodes_views/manage_nodes_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/security_views/security_view.dart';
@@ -92,19 +91,19 @@ class GlobalSettingsView extends StatelessWidget {
                                         .pushNamed(ManageNodesView.routeName);
                                   },
                                 ),
-                                const SizedBox(
-                                  height: 8,
-                                ),
-                                SettingsListButton(
-                                  iconAssetName: Assets.svg.sun,
-                                  iconSize: 18,
-                                  title: "Appearance",
-                                  onPressed: () {
-                                    Navigator.of(context).pushNamed(
-                                      AppearanceSettingsView.routeName,
-                                    );
-                                  },
-                                ),
+                                // const SizedBox(
+                                //   height: 8,
+                                // ),
+                                // SettingsListButton(
+                                //   iconAssetName: Assets.svg.sun,
+                                //   iconSize: 18,
+                                //   title: "Appearance",
+                                //   onPressed: () {
+                                //     Navigator.of(context).pushNamed(
+                                //       AppearanceSettingsView.routeName,
+                                //     );
+                                //   },
+                                // ),
                                 if (Platform.isIOS)
                                   const SizedBox(
                                     height: 8,

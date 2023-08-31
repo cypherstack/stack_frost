@@ -259,7 +259,7 @@ abstract class SWB {
       prefs['useBiometrics'] = _prefs.useBiometrics;
       prefs['hasPin'] = _prefs.hasPin;
       prefs['language'] = _prefs.language;
-      prefs['showFavoriteWallets'] = _prefs.showFavoriteWallets;
+      // prefs['showFavoriteWallets'] = _prefs.showFavoriteWallets;
       prefs['wifiOnly'] = _prefs.wifiOnly;
       prefs['syncType'] = _prefs.syncType.name;
       prefs['walletIdsSyncOnStartup'] = _prefs.walletIdsSyncOnStartup;
@@ -1090,7 +1090,7 @@ abstract class SWB {
     // _prefs.useBiometrics = prefs['useBiometrics'] as bool;
     // _prefs.hasPin = prefs['hasPin'] as bool;
     _prefs.language = prefs['language'] as String;
-    _prefs.showFavoriteWallets = prefs['showFavoriteWallets'] as bool;
+    // _prefs.showFavoriteWallets = prefs['showFavoriteWallets'] as bool;
     _prefs.wifiOnly = prefs['wifiOnly'] as bool;
     _prefs.syncType = prefs['syncType'] == "currentWalletOnly"
         ? SyncingType.currentWalletOnly
