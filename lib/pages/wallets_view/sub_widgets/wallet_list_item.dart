@@ -102,8 +102,9 @@ class WalletListItem extends ConsumerWidget {
                 builder: (_, ref, __) {
                   final tuple = ref.watch(priceAnd24hChangeNotifierProvider
                       .select((value) => value.getPrice(coin)));
-                  final calls =
-                      ref.watch(prefsChangeNotifierProvider).externalCalls;
+                  final calls = coin.isTestNet
+                      ? false
+                      : ref.watch(prefsChangeNotifierProvider).externalCalls;
 
                   final priceString =
                       tuple.item1.toAmount(fractionDigits: 2).fiatString(

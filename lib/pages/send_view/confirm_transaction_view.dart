@@ -562,9 +562,11 @@ class _ConfirmTransactionViewState
                                   ),
                                 );
                                 final amount = transactionInfo.amount!;
-                                final externalCalls = ref.watch(
-                                    prefsChangeNotifierProvider.select(
-                                        (value) => value.externalCalls));
+                                final externalCalls = coin.isTestNet
+                                    ? false
+                                    : ref.watch(
+                                        prefsChangeNotifierProvider.select(
+                                            (value) => value.externalCalls));
                                 String fiatAmount = "N/A";
 
                                 if (externalCalls) {
