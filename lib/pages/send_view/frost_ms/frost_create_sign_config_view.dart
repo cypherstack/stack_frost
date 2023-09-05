@@ -113,7 +113,7 @@ class _FrostCreateSignConfigViewState
                       ),
                       child: IntrinsicHeight(
                         child: Padding(
-                          padding: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: child,
                         ),
                       ),
@@ -128,13 +128,13 @@ class _FrostCreateSignConfigViewState
           children: [
             if (!Util.isDesktop) const Spacer(),
             SizedBox(
-              height: 220,
+              height: MediaQuery.of(context).size.width - 32,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   QrImageView(
                     data: ref.watch(pFrostTxData.state).state!.frostMSConfig!,
-                    size: 220,
+                    size: MediaQuery.of(context).size.width - 32,
                     backgroundColor:
                         Theme.of(context).extension<StackColors>()!.background,
                     foregroundColor: Theme.of(context)
@@ -170,6 +170,9 @@ class _FrostCreateSignConfigViewState
               onPressed: () {
                 _attemptSign();
               },
+            ),
+            const SizedBox(
+              height: 16,
             ),
           ],
         ),
