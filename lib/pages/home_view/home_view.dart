@@ -14,7 +14,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/global_settings_view.dart';
-import 'package:stackfrost/pages/settings_views/global_settings_view/hidden_settings.dart';
 import 'package:stackfrost/pages/wallets_view/wallets_view.dart';
 import 'package:stackfrost/providers/global/notifications_provider.dart';
 import 'package:stackfrost/providers/ui/home_view_index_provider.dart';
@@ -127,23 +126,23 @@ class _HomeViewState extends ConsumerState<HomeView> {
     super.dispose();
   }
 
-  DateTime _hiddenTime = DateTime.now();
-  int _hiddenCount = 0;
+  // DateTime _hiddenTime = DateTime.now();
+  // int _hiddenCount = 0;
 
   void _hiddenOptions() {
     _rotateIconController.reset?.call();
     _rotateIconController.forward?.call();
-    if (_hiddenCount == 5) {
-      Navigator.of(context).pushNamed(HiddenSettings.routeName);
-    }
-    final now = DateTime.now();
-    const timeout = Duration(seconds: 1);
-    if (now.difference(_hiddenTime) < timeout) {
-      _hiddenCount++;
-    } else {
-      _hiddenCount = 0;
-    }
-    _hiddenTime = now;
+    // if (_hiddenCount == 5) {
+    //   Navigator.of(context).pushNamed(HiddenSettings.routeName);
+    // }
+    // final now = DateTime.now();
+    // const timeout = Duration(seconds: 1);
+    // if (now.difference(_hiddenTime) < timeout) {
+    //   _hiddenCount++;
+    // } else {
+    //   _hiddenCount = 0;
+    // }
+    // _hiddenTime = now;
   }
 
   @override

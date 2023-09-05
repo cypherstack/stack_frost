@@ -8,8 +8,6 @@
  *
  */
 
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -43,14 +41,8 @@ class EmptyWallets extends ConsumerWidget {
               const Spacer(
                 flex: 2,
               ),
-              SvgPicture.file(
-                File(
-                  ref.watch(
-                    themeProvider.select(
-                      (value) => value.assets.stack,
-                    ),
-                  ),
-                ),
+              Image.asset(
+                Assets.png.icon,
                 width: isDesktop ? 324 : MediaQuery.of(context).size.width / 3,
               ),
               SizedBox(

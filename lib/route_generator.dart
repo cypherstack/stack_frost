@@ -68,7 +68,6 @@ import 'package:stackfrost/pages/settings_views/global_settings_view/appearance_
 import 'package:stackfrost/pages/settings_views/global_settings_view/appearance_settings/system_brightness_theme_selection_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/delete_account_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/global_settings_view.dart';
-import 'package:stackfrost/pages/settings_views/global_settings_view/hidden_settings.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/language_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/manage_nodes_views/add_edit_node_view.dart';
 import 'package:stackfrost/pages/settings_views/global_settings_view/manage_nodes_views/coin_nodes_view.dart';
@@ -476,11 +475,11 @@ class RouteGenerator {
             builder: (_) => const CreateBackupView(),
             settings: RouteSettings(name: settings.name));
 
-      case HiddenSettings.routeName:
-        return getRoute(
-            shouldUseMaterialRoute: false,
-            builder: (_) => const HiddenSettings(),
-            settings: RouteSettings(name: settings.name));
+      // case HiddenSettings.routeName:
+      //   return getRoute(
+      //       shouldUseMaterialRoute: false,
+      //       builder: (_) => const HiddenSettings(),
+      //       settings: RouteSettings(name: settings.name));
 
       case CoinNodesView.routeName:
         if (args is Coin) {
