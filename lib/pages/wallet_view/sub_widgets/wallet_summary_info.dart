@@ -97,25 +97,25 @@ class _WalletSummaryInfoState extends ConsumerState<WalletSummaryInfo> {
   Widget build(BuildContext context) {
     debugPrint("BUILD: $runtimeType");
 
-    bool isMonkey = true;
+    // bool isMonkey = true;
 
     final manager = ref.watch(walletsChangeNotifierProvider
         .select((value) => value.getManager(widget.walletId)));
 
-    final externalCalls = ref.watch(
-        prefsChangeNotifierProvider.select((value) => value.externalCalls));
+    // final externalCalls = ref.watch(
+    //     prefsChangeNotifierProvider.select((value) => value.externalCalls));
     final coin = manager.coin;
     final balance = ref.watch(walletsChangeNotifierProvider
         .select((value) => value.getManager(widget.walletId).balance));
+    //
+    // final locale = ref.watch(
+    //     localeServiceChangeNotifierProvider.select((value) => value.locale));
+    //
+    // final baseCurrency = ref
+    //     .watch(prefsChangeNotifierProvider.select((value) => value.currency));
 
-    final locale = ref.watch(
-        localeServiceChangeNotifierProvider.select((value) => value.locale));
-
-    final baseCurrency = ref
-        .watch(prefsChangeNotifierProvider.select((value) => value.currency));
-
-    final priceTuple = ref.watch(priceAnd24hChangeNotifierProvider
-        .select((value) => value.getPrice(coin)));
+    // final priceTuple = ref.watch(priceAnd24hChangeNotifierProvider
+    //     .select((value) => value.getPrice(coin)));
 
     final _showAvailable =
         ref.watch(walletBalanceToggleStateProvider.state).state ==
@@ -187,19 +187,19 @@ class _WalletSummaryInfoState extends ConsumerState<WalletSummaryInfo> {
                     ),
                   ),
                 ),
-                if (externalCalls)
-                  Text(
-                    "${(priceTuple.item1 * balanceToShow.decimal).toAmount(
-                          fractionDigits: 2,
-                        ).fiatString(
-                          locale: locale,
-                        )} $baseCurrency",
-                    style: STextStyles.subtitle500(context).copyWith(
-                      color: Theme.of(context)
-                          .extension<StackColors>()!
-                          .textFavoriteCard,
-                    ),
-                  ),
+                // if (externalCalls)
+                //   Text(
+                //     "${(priceTuple.item1 * balanceToShow.decimal).toAmount(
+                //           fractionDigits: 2,
+                //         ).fiatString(
+                //           locale: locale,
+                //         )} $baseCurrency",
+                //     style: STextStyles.subtitle500(context).copyWith(
+                //       color: Theme.of(context)
+                //           .extension<StackColors>()!
+                //           .textFavoriteCard,
+                //     ),
+                //   ),
               ],
             ),
           ),

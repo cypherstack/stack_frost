@@ -41,7 +41,6 @@ import 'package:stackfrost/utilities/constants.dart';
 import 'package:stackfrost/utilities/enums/coin_enum.dart';
 import 'package:stackfrost/utilities/enums/fee_rate_type_enum.dart';
 import 'package:stackfrost/utilities/logger.dart';
-import 'package:stackfrost/utilities/prefs.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
 import 'package:stackfrost/utilities/util.dart';
 import 'package:stackfrost/widgets/animated_text.dart';
@@ -413,18 +412,18 @@ class _DesktopSendState extends ConsumerState<DesktopSend> {
             level: LogLevel.Info);
         _cachedAmountToSend = _amountToSend;
 
-        final price =
-            ref.read(priceAnd24hChangeNotifierProvider).getPrice(coin).item1;
-
-        if (price > Decimal.zero) {
-          final String fiatAmountString = (_amountToSend!.decimal * price)
-              .toAmount(fractionDigits: 2)
-              .fiatString(
-                locale: ref.read(localeServiceChangeNotifierProvider).locale,
-              );
-
-          baseAmountController.text = fiatAmountString;
-        }
+        // final price =
+        //     ref.read(priceAnd24hChangeNotifierProvider).getPrice(coin).item1;
+        //
+        // if (price > Decimal.zero) {
+        //   final String fiatAmountString = (_amountToSend!.decimal * price)
+        //       .toAmount(fractionDigits: 2)
+        //       .fiatString(
+        //         locale: ref.read(localeServiceChangeNotifierProvider).locale,
+        //       );
+        //
+        //   baseAmountController.text = fiatAmountString;
+        // }
       } else {
         _amountToSend = null;
         _cachedAmountToSend = null;
@@ -549,18 +548,18 @@ class _DesktopSendState extends ConsumerState<DesktopSend> {
       locale: ref.read(localeServiceChangeNotifierProvider).locale,
     );
     if (baseAmount != null) {
-      final _price =
-          ref.read(priceAnd24hChangeNotifierProvider).getPrice(coin).item1;
+      // final _price =
+      //     ref.read(priceAnd24hChangeNotifierProvider).getPrice(coin).item1;
 
-      if (_price == Decimal.zero) {
-        _amountToSend = Decimal.zero.toAmount(fractionDigits: coin.decimals);
-      } else {
-        _amountToSend = baseAmount <= Amount.zero
-            ? Decimal.zero.toAmount(fractionDigits: coin.decimals)
-            : (baseAmount.decimal / _price)
-                .toDecimal(scaleOnInfinitePrecision: coin.decimals)
-                .toAmount(fractionDigits: coin.decimals);
-      }
+      // if (_price == Decimal.zero) {
+      //   _amountToSend = Decimal.zero.toAmount(fractionDigits: coin.decimals);
+      // } else {
+      //   _amountToSend = baseAmount <= Amount.zero
+      //       ? Decimal.zero.toAmount(fractionDigits: coin.decimals)
+      //       : (baseAmount.decimal / _price)
+      //           .toDecimal(scaleOnInfinitePrecision: coin.decimals)
+      //           .toAmount(fractionDigits: coin.decimals);
+      // }
       if (_cachedAmountToSend != null && _cachedAmountToSend == _amountToSend) {
         return;
       }
@@ -786,68 +785,68 @@ class _DesktopSendState extends ConsumerState<DesktopSend> {
             ),
           ),
         ),
-        if (Prefs.instance.externalCalls)
-          const SizedBox(
-            height: 10,
-          ),
-        if (Prefs.instance.externalCalls)
-          TextField(
-            autocorrect: Util.isDesktop ? false : true,
-            enableSuggestions: Util.isDesktop ? false : true,
-            style: STextStyles.smallMed14(context).copyWith(
-              color: Theme.of(context).extension<StackColors>()!.textDark,
-            ),
-            key: const Key("amountInputFieldFiatTextFieldKey"),
-            controller: baseAmountController,
-            focusNode: _baseFocus,
-            keyboardType: Util.isDesktop
-                ? null
-                : const TextInputType.numberWithOptions(
-                    signed: false,
-                    decimal: true,
-                  ),
-            textAlign: TextAlign.right,
-            inputFormatters: [
-              AmountInputFormatter(
-                decimals: 2,
-                locale: locale,
-              ),
-              // // regex to validate a fiat amount with 2 decimal places
-              // TextInputFormatter.withFunction((oldValue, newValue) =>
-              //     RegExp(r'^([0-9]*[,.]?[0-9]{0,2}|[,.][0-9]{0,2})$')
-              //             .hasMatch(newValue.text)
-              //         ? newValue
-              //         : oldValue),
-            ],
-            onChanged: fiatTextFieldOnChanged,
-            decoration: InputDecoration(
-              contentPadding: const EdgeInsets.only(
-                top: 22,
-                right: 12,
-                bottom: 22,
-              ),
-              hintText: "0",
-              hintStyle: STextStyles.desktopTextExtraSmall(context).copyWith(
-                color: Theme.of(context)
-                    .extension<StackColors>()!
-                    .textFieldDefaultText,
-              ),
-              prefixIcon: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Text(
-                    ref.watch(prefsChangeNotifierProvider
-                        .select((value) => value.currency)),
-                    style: STextStyles.smallMed14(context).copyWith(
-                        color: Theme.of(context)
-                            .extension<StackColors>()!
-                            .accentColorDark),
-                  ),
-                ),
-              ),
-            ),
-          ),
+        // if (Prefs.instance.externalCalls)
+        //   const SizedBox(
+        //     height: 10,
+        //   ),
+        // if (Prefs.instance.externalCalls)
+        //   TextField(
+        //     autocorrect: Util.isDesktop ? false : true,
+        //     enableSuggestions: Util.isDesktop ? false : true,
+        //     style: STextStyles.smallMed14(context).copyWith(
+        //       color: Theme.of(context).extension<StackColors>()!.textDark,
+        //     ),
+        //     key: const Key("amountInputFieldFiatTextFieldKey"),
+        //     controller: baseAmountController,
+        //     focusNode: _baseFocus,
+        //     keyboardType: Util.isDesktop
+        //         ? null
+        //         : const TextInputType.numberWithOptions(
+        //             signed: false,
+        //             decimal: true,
+        //           ),
+        //     textAlign: TextAlign.right,
+        //     inputFormatters: [
+        //       AmountInputFormatter(
+        //         decimals: 2,
+        //         locale: locale,
+        //       ),
+        //       // // regex to validate a fiat amount with 2 decimal places
+        //       // TextInputFormatter.withFunction((oldValue, newValue) =>
+        //       //     RegExp(r'^([0-9]*[,.]?[0-9]{0,2}|[,.][0-9]{0,2})$')
+        //       //             .hasMatch(newValue.text)
+        //       //         ? newValue
+        //       //         : oldValue),
+        //     ],
+        //     onChanged: fiatTextFieldOnChanged,
+        //     decoration: InputDecoration(
+        //       contentPadding: const EdgeInsets.only(
+        //         top: 22,
+        //         right: 12,
+        //         bottom: 22,
+        //       ),
+        //       hintText: "0",
+        //       hintStyle: STextStyles.desktopTextExtraSmall(context).copyWith(
+        //         color: Theme.of(context)
+        //             .extension<StackColors>()!
+        //             .textFieldDefaultText,
+        //       ),
+        //       prefixIcon: FittedBox(
+        //         fit: BoxFit.scaleDown,
+        //         child: Padding(
+        //           padding: const EdgeInsets.all(12),
+        //           child: Text(
+        //             ref.watch(prefsChangeNotifierProvider
+        //                 .select((value) => value.currency)),
+        //             style: STextStyles.smallMed14(context).copyWith(
+        //                 color: Theme.of(context)
+        //                     .extension<StackColors>()!
+        //                     .accentColorDark),
+        //           ),
+        //         ),
+        //       ),
+        //     ),
+        //   ),
         if (showCoinControl)
           const SizedBox(
             height: 10,

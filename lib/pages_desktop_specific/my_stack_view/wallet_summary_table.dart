@@ -17,7 +17,6 @@ import 'package:stackfrost/pages/wallets_view/wallets_overview.dart';
 import 'package:stackfrost/providers/providers.dart';
 import 'package:stackfrost/themes/coin_icon_provider.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
-import 'package:stackfrost/utilities/amount/amount.dart';
 import 'package:stackfrost/utilities/enums/coin_enum.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
 import 'package:stackfrost/widgets/conditional_parent.dart';
@@ -188,12 +187,12 @@ class _DesktopWalletSummaryRowState
                   ),
                 ),
               ),
-              Expanded(
-                flex: 6,
-                child: TablePriceInfo(
-                  coin: widget.coin,
-                ),
-              ),
+              // Expanded(
+              //   flex: 6,
+              //   child: TablePriceInfo(
+              //     coin: widget.coin,
+              //   ),
+              // ),
             ],
           ),
         ),
@@ -209,11 +208,11 @@ class TablePriceInfo extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final tuple = ref.watch(
-      priceAnd24hChangeNotifierProvider.select(
-        (value) => value.getPrice(coin),
-      ),
-    );
+    // final tuple = ref.watch(
+    //   priceAnd24hChangeNotifierProvider.select(
+    //     (value) => value.getPrice(coin),
+    //   ),
+    // );
 
     final currency = ref.watch(
       prefsChangeNotifierProvider.select(
@@ -221,44 +220,44 @@ class TablePriceInfo extends ConsumerWidget {
       ),
     );
 
-    final priceString = Amount.fromDecimal(
-      tuple.item1,
-      fractionDigits: 2,
-    ).fiatString(
-      locale: ref
-          .watch(
-            localeServiceChangeNotifierProvider.notifier,
-          )
-          .locale,
-    );
+    // final priceString = Amount.fromDecimal(
+    //   tuple.item1,
+    //   fractionDigits: 2,
+    // ).fiatString(
+    //   locale: ref
+    //       .watch(
+    //         localeServiceChangeNotifierProvider.notifier,
+    //       )
+    //       .locale,
+    // );
+    //
+    // final double percentChange = tuple.item2;
 
-    final double percentChange = tuple.item2;
-
-    var percentChangedColor =
-        Theme.of(context).extension<StackColors>()!.textDark;
-    if (percentChange > 0) {
-      percentChangedColor =
-          Theme.of(context).extension<StackColors>()!.accentColorGreen;
-    } else if (percentChange < 0) {
-      percentChangedColor =
-          Theme.of(context).extension<StackColors>()!.accentColorRed;
-    }
+    // var percentChangedColor =
+    //     Theme.of(context).extension<StackColors>()!.textDark;
+    // if (percentChange > 0) {
+    //   percentChangedColor =
+    //       Theme.of(context).extension<StackColors>()!.accentColorGreen;
+    // } else if (percentChange < 0) {
+    //   percentChangedColor =
+    //       Theme.of(context).extension<StackColors>()!.accentColorRed;
+    // }
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          "$priceString $currency/${coin.ticker}",
-          style: STextStyles.desktopTextExtraSmall(context).copyWith(
-            color: Theme.of(context).extension<StackColors>()!.textSubtitle1,
-          ),
-        ),
-        Text(
-          "${percentChange.toStringAsFixed(2)}%",
-          style: STextStyles.desktopTextExtraSmall(context).copyWith(
-            color: percentChangedColor,
-          ),
-        ),
+        // Text(
+        //   "$priceString $currency/${coin.ticker}",
+        //   style: STextStyles.desktopTextExtraSmall(context).copyWith(
+        //     color: Theme.of(context).extension<StackColors>()!.textSubtitle1,
+        //   ),
+        // ),
+        // Text(
+        //   "${percentChange.toStringAsFixed(2)}%",
+        //   style: STextStyles.desktopTextExtraSmall(context).copyWith(
+        //     color: percentChangedColor,
+        //   ),
+        // ),
       ],
     );
   }

@@ -467,43 +467,43 @@ class _TransactionDetailsViewState
                                           const SizedBox(
                                             height: 2,
                                           ),
-                                          if (ref.watch(
-                                              prefsChangeNotifierProvider
-                                                  .select((value) =>
-                                                      value.externalCalls)))
-                                            SelectableText(
-                                              "$amountPrefix${(amount.decimal * ref.watch(
-                                                        priceAnd24hChangeNotifierProvider.select(
-                                                            (value) => isTokenTx
-                                                                ? value
-                                                                    .getTokenPrice(
-                                                                        _transaction
-                                                                            .otherData!)
-                                                                    .item1
-                                                                : value
-                                                                    .getPrice(
-                                                                        coin)
-                                                                    .item1),
-                                                      )).toAmount(fractionDigits: 2).fiatString(
-                                                    locale: ref.watch(
-                                                      localeServiceChangeNotifierProvider
-                                                          .select(
-                                                        (value) => value.locale,
-                                                      ),
-                                                    ),
-                                                  )} ${ref.watch(
-                                                prefsChangeNotifierProvider
-                                                    .select(
-                                                  (value) => value.currency,
-                                                ),
-                                              )}",
-                                              style: isDesktop
-                                                  ? STextStyles
-                                                      .desktopTextExtraExtraSmall(
-                                                          context)
-                                                  : STextStyles.itemSubtitle(
-                                                      context),
-                                            ),
+                                          // if (ref.watch(
+                                          //     prefsChangeNotifierProvider
+                                          //         .select((value) =>
+                                          //             value.externalCalls)))
+                                          //   SelectableText(
+                                          //     "$amountPrefix${(amount.decimal * ref.watch(
+                                          //               priceAnd24hChangeNotifierProvider.select(
+                                          //                   (value) => isTokenTx
+                                          //                       ? value
+                                          //                           .getTokenPrice(
+                                          //                               _transaction
+                                          //                                   .otherData!)
+                                          //                           .item1
+                                          //                       : value
+                                          //                           .getPrice(
+                                          //                               coin)
+                                          //                           .item1),
+                                          //             )).toAmount(fractionDigits: 2).fiatString(
+                                          //           locale: ref.watch(
+                                          //             localeServiceChangeNotifierProvider
+                                          //                 .select(
+                                          //               (value) => value.locale,
+                                          //             ),
+                                          //           ),
+                                          //         )} ${ref.watch(
+                                          //       prefsChangeNotifierProvider
+                                          //           .select(
+                                          //         (value) => value.currency,
+                                          //       ),
+                                          //     )}",
+                                          //     style: isDesktop
+                                          //         ? STextStyles
+                                          //             .desktopTextExtraExtraSmall(
+                                          //                 context)
+                                          //         : STextStyles.itemSubtitle(
+                                          //             context),
+                                          //   ),
                                         ],
                                       ),
                                       if (!isDesktop)

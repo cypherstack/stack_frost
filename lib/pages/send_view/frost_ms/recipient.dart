@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stackfrost/providers/global/locale_provider.dart';
-import 'package:stackfrost/providers/global/prefs_provider.dart';
-import 'package:stackfrost/providers/global/price_provider.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/utilities/address_utils.dart';
 import 'package:stackfrost/utilities/amount/amount.dart';
@@ -32,12 +30,12 @@ final pClipboard =
 final pBarcodeScanner =
     Provider<BarcodeScannerInterface>((ref) => const BarcodeScannerWrapper());
 
-final _pPrice = Provider.family<Decimal, Coin>((ref, coin) {
-  return ref.watch(
-    priceAnd24hChangeNotifierProvider
-        .select((value) => value.getPrice(coin).item1),
-  );
-});
+// final _pPrice = Provider.family<Decimal, Coin>((ref, coin) {
+//   return ref.watch(
+//     priceAnd24hChangeNotifierProvider
+//         .select((value) => value.getPrice(coin).item1),
+//   );
+// });
 
 final pRecipient =
     StateProvider.family<({String address, Amount? amount})?, int>(
@@ -63,10 +61,8 @@ class Recipient extends ConsumerStatefulWidget {
 }
 
 class _RecipientState extends ConsumerState<Recipient> {
-  late final TextEditingController addressController,
-      amountController,
-      baseController;
-  late final FocusNode addressFocusNode, amountFocusNode, baseFocusNode;
+  late final TextEditingController addressController, amountController;
+  late final FocusNode addressFocusNode, amountFocusNode;
 
   bool _addressIsEmpty = true;
   bool _cryptoAmountChangeLock = false;
@@ -94,20 +90,20 @@ class _RecipientState extends ConsumerState<Recipient> {
           return;
         }
 
-        final price = ref.read(_pPrice(widget.coin));
-
-        if (price > Decimal.zero) {
-          baseController.text = (cryptoAmount.decimal * price)
-              .toAmount(
-                fractionDigits: 2,
-              )
-              .fiatString(
-                locale: ref.read(localeServiceChangeNotifierProvider).locale,
-              );
-        }
+        // final price = ref.read(_pPrice(widget.coin));
+        //
+        // if (price > Decimal.zero) {
+        //   baseController.text = (cryptoAmount.decimal * price)
+        //       .toAmount(
+        //         fractionDigits: 2,
+        //       )
+        //       .fiatString(
+        //         locale: ref.read(localeServiceChangeNotifierProvider).locale,
+        //       );
+        // }
       } else {
         cryptoAmount = null;
-        baseController.text = "";
+        // baseController.text = "";
       }
 
       _updateRecipientData();
@@ -118,11 +114,11 @@ class _RecipientState extends ConsumerState<Recipient> {
   void initState() {
     addressController = TextEditingController();
     amountController = TextEditingController();
-    baseController = TextEditingController();
+    // baseController = TextEditingController();
 
     addressFocusNode = FocusNode();
     amountFocusNode = FocusNode();
-    baseFocusNode = FocusNode();
+    // baseFocusNode = FocusNode();
 
     amountController.addListener(_cryptoAmountChanged);
 
@@ -135,11 +131,11 @@ class _RecipientState extends ConsumerState<Recipient> {
 
     addressController.dispose();
     amountController.dispose();
-    baseController.dispose();
+    // baseController.dispose();
 
     addressFocusNode.dispose();
     amountFocusNode.dispose();
-    baseFocusNode.dispose();
+    // baseFocusNode.dispose();
 
     super.dispose();
   }
@@ -378,109 +374,109 @@ class _RecipientState extends ConsumerState<Recipient> {
               ),
             ),
           ),
-          if (ref.watch(prefsChangeNotifierProvider
-              .select((value) => value.externalCalls)))
-            const SizedBox(
-              height: 8,
-            ),
-          if (ref.watch(prefsChangeNotifierProvider
-              .select((value) => value.externalCalls)))
-            TextField(
-              autocorrect: Util.isDesktop ? false : true,
-              enableSuggestions: Util.isDesktop ? false : true,
-              style: STextStyles.smallMed14(context).copyWith(
-                color: Theme.of(context).extension<StackColors>()!.textDark,
-              ),
-              key: const Key("amountInputFieldFiatTextFieldKey"),
-              controller: baseController,
-              focusNode: baseFocusNode,
-              keyboardType: Util.isDesktop
-                  ? null
-                  : const TextInputType.numberWithOptions(
-                      signed: false,
-                      decimal: true,
-                    ),
-              textAlign: TextAlign.right,
-              inputFormatters: [
-                AmountInputFormatter(
-                  decimals: 2,
-                  locale: locale,
-                ),
-              ],
-              onChanged: (baseAmountString) {
-                final baseAmount = Amount.tryParseFiatString(
-                  baseAmountString,
-                  locale: locale,
-                );
-                Amount? cryptoAmount;
-                final int decimals = widget.coin.decimals;
-                if (baseAmount != null) {
-                  final _price = ref.read(_pPrice(widget.coin));
-
-                  if (_price == Decimal.zero) {
-                    cryptoAmount = 0.toAmountAsRaw(
-                      fractionDigits: decimals,
-                    );
-                  } else {
-                    cryptoAmount = baseAmount <= Amount.zero
-                        ? 0.toAmountAsRaw(fractionDigits: decimals)
-                        : (baseAmount.decimal / _price)
-                            .toDecimal(
-                              scaleOnInfinitePrecision: decimals,
-                            )
-                            .toAmount(fractionDigits: decimals);
-                  }
-                  if (ref.read(pRecipient(widget.index))?.amount != null &&
-                      ref.read(pRecipient(widget.index))?.amount ==
-                          cryptoAmount) {
-                    return;
-                  }
-
-                  final amountString =
-                      ref.read(pAmountFormatter(widget.coin)).format(
-                            cryptoAmount,
-                            withUnitName: false,
-                          );
-
-                  _cryptoAmountChangeLock = true;
-                  amountController.text = amountString;
-                  _cryptoAmountChangeLock = false;
-                } else {
-                  cryptoAmount = 0.toAmountAsRaw(
-                    fractionDigits: decimals,
-                  );
-                  _cryptoAmountChangeLock = true;
-                  amountController.text = "";
-                  _cryptoAmountChangeLock = false;
-                }
-
-                _updateRecipientData();
-              },
-              decoration: InputDecoration(
-                contentPadding: const EdgeInsets.only(
-                  top: 12,
-                  right: 12,
-                ),
-                hintText: "0",
-                hintStyle: STextStyles.fieldLabel(context).copyWith(
-                  fontSize: 14,
-                ),
-                prefixIcon: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Text(
-                      ref.watch(prefsChangeNotifierProvider
-                          .select((value) => value.currency)),
-                      style: STextStyles.smallMed14(context).copyWith(
-                          color: Theme.of(context)
-                              .extension<StackColors>()!
-                              .accentColorDark),
-                    ),
-                  ),
-                ),
-              ),
-            ),
+          // if (ref.watch(prefsChangeNotifierProvider
+          //     .select((value) => value.externalCalls)))
+          //   const SizedBox(
+          //     height: 8,
+          //   ),
+          // if (ref.watch(prefsChangeNotifierProvider
+          //     .select((value) => value.externalCalls)))
+          //   TextField(
+          //     autocorrect: Util.isDesktop ? false : true,
+          //     enableSuggestions: Util.isDesktop ? false : true,
+          //     style: STextStyles.smallMed14(context).copyWith(
+          //       color: Theme.of(context).extension<StackColors>()!.textDark,
+          //     ),
+          //     key: const Key("amountInputFieldFiatTextFieldKey"),
+          //     controller: baseController,
+          //     focusNode: baseFocusNode,
+          //     keyboardType: Util.isDesktop
+          //         ? null
+          //         : const TextInputType.numberWithOptions(
+          //             signed: false,
+          //             decimal: true,
+          //           ),
+          //     textAlign: TextAlign.right,
+          //     inputFormatters: [
+          //       AmountInputFormatter(
+          //         decimals: 2,
+          //         locale: locale,
+          //       ),
+          //     ],
+          //     onChanged: (baseAmountString) {
+          //       final baseAmount = Amount.tryParseFiatString(
+          //         baseAmountString,
+          //         locale: locale,
+          //       );
+          //       Amount? cryptoAmount;
+          //       final int decimals = widget.coin.decimals;
+          //       if (baseAmount != null) {
+          //         final _price = ref.read(_pPrice(widget.coin));
+          //
+          //         if (_price == Decimal.zero) {
+          //           cryptoAmount = 0.toAmountAsRaw(
+          //             fractionDigits: decimals,
+          //           );
+          //         } else {
+          //           cryptoAmount = baseAmount <= Amount.zero
+          //               ? 0.toAmountAsRaw(fractionDigits: decimals)
+          //               : (baseAmount.decimal / _price)
+          //                   .toDecimal(
+          //                     scaleOnInfinitePrecision: decimals,
+          //                   )
+          //                   .toAmount(fractionDigits: decimals);
+          //         }
+          //         if (ref.read(pRecipient(widget.index))?.amount != null &&
+          //             ref.read(pRecipient(widget.index))?.amount ==
+          //                 cryptoAmount) {
+          //           return;
+          //         }
+          //
+          //         final amountString =
+          //             ref.read(pAmountFormatter(widget.coin)).format(
+          //                   cryptoAmount,
+          //                   withUnitName: false,
+          //                 );
+          //
+          //         _cryptoAmountChangeLock = true;
+          //         amountController.text = amountString;
+          //         _cryptoAmountChangeLock = false;
+          //       } else {
+          //         cryptoAmount = 0.toAmountAsRaw(
+          //           fractionDigits: decimals,
+          //         );
+          //         _cryptoAmountChangeLock = true;
+          //         amountController.text = "";
+          //         _cryptoAmountChangeLock = false;
+          //       }
+          //
+          //       _updateRecipientData();
+          //     },
+          //     decoration: InputDecoration(
+          //       contentPadding: const EdgeInsets.only(
+          //         top: 12,
+          //         right: 12,
+          //       ),
+          //       hintText: "0",
+          //       hintStyle: STextStyles.fieldLabel(context).copyWith(
+          //         fontSize: 14,
+          //       ),
+          //       prefixIcon: FittedBox(
+          //         fit: BoxFit.scaleDown,
+          //         child: Padding(
+          //           padding: const EdgeInsets.all(12),
+          //           child: Text(
+          //             ref.watch(prefsChangeNotifierProvider
+          //                 .select((value) => value.currency)),
+          //             style: STextStyles.smallMed14(context).copyWith(
+          //                 color: Theme.of(context)
+          //                     .extension<StackColors>()!
+          //                     .accentColorDark),
+          //           ),
+          //         ),
+          //       ),
+          //     ),
+          //   ),
           if (widget.remove != null)
             const SizedBox(
               height: 6,

@@ -15,7 +15,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:stackfrost/db/hive/db.dart';
 import 'package:stackfrost/providers/global/prefs_provider.dart';
-import 'package:stackfrost/providers/global/price_provider.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/themes/theme_providers.dart';
 import 'package:stackfrost/utilities/assets.dart';
@@ -182,9 +181,9 @@ class _StackPrivacyDialog extends ConsumerState<StackPrivacyDialog> {
                               value: isEasy)
                           .then((_) {
                         if (isEasy) {
-                          ref
-                              .read(priceAnd24hChangeNotifierProvider)
-                              .start(true);
+                          // ref
+                          //     .read(priceAnd24hChangeNotifierProvider)
+                          //     .start(true);
                         }
                       });
                       if (isDesktop) {

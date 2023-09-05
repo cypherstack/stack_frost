@@ -16,7 +16,6 @@ import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/sub_
 import 'package:stackfrost/providers/providers.dart';
 import 'package:stackfrost/providers/wallet/wallet_balance_toggle_state_provider.dart';
 import 'package:stackfrost/services/event_bus/events/global/wallet_sync_status_changed_event.dart';
-import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/utilities/amount/amount.dart';
 import 'package:stackfrost/utilities/amount/amount_formatter.dart';
 import 'package:stackfrost/utilities/enums/wallet_balance_toggle_state.dart';
@@ -62,14 +61,14 @@ class _WDesktopWalletSummaryState extends ConsumerState<DesktopWalletSummary> {
         (value) => value.getManager(widget.walletId).coin,
       ),
     );
-    final locale = ref.watch(
-        localeServiceChangeNotifierProvider.select((value) => value.locale));
-
-    final baseCurrency = ref
-        .watch(prefsChangeNotifierProvider.select((value) => value.currency));
-
-    final priceTuple = ref.watch(priceAnd24hChangeNotifierProvider
-        .select((value) => value.getPrice(coin)));
+    // final locale = ref.watch(
+    //     localeServiceChangeNotifierProvider.select((value) => value.locale));
+    //
+    // final baseCurrency = ref
+    //     .watch(prefsChangeNotifierProvider.select((value) => value.currency));
+    //
+    // final priceTuple = ref.watch(priceAnd24hChangeNotifierProvider
+    //     .select((value) => value.getPrice(coin)));
 
     final _showAvailable =
         ref.watch(walletBalanceToggleStateProvider.state).state ==
@@ -100,20 +99,20 @@ class _WDesktopWalletSummaryState extends ConsumerState<DesktopWalletSummary> {
                     style: STextStyles.desktopH3(context),
                   ),
                 ),
-                if (externalCalls)
-                  Text(
-                    "${Amount.fromDecimal(
-                      priceTuple.item1 * balanceToShow.decimal,
-                      fractionDigits: 2,
-                    ).fiatString(
-                      locale: locale,
-                    )} $baseCurrency",
-                    style: STextStyles.desktopTextExtraSmall(context).copyWith(
-                      color: Theme.of(context)
-                          .extension<StackColors>()!
-                          .textSubtitle1,
-                    ),
-                  ),
+                // if (externalCalls)
+                //   Text(
+                //     "${Amount.fromDecimal(
+                //       priceTuple.item1 * balanceToShow.decimal,
+                //       fractionDigits: 2,
+                //     ).fiatString(
+                //       locale: locale,
+                //     )} $baseCurrency",
+                //     style: STextStyles.desktopTextExtraSmall(context).copyWith(
+                //       color: Theme.of(context)
+                //           .extension<StackColors>()!
+                //           .textSubtitle1,
+                //     ),
+                //   ),
               ],
             ),
             const SizedBox(

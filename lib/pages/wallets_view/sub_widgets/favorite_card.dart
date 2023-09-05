@@ -190,17 +190,17 @@ class _FavoriteCardState extends ConsumerState<FavoriteCard> {
                       Amount total = balance.total;
                       Amount fiatTotal = Amount.zero;
 
-                      if (externalCalls && total > Amount.zero) {
-                        fiatTotal = (total.decimal *
-                                ref
-                                    .watch(
-                                      priceAnd24hChangeNotifierProvider.select(
-                                        (value) => value.getPrice(coin),
-                                      ),
-                                    )
-                                    .item1)
-                            .toAmount(fractionDigits: 2);
-                      }
+                      // if (externalCalls && total > Amount.zero) {
+                      //   fiatTotal = (total.decimal *
+                      //           ref
+                      //               .watch(
+                      //                 priceAnd24hChangeNotifierProvider.select(
+                      //                   (value) => value.getPrice(coin),
+                      //                 ),
+                      //               )
+                      //               .item1)
+                      //       .toAmount(fractionDigits: 2);
+                      // }
 
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

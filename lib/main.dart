@@ -39,7 +39,6 @@ import 'package:stackfrost/pages_desktop_specific/password/create_password_view.
 import 'package:stackfrost/pages_desktop_specific/password/desktop_login_view.dart';
 import 'package:stackfrost/providers/desktop/storage_crypto_handler_provider.dart';
 import 'package:stackfrost/providers/global/auto_swb_service_provider.dart';
-import 'package:stackfrost/providers/global/base_currencies_provider.dart';
 import 'package:stackfrost/providers/global/trades_service_provider.dart';
 import 'package:stackfrost/providers/providers.dart';
 import 'package:stackfrost/route_generator.dart';
@@ -310,7 +309,7 @@ class _MaterialAppWithThemeState extends ConsumerState<MaterialAppWithTheme>
       NotificationApi.prefs = ref.read(prefsChangeNotifierProvider);
       NotificationApi.notificationsService = _notificationsService;
 
-      unawaited(ref.read(baseCurrenciesProvider).update());
+      // unawaited(ref.read(baseCurrenciesProvider).update());
 
       await _nodeService.updateDefaults();
       await _notificationsService.init(
@@ -318,7 +317,7 @@ class _MaterialAppWithThemeState extends ConsumerState<MaterialAppWithTheme>
         tradesService: _tradesService,
         prefs: ref.read(prefsChangeNotifierProvider),
       );
-      ref.read(priceAnd24hChangeNotifierProvider).start(true);
+      // ref.read(priceAnd24hChangeNotifierProvider).start(true);
       await ref
           .read(walletsChangeNotifierProvider)
           .load(ref.read(prefsChangeNotifierProvider));

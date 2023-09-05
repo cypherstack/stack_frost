@@ -23,7 +23,6 @@ import 'package:stackfrost/providers/global/address_book_service_provider.dart';
 import 'package:stackfrost/providers/providers.dart';
 import 'package:stackfrost/providers/ui/transaction_filter_provider.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
-import 'package:stackfrost/utilities/amount/amount.dart';
 import 'package:stackfrost/utilities/amount/amount_formatter.dart';
 import 'package:stackfrost/utilities/assets.dart';
 import 'package:stackfrost/utilities/constants.dart';
@@ -839,11 +838,11 @@ class _DesktopTransactionCardRowState
 
     final coin = manager.coin;
 
-    final price = ref
-        .watch(priceAnd24hChangeNotifierProvider
-            .select((value) => value.getPrice(coin)))
-        .item1;
-
+    // final price = ref
+    //     .watch(priceAnd24hChangeNotifierProvider
+    //         .select((value) => value.getPrice(coin)))
+    //     .item1;
+    //
     late final String prefix;
     if (Util.isDesktop) {
       if (_transaction.type == TransactionType.outgoing) {
@@ -955,25 +954,25 @@ class _DesktopTransactionCardRowState
                   },
                 ),
               ),
-              if (ref.watch(prefsChangeNotifierProvider
-                  .select((value) => value.externalCalls)))
-                Expanded(
-                  flex: 4,
-                  child: Builder(
-                    builder: (_) {
-                      final amount = _transaction.realAmount;
-
-                      return Text(
-                        "$prefix${(amount.decimal * price).toAmount(
-                              fractionDigits: 2,
-                            ).fiatString(
-                              locale: locale,
-                            )} $baseCurrency",
-                        style: STextStyles.desktopTextExtraExtraSmall(context),
-                      );
-                    },
-                  ),
-                ),
+              // if (ref.watch(prefsChangeNotifierProvider
+              //     .select((value) => value.externalCalls)))
+              //   Expanded(
+              //     flex: 4,
+              //     child: Builder(
+              //       builder: (_) {
+              //         final amount = _transaction.realAmount;
+              //
+              //         return Text(
+              //           "$prefix${(amount.decimal * price).toAmount(
+              //                 fractionDigits: 2,
+              //               ).fiatString(
+              //                 locale: locale,
+              //               )} $baseCurrency",
+              //           style: STextStyles.desktopTextExtraExtraSmall(context),
+              //         );
+              //       },
+              //     ),
+              //   ),
               SvgPicture.asset(
                 Assets.svg.circleInfo,
                 width: 20,

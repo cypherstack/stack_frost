@@ -17,7 +17,6 @@ import 'package:stackfrost/pages/wallet_view/sub_widgets/tx_icon.dart';
 import 'package:stackfrost/pages/wallet_view/transaction_views/transaction_details_view.dart';
 import 'package:stackfrost/providers/providers.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
-import 'package:stackfrost/utilities/amount/amount.dart';
 import 'package:stackfrost/utilities/amount/amount_formatter.dart';
 import 'package:stackfrost/utilities/constants.dart';
 import 'package:stackfrost/utilities/enums/coin_enum.dart';
@@ -111,11 +110,11 @@ class _TransactionCardState extends ConsumerState<TransactionCard> {
     final baseCurrency = ref
         .watch(prefsChangeNotifierProvider.select((value) => value.currency));
 
-    final price = ref
-        .watch(priceAnd24hChangeNotifierProvider.select((value) => isTokenTx
-            ? value.getTokenPrice(_transaction.otherData!)
-            : value.getPrice(coin)))
-        .item1;
+    // final price = ref
+    //     .watch(priceAnd24hChangeNotifierProvider.select((value) => isTokenTx
+    //         ? value.getTokenPrice(_transaction.otherData!)
+    //         : value.getPrice(coin)))
+    //     .item1;
 
     final currentHeight = ref.watch(walletsChangeNotifierProvider
         .select((value) => value.getManager(walletId).currentHeight));
@@ -233,33 +232,33 @@ class _TransactionCardState extends ConsumerState<TransactionCard> {
                               ),
                             ),
                           ),
-                          if (ref.watch(prefsChangeNotifierProvider
-                              .select((value) => value.externalCalls)))
-                            const SizedBox(
-                              width: 10,
-                            ),
-                          if (ref.watch(prefsChangeNotifierProvider
-                              .select((value) => value.externalCalls)))
-                            Flexible(
-                              child: FittedBox(
-                                fit: BoxFit.scaleDown,
-                                child: Builder(
-                                  builder: (_) {
-                                    final amount = _transaction.realAmount;
-
-                                    return Text(
-                                      "$prefix${Amount.fromDecimal(
-                                        amount.decimal * price,
-                                        fractionDigits: 2,
-                                      ).fiatString(
-                                        locale: locale,
-                                      )} $baseCurrency",
-                                      style: STextStyles.label(context),
-                                    );
-                                  },
-                                ),
-                              ),
-                            ),
+                          // if (ref.watch(prefsChangeNotifierProvider
+                          //     .select((value) => value.externalCalls)))
+                          //   const SizedBox(
+                          //     width: 10,
+                          //   ),
+                          // if (ref.watch(prefsChangeNotifierProvider
+                          //     .select((value) => value.externalCalls)))
+                          //   Flexible(
+                          //     child: FittedBox(
+                          //       fit: BoxFit.scaleDown,
+                          //       child: Builder(
+                          //         builder: (_) {
+                          //           final amount = _transaction.realAmount;
+                          //
+                          //           return Text(
+                          //             "$prefix${Amount.fromDecimal(
+                          //               amount.decimal * price,
+                          //               fractionDigits: 2,
+                          //             ).fiatString(
+                          //               locale: locale,
+                          //             )} $baseCurrency",
+                          //             style: STextStyles.label(context),
+                          //           );
+                          //         },
+                          //       ),
+                          //     ),
+                          //   ),
                         ],
                       ),
                     ],

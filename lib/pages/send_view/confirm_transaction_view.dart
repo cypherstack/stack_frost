@@ -11,7 +11,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -26,7 +25,6 @@ import 'package:stackfrost/providers/providers.dart';
 import 'package:stackfrost/route_generator.dart';
 import 'package:stackfrost/themes/stack_colors.dart';
 import 'package:stackfrost/themes/theme_providers.dart';
-import 'package:stackfrost/utilities/amount/amount.dart';
 import 'package:stackfrost/utilities/amount/amount_formatter.dart';
 import 'package:stackfrost/utilities/constants.dart';
 import 'package:stackfrost/utilities/enums/coin_enum.dart';
@@ -569,22 +567,22 @@ class _ConfirmTransactionViewState
                                             (value) => value.externalCalls));
                                 String fiatAmount = "N/A";
 
-                                if (externalCalls) {
-                                  final price = ref
-                                      .read(priceAnd24hChangeNotifierProvider)
-                                      .getPrice(coin)
-                                      .item1;
-                                  if (price > Decimal.zero) {
-                                    fiatAmount = (amount.decimal * price)
-                                        .toAmount(fractionDigits: 2)
-                                        .fiatString(
-                                          locale: ref
-                                              .read(
-                                                  localeServiceChangeNotifierProvider)
-                                              .locale,
-                                        );
-                                  }
-                                }
+                                // if (externalCalls) {
+                                //   final price = ref
+                                //       .read(priceAnd24hChangeNotifierProvider)
+                                //       .getPrice(coin)
+                                //       .item1;
+                                //   if (price > Decimal.zero) {
+                                //     fiatAmount = (amount.decimal * price)
+                                //         .toAmount(fractionDigits: 2)
+                                //         .fiatString(
+                                //           locale: ref
+                                //               .read(
+                                //                   localeServiceChangeNotifierProvider)
+                                //               .locale,
+                                //         );
+                                //   }
+                                // }
 
                                 return Row(
                                   children: [

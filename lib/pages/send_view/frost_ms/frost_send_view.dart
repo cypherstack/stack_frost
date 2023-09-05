@@ -302,103 +302,103 @@ class _FrostSendViewState extends ConsumerState<FrostSendView> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           if (!Util.isDesktop)
-          Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).extension<StackColors>()!.popupBG,
-              borderRadius: BorderRadius.circular(
-                Constants.size.circularBorderRadius,
+            Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).extension<StackColors>()!.popupBG,
+                borderRadius: BorderRadius.circular(
+                  Constants.size.circularBorderRadius,
+                ),
               ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Row(
-                children: [
-                  SvgPicture.file(
-                    File(
-                      ref.watch(
-                        coinIconProvider(coin),
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Row(
+                  children: [
+                    SvgPicture.file(
+                      File(
+                        ref.watch(
+                          coinIconProvider(coin),
+                        ),
                       ),
+                      width: 22,
+                      height: 22,
                     ),
-                    width: 22,
-                    height: 22,
-                  ),
-                  const SizedBox(
-                    width: 6,
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        manager.walletName,
-                        style: STextStyles.titleBold12(context)
-                            .copyWith(fontSize: 14),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                      // const SizedBox(
-                      //   height: 2,
-                      // ),
-                      Text(
-                        "Available balance",
-                        style:
-                            STextStyles.label(context).copyWith(fontSize: 10),
-                      ),
-                    ],
-                  ),
-                  Util.isDesktop
-                      ? const SizedBox(
-                          height: 24,
-                        )
-                      : const Spacer(),
-                  GestureDetector(
-                    onTap: () {
-                      // cryptoAmountController.text = ref
-                      //     .read(pAmountFormatter(coin))
-                      //     .format(
-                      //       _cachedBalance!,
-                      //       withUnitName: false,
-                      //     );
-                    },
-                    child: Container(
-                      color: Colors.transparent,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            ref
-                                .watch(pAmountFormatter(coin))
-                                .format(manager.balance.spendable),
-                            style: STextStyles.titleBold12(context).copyWith(
-                              fontSize: 10,
-                            ),
-                            textAlign: TextAlign.right,
-                          ),
-                          Text(
-                            "${(manager.balance.spendable.decimal * ref.watch(
-                                      priceAnd24hChangeNotifierProvider.select(
-                                        (value) => value.getPrice(coin).item1,
-                                      ),
-                                    )).toAmount(
-                                  fractionDigits: 2,
-                                ).fiatString(
-                                  locale: locale,
-                                )} ${ref.watch(
-                              prefsChangeNotifierProvider
-                                  .select((value) => value.currency),
-                            )}",
-                            style: STextStyles.subtitle(context).copyWith(
-                              fontSize: 8,
-                            ),
-                            textAlign: TextAlign.right,
+                    const SizedBox(
+                      width: 6,
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          manager.walletName,
+                          style: STextStyles.titleBold12(context)
+                              .copyWith(fontSize: 14),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                        // const SizedBox(
+                        //   height: 2,
+                        // ),
+                        Text(
+                          "Available balance",
+                          style:
+                              STextStyles.label(context).copyWith(fontSize: 10),
+                        ),
+                      ],
+                    ),
+                    Util.isDesktop
+                        ? const SizedBox(
+                            height: 24,
                           )
-                        ],
+                        : const Spacer(),
+                    GestureDetector(
+                      onTap: () {
+                        // cryptoAmountController.text = ref
+                        //     .read(pAmountFormatter(coin))
+                        //     .format(
+                        //       _cachedBalance!,
+                        //       withUnitName: false,
+                        //     );
+                      },
+                      child: Container(
+                        color: Colors.transparent,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              ref
+                                  .watch(pAmountFormatter(coin))
+                                  .format(manager.balance.spendable),
+                              style: STextStyles.titleBold12(context).copyWith(
+                                fontSize: 10,
+                              ),
+                              textAlign: TextAlign.right,
+                            ),
+                            // Text(
+                            //   "${(manager.balance.spendable.decimal * ref.watch(
+                            //             priceAnd24hChangeNotifierProvider.select(
+                            //               (value) => value.getPrice(coin).item1,
+                            //             ),
+                            //           )).toAmount(
+                            //         fractionDigits: 2,
+                            //       ).fiatString(
+                            //         locale: locale,
+                            //       )} ${ref.watch(
+                            //     prefsChangeNotifierProvider
+                            //         .select((value) => value.currency),
+                            //   )}",
+                            //   style: STextStyles.subtitle(context).copyWith(
+                            //     fontSize: 8,
+                            //   ),
+                            //   textAlign: TextAlign.right,
+                            // )
+                          ],
+                        ),
                       ),
-                    ),
-                  )
-                ],
+                    )
+                  ],
+                ),
               ),
             ),
-          ),
           const SizedBox(
             height: 16,
           ),

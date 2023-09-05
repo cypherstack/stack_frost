@@ -18,8 +18,6 @@ import 'package:stackfrost/pages/wallet_view/wallet_view.dart';
 import 'package:stackfrost/pages/wallets_view/wallets_overview.dart';
 import 'package:stackfrost/providers/providers.dart';
 import 'package:stackfrost/themes/coin_icon_provider.dart';
-import 'package:stackfrost/themes/stack_colors.dart';
-import 'package:stackfrost/utilities/amount/amount.dart';
 import 'package:stackfrost/utilities/constants.dart';
 import 'package:stackfrost/utilities/enums/coin_enum.dart';
 import 'package:stackfrost/utilities/text_styles.dart';
@@ -100,32 +98,32 @@ class WalletListItem extends ConsumerWidget {
             Expanded(
               child: Consumer(
                 builder: (_, ref, __) {
-                  final tuple = ref.watch(priceAnd24hChangeNotifierProvider
-                      .select((value) => value.getPrice(coin)));
+                  // final tuple = ref.watch(priceAnd24hChangeNotifierProvider
+                  //     .select((value) => value.getPrice(coin)));
                   final calls = coin.isTestNet
                       ? false
                       : ref.watch(prefsChangeNotifierProvider).externalCalls;
 
-                  final priceString =
-                      tuple.item1.toAmount(fractionDigits: 2).fiatString(
-                            locale: ref.watch(
-                                localeServiceChangeNotifierProvider
-                                    .select((value) => value.locale)),
-                          );
+                  // final priceString =
+                  //     tuple.item1.toAmount(fractionDigits: 2).fiatString(
+                  //           locale: ref.watch(
+                  //               localeServiceChangeNotifierProvider
+                  //                   .select((value) => value.locale)),
+                  //         );
 
-                  final double percentChange = tuple.item2;
+                  // final double percentChange = tuple.item2;
 
-                  var percentChangedColor =
-                      Theme.of(context).extension<StackColors>()!.textDark;
-                  if (percentChange > 0) {
-                    percentChangedColor = Theme.of(context)
-                        .extension<StackColors>()!
-                        .accentColorGreen;
-                  } else if (percentChange < 0) {
-                    percentChangedColor = Theme.of(context)
-                        .extension<StackColors>()!
-                        .accentColorRed;
-                  }
+                  // var percentChangedColor =
+                  //     Theme.of(context).extension<StackColors>()!.textDark;
+                  // if (percentChange > 0) {
+                  //   percentChangedColor = Theme.of(context)
+                  //       .extension<StackColors>()!
+                  //       .accentColorGreen;
+                  // } else if (percentChange < 0) {
+                  //   percentChangedColor = Theme.of(context)
+                  //       .extension<StackColors>()!
+                  //       .accentColorRed;
+                  // }
 
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -137,11 +135,11 @@ class WalletListItem extends ConsumerWidget {
                             style: STextStyles.titleBold12(context),
                           ),
                           const Spacer(),
-                          if (calls)
-                            Text(
-                              "$priceString $currency/${coin.ticker}",
-                              style: STextStyles.itemSubtitle(context),
-                            ),
+                          // if (calls)
+                          //   Text(
+                          //     "$priceString $currency/${coin.ticker}",
+                          //     style: STextStyles.itemSubtitle(context),
+                          //   ),
                         ],
                       ),
                       const SizedBox(
@@ -154,13 +152,13 @@ class WalletListItem extends ConsumerWidget {
                             style: STextStyles.itemSubtitle(context),
                           ),
                           const Spacer(),
-                          if (calls)
-                            Text(
-                              "${percentChange.toStringAsFixed(2)}%",
-                              style: STextStyles.itemSubtitle(context).copyWith(
-                                color: percentChangedColor,
-                              ),
-                            ),
+                          // if (calls)
+                          //   Text(
+                          //     "${percentChange.toStringAsFixed(2)}%",
+                          //     style: STextStyles.itemSubtitle(context).copyWith(
+                          //       color: percentChangedColor,
+                          //     ),
+                          //   ),
                         ],
                       ),
                     ],
