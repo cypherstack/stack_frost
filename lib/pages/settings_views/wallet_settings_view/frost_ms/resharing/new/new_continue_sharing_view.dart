@@ -104,7 +104,7 @@ class _NewContinueSharingViewState
                   },
                 ),
                 title: Text(
-                  "Reshared start",
+                  "Encryption keys",
                   style: STextStyles.navBarTitle(context),
                 ),
               ),
