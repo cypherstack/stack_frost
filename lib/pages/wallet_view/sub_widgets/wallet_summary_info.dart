@@ -15,25 +15,21 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:stackwallet/pages/wallet_view/sub_widgets/wallet_balance_toggle_sheet.dart';
-import 'package:stackwallet/pages/wallet_view/sub_widgets/wallet_refresh_button.dart';
-import 'package:stackwallet/providers/providers.dart';
-import 'package:stackwallet/providers/wallet/public_private_balance_state_provider.dart';
-import 'package:stackwallet/providers/wallet/wallet_balance_toggle_state_provider.dart';
-import 'package:stackwallet/services/coins/banano/banano_wallet.dart';
-import 'package:stackwallet/services/coins/firo/firo_wallet.dart';
-import 'package:stackwallet/services/event_bus/events/global/balance_refreshed_event.dart';
-import 'package:stackwallet/services/event_bus/events/global/wallet_sync_status_changed_event.dart';
-import 'package:stackwallet/services/event_bus/global_event_bus.dart';
-import 'package:stackwallet/themes/coin_icon_provider.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/amount/amount.dart';
-import 'package:stackwallet/utilities/amount/amount_formatter.dart';
-import 'package:stackwallet/utilities/assets.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/enums/wallet_balance_toggle_state.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/widgets/conditional_parent.dart';
+import 'package:stackfrost/pages/wallet_view/sub_widgets/wallet_balance_toggle_sheet.dart';
+import 'package:stackfrost/pages/wallet_view/sub_widgets/wallet_refresh_button.dart';
+import 'package:stackfrost/providers/providers.dart';
+import 'package:stackfrost/providers/wallet/wallet_balance_toggle_state_provider.dart';
+import 'package:stackfrost/services/event_bus/events/global/balance_refreshed_event.dart';
+import 'package:stackfrost/services/event_bus/events/global/wallet_sync_status_changed_event.dart';
+import 'package:stackfrost/services/event_bus/global_event_bus.dart';
+import 'package:stackfrost/themes/coin_icon_provider.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/amount/amount.dart';
+import 'package:stackfrost/utilities/amount/amount_formatter.dart';
+import 'package:stackfrost/utilities/assets.dart';
+import 'package:stackfrost/utilities/enums/wallet_balance_toggle_state.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/widgets/conditional_parent.dart';
 
 class WalletSummaryInfo extends ConsumerStatefulWidget {
   const WalletSummaryInfo({
@@ -101,25 +97,25 @@ class _WalletSummaryInfoState extends ConsumerState<WalletSummaryInfo> {
   Widget build(BuildContext context) {
     debugPrint("BUILD: $runtimeType");
 
-    bool isMonkey = true;
+    // bool isMonkey = true;
 
     final manager = ref.watch(walletsChangeNotifierProvider
         .select((value) => value.getManager(widget.walletId)));
 
-    final externalCalls = ref.watch(
-        prefsChangeNotifierProvider.select((value) => value.externalCalls));
+    // final externalCalls = ref.watch(
+    //     prefsChangeNotifierProvider.select((value) => value.externalCalls));
     final coin = manager.coin;
     final balance = ref.watch(walletsChangeNotifierProvider
         .select((value) => value.getManager(widget.walletId).balance));
+    //
+    // final locale = ref.watch(
+    //     localeServiceChangeNotifierProvider.select((value) => value.locale));
+    //
+    // final baseCurrency = ref
+    //     .watch(prefsChangeNotifierProvider.select((value) => value.currency));
 
-    final locale = ref.watch(
-        localeServiceChangeNotifierProvider.select((value) => value.locale));
-
-    final baseCurrency = ref
-        .watch(prefsChangeNotifierProvider.select((value) => value.currency));
-
-    final priceTuple = ref.watch(priceAnd24hChangeNotifierProvider
-        .select((value) => value.getPrice(coin)));
+    // final priceTuple = ref.watch(priceAnd24hChangeNotifierProvider
+    //     .select((value) => value.getPrice(coin)));
 
     final _showAvailable =
         ref.watch(walletBalanceToggleStateProvider.state).state ==
@@ -128,28 +124,10 @@ class _WalletSummaryInfoState extends ConsumerState<WalletSummaryInfo> {
     final Amount balanceToShow;
     String title;
 
-    if (coin == Coin.firo || coin == Coin.firoTestNet) {
-      final _showPrivate =
-          ref.watch(publicPrivateBalanceStateProvider.state).state == "Private";
-
-      final firoWallet = ref.watch(walletsChangeNotifierProvider.select(
-          (value) => value.getManager(widget.walletId).wallet)) as FiroWallet;
-
-      final bal = _showPrivate ? firoWallet.balancePrivate : firoWallet.balance;
-
-      balanceToShow = _showAvailable ? bal.spendable : bal.total;
-      title = _showAvailable ? "Available" : "Full";
-      title += _showPrivate ? " private balance" : " public balance";
-    } else {
-      balanceToShow = _showAvailable ? balance.spendable : balance.total;
-      title = _showAvailable ? "Available balance" : "Full balance";
-    }
+    balanceToShow = _showAvailable ? balance.spendable : balance.total;
+    title = _showAvailable ? "Available balance" : "Full balance";
 
     List<int>? imageBytes;
-
-    if (coin == Coin.banano) {
-      imageBytes = (manager.wallet as BananoWallet).getMonkeyImageBytes();
-    }
 
     return ConditionalParent(
       condition: imageBytes != null,
@@ -209,19 +187,19 @@ class _WalletSummaryInfoState extends ConsumerState<WalletSummaryInfo> {
                     ),
                   ),
                 ),
-                if (externalCalls)
-                  Text(
-                    "${(priceTuple.item1 * balanceToShow.decimal).toAmount(
-                          fractionDigits: 2,
-                        ).fiatString(
-                          locale: locale,
-                        )} $baseCurrency",
-                    style: STextStyles.subtitle500(context).copyWith(
-                      color: Theme.of(context)
-                          .extension<StackColors>()!
-                          .textFavoriteCard,
-                    ),
-                  ),
+                // if (externalCalls)
+                //   Text(
+                //     "${(priceTuple.item1 * balanceToShow.decimal).toAmount(
+                //           fractionDigits: 2,
+                //         ).fiatString(
+                //           locale: locale,
+                //         )} $baseCurrency",
+                //     style: STextStyles.subtitle500(context).copyWith(
+                //       color: Theme.of(context)
+                //           .extension<StackColors>()!
+                //           .textFavoriteCard,
+                //     ),
+                //   ),
               ],
             ),
           ),

@@ -9,8 +9,8 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:stackwallet/widgets/animated_widgets/rotating_arrows.dart';
-import 'package:stackwallet/widgets/stack_dialog.dart';
+import 'package:stackfrost/widgets/animated_widgets/rotating_arrows.dart';
+import 'package:stackfrost/widgets/stack_dialog.dart';
 
 class CancellingTransactionProgressDialog extends StatefulWidget {
   const CancellingTransactionProgressDialog({Key? key}) : super(key: key);

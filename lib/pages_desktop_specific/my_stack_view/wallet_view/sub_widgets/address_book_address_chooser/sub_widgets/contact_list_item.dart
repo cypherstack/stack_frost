@@ -10,15 +10,15 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackwallet/providers/global/address_book_service_provider.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/widgets/address_book_card.dart';
-import 'package:stackwallet/widgets/custom_buttons/blue_text_button.dart';
-import 'package:stackwallet/widgets/expandable.dart';
-import 'package:stackwallet/widgets/rounded_white_container.dart';
-import 'package:stackwallet/widgets/wallet_info_row/sub_widgets/wallet_info_row_coin_icon.dart';
+import 'package:stackfrost/providers/global/address_book_service_provider.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/widgets/address_book_card.dart';
+import 'package:stackfrost/widgets/custom_buttons/blue_text_button.dart';
+import 'package:stackfrost/widgets/expandable.dart';
+import 'package:stackfrost/widgets/rounded_white_container.dart';
+import 'package:stackfrost/widgets/wallet_info_row/sub_widgets/wallet_info_row_coin_icon.dart';
 
 class ContactListItem extends ConsumerStatefulWidget {
   const ContactListItem({

@@ -237,20 +237,14 @@ P _addressDeserializeProp<P>(
 const _AddresssubTypeEnumValueMap = {
   'receiving': 0,
   'change': 1,
-  'paynymNotification': 2,
-  'paynymSend': 3,
-  'paynymReceive': 4,
-  'unknown': 5,
-  'nonWallet': 6,
+  'unknown': 2,
+  'nonWallet': 3,
 };
 const _AddresssubTypeValueEnumMap = {
   0: AddressSubType.receiving,
   1: AddressSubType.change,
-  2: AddressSubType.paynymNotification,
-  3: AddressSubType.paynymSend,
-  4: AddressSubType.paynymReceive,
-  5: AddressSubType.unknown,
-  6: AddressSubType.nonWallet,
+  2: AddressSubType.unknown,
+  3: AddressSubType.nonWallet,
 };
 const _AddresstypeEnumValueMap = {
   'p2pkh': 0,

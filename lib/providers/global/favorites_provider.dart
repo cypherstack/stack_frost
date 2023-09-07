@@ -10,9 +10,9 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackwallet/services/coins/manager.dart';
-import 'package:stackwallet/services/wallets.dart';
-import 'package:stackwallet/utilities/listenable_list.dart';
+import 'package:stackfrost/services/coins/manager.dart';
+import 'package:stackfrost/services/wallets.dart';
+import 'package:stackfrost/utilities/listenable_list.dart';
 
 int _count = 0;
 

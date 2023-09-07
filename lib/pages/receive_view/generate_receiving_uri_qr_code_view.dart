@@ -22,26 +22,26 @@ import 'package:flutter_svg/svg.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:stackwallet/notifications/show_flush_bar.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/address_utils.dart';
-import 'package:stackwallet/utilities/assets.dart';
-import 'package:stackwallet/utilities/clipboard_interface.dart';
-import 'package:stackwallet/utilities/constants.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/logger.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/utilities/util.dart';
-import 'package:stackwallet/widgets/background.dart';
-import 'package:stackwallet/widgets/conditional_parent.dart';
-import 'package:stackwallet/widgets/custom_buttons/app_bar_icon_button.dart';
-import 'package:stackwallet/widgets/desktop/primary_button.dart';
-import 'package:stackwallet/widgets/desktop/secondary_button.dart';
-import 'package:stackwallet/widgets/icon_widgets/x_icon.dart';
-import 'package:stackwallet/widgets/rounded_white_container.dart';
-import 'package:stackwallet/widgets/stack_dialog.dart';
-import 'package:stackwallet/widgets/stack_text_field.dart';
-import 'package:stackwallet/widgets/textfield_icon_button.dart';
+import 'package:stackfrost/notifications/show_flush_bar.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/address_utils.dart';
+import 'package:stackfrost/utilities/assets.dart';
+import 'package:stackfrost/utilities/clipboard_interface.dart';
+import 'package:stackfrost/utilities/constants.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/logger.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/utilities/util.dart';
+import 'package:stackfrost/widgets/background.dart';
+import 'package:stackfrost/widgets/conditional_parent.dart';
+import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
+import 'package:stackfrost/widgets/desktop/primary_button.dart';
+import 'package:stackfrost/widgets/desktop/secondary_button.dart';
+import 'package:stackfrost/widgets/icon_widgets/x_icon.dart';
+import 'package:stackfrost/widgets/rounded_white_container.dart';
+import 'package:stackfrost/widgets/stack_dialog.dart';
+import 'package:stackfrost/widgets/stack_text_field.dart';
+import 'package:stackfrost/widgets/textfield_icon_button.dart';
 
 class GenerateUriQrCodeView extends StatefulWidget {
   const GenerateUriQrCodeView({
@@ -159,10 +159,7 @@ class _GenerateUriQrCodeViewState extends State<GenerateUriQrCodeView> {
     }
 
     String receivingAddress = widget.receivingAddress;
-    if ((widget.coin == Coin.bitcoincash ||
-            widget.coin == Coin.eCash ||
-            widget.coin == Coin.bitcoincashTestnet) &&
-        receivingAddress.contains(":")) {
+    if (receivingAddress.contains(":")) {
       // remove cash addr prefix
       receivingAddress = receivingAddress.split(":").sublist(1).join();
     }
@@ -256,10 +253,7 @@ class _GenerateUriQrCodeViewState extends State<GenerateUriQrCodeView> {
     isDesktop = Util.isDesktop;
 
     String receivingAddress = widget.receivingAddress;
-    if ((widget.coin == Coin.bitcoincash ||
-            widget.coin == Coin.eCash ||
-            widget.coin == Coin.bitcoincashTestnet) &&
-        receivingAddress.contains(":")) {
+    if (receivingAddress.contains(":")) {
       // remove cash addr prefix
       receivingAddress = receivingAddress.split(":").sublist(1).join();
     }

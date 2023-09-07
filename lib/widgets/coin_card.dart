@@ -13,11 +13,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:stackwallet/providers/providers.dart';
-import 'package:stackwallet/themes/coin_card_provider.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/assets.dart';
-import 'package:stackwallet/utilities/constants.dart';
+import 'package:stackfrost/providers/providers.dart';
+import 'package:stackfrost/themes/coin_card_provider.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/assets.dart';
+import 'package:stackfrost/utilities/constants.dart';
 
 class CoinCard extends ConsumerWidget {
   const CoinCard({
@@ -40,7 +40,9 @@ class CoinCard extends ConsumerWidget {
           .select((value) => value.getManager(walletId).coin),
     );
 
-    final bool hasCardImageBg = (isFavorite) ? ref.watch(coinCardFavoritesProvider(coin)) != null : ref.watch(coinCardProvider(coin)) != null;
+    final bool hasCardImageBg = (isFavorite)
+        ? ref.watch(coinCardFavoritesProvider(coin)) != null
+        : ref.watch(coinCardProvider(coin)) != null;
 
     return Stack(
       children: [

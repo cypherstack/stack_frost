@@ -11,9 +11,9 @@
 import 'dart:convert';
 
 import 'package:isar/isar.dart';
-import 'package:stackwallet/exceptions/address/address_exception.dart';
-import 'package:stackwallet/models/isar/models/blockchain_data/crypto_currency_address.dart';
-import 'package:stackwallet/models/isar/models/blockchain_data/transaction.dart';
+import 'package:stackfrost/exceptions/address/address_exception.dart';
+import 'package:stackfrost/models/isar/models/blockchain_data/crypto_currency_address.dart';
+import 'package:stackfrost/models/isar/models/blockchain_data/transaction.dart';
 
 part 'address.g.dart';
 
@@ -64,11 +64,6 @@ class Address extends CryptoCurrencyAddress {
       throw AddressException("Could not imply derivation chain value");
     }
   }
-
-  bool isPaynymAddress() =>
-      subType == AddressSubType.paynymNotification ||
-      subType == AddressSubType.paynymSend ||
-      subType == AddressSubType.paynymReceive;
 
   @override
   String toString() => "{ "
@@ -167,9 +162,6 @@ enum AddressType {
 enum AddressSubType {
   receiving,
   change,
-  paynymNotification,
-  paynymSend,
-  paynymReceive,
   unknown,
   nonWallet;
 
@@ -179,12 +171,6 @@ enum AddressSubType {
         return "Receiving";
       case AddressSubType.change:
         return "Change";
-      case AddressSubType.paynymNotification:
-        return "PayNym Notification";
-      case AddressSubType.paynymSend:
-        return "PayNym Send";
-      case AddressSubType.paynymReceive:
-        return "PayNym Receiving";
       case AddressSubType.unknown:
         return "Unknown";
       case AddressSubType.nonWallet:

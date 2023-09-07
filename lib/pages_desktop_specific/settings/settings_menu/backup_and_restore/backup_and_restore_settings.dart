@@ -13,28 +13,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
-import 'package:stackwallet/pages/settings_views/global_settings_view/stack_backup_views/create_backup_view.dart';
-import 'package:stackwallet/pages/settings_views/global_settings_view/stack_backup_views/edit_auto_backup_view.dart';
-import 'package:stackwallet/pages/settings_views/global_settings_view/stack_backup_views/restore_from_file_view.dart';
-import 'package:stackwallet/pages_desktop_specific/settings/settings_menu/backup_and_restore/create_auto_backup.dart';
-import 'package:stackwallet/pages_desktop_specific/settings/settings_menu/backup_and_restore/enable_backup_dialog.dart';
-import 'package:stackwallet/providers/global/auto_swb_service_provider.dart';
-import 'package:stackwallet/providers/global/prefs_provider.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/assets.dart';
-import 'package:stackwallet/utilities/enums/backup_frequency_type.dart';
-import 'package:stackwallet/utilities/format.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/utilities/util.dart';
-import 'package:stackwallet/widgets/custom_buttons/blue_text_button.dart';
-import 'package:stackwallet/widgets/custom_buttons/draggable_switch_button.dart';
-import 'package:stackwallet/widgets/desktop/desktop_dialog.dart';
-import 'package:stackwallet/widgets/desktop/desktop_dialog_close_button.dart';
-import 'package:stackwallet/widgets/desktop/primary_button.dart';
-import 'package:stackwallet/widgets/desktop/secondary_button.dart';
-import 'package:stackwallet/widgets/rounded_container.dart';
-import 'package:stackwallet/widgets/rounded_white_container.dart';
-import 'package:stackwallet/widgets/stack_dialog.dart';
+import 'package:stackfrost/pages/settings_views/global_settings_view/stack_backup_views/create_backup_view.dart';
+import 'package:stackfrost/pages/settings_views/global_settings_view/stack_backup_views/edit_auto_backup_view.dart';
+import 'package:stackfrost/pages/settings_views/global_settings_view/stack_backup_views/restore_from_file_view.dart';
+import 'package:stackfrost/pages_desktop_specific/settings/settings_menu/backup_and_restore/create_auto_backup.dart';
+import 'package:stackfrost/pages_desktop_specific/settings/settings_menu/backup_and_restore/enable_backup_dialog.dart';
+import 'package:stackfrost/providers/global/auto_swb_service_provider.dart';
+import 'package:stackfrost/providers/global/prefs_provider.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/assets.dart';
+import 'package:stackfrost/utilities/enums/backup_frequency_type.dart';
+import 'package:stackfrost/utilities/format.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/utilities/util.dart';
+import 'package:stackfrost/widgets/custom_buttons/blue_text_button.dart';
+import 'package:stackfrost/widgets/custom_buttons/draggable_switch_button.dart';
+import 'package:stackfrost/widgets/desktop/desktop_dialog.dart';
+import 'package:stackfrost/widgets/desktop/desktop_dialog_close_button.dart';
+import 'package:stackfrost/widgets/desktop/primary_button.dart';
+import 'package:stackfrost/widgets/desktop/secondary_button.dart';
+import 'package:stackfrost/widgets/rounded_container.dart';
+import 'package:stackfrost/widgets/rounded_white_container.dart';
+import 'package:stackfrost/widgets/stack_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class BackupRestoreSettings extends ConsumerStatefulWidget {
@@ -390,7 +390,7 @@ class _BackupRestoreSettings extends ConsumerState<BackupRestoreSettings> {
                                           ),
                                           TextSpan(
                                             text:
-                                                "\n\nAuto backup is a custom Stack Wallet feature that offers a convenient backup of your data."
+                                                "\n\nAuto backup is a custom Stack Frost feature that offers a convenient backup of your data."
                                                 "To ensure maximum security, we recommend using a unique password that you haven't used anywhere "
                                                 "else on the internet before. Your password is not stored.",
                                             style: STextStyles
@@ -626,7 +626,7 @@ class _BackupRestoreSettings extends ConsumerState<BackupRestoreSettings> {
                                           ),
                                           TextSpan(
                                             text:
-                                                "\n\nUse your Stack Wallet backup file to restore your wallets, address book "
+                                                "\n\nUse your Stack Frost backup file to restore your wallets, address book "
                                                 "and wallet preferences.",
                                             style: STextStyles
                                                 .desktopTextExtraExtraSmall(

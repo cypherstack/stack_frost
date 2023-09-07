@@ -10,9 +10,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/assets.dart';
-import 'package:stackwallet/utilities/util.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/assets.dart';
+import 'package:stackfrost/utilities/util.dart';
 
 class AppBarIconButton extends StatelessWidget {
   const AppBarIconButton({
@@ -82,32 +82,32 @@ class AppBarBackButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDesktop = Util.isDesktop;
     return Padding(
-        padding: isDesktop
-            ? const EdgeInsets.symmetric(
-                vertical: 20,
-                horizontal: 24,
-              )
-            : const EdgeInsets.all(10),
-        child: AppBarIconButton(
-          semanticsLabel: semanticsLabel,
-          size: size ??
-              (isDesktop
-                  ? isCompact
-                      ? 42
-                      : 56
-                  : 32),
-          color: isDesktop
-              ? Theme.of(context).extension<StackColors>()!.textFieldDefaultBG
-              : Theme.of(context).extension<StackColors>()!.background,
-          shadows: const [],
-          icon: SvgPicture.asset(
-            Assets.svg.arrowLeft,
-            width: iconSize ?? (isCompact ? 18 : 24),
-            height: iconSize ?? (isCompact ? 18 : 24),
-            color:
-                Theme.of(context).extension<StackColors>()!.topNavIconPrimary,
-          ),
-          onPressed: onPressed ?? Navigator.of(context).pop,
-        ));
+      padding: isDesktop
+          ? const EdgeInsets.symmetric(
+              vertical: 20,
+              horizontal: 24,
+            )
+          : const EdgeInsets.all(10),
+      child: AppBarIconButton(
+        semanticsLabel: semanticsLabel,
+        size: size ??
+            (isDesktop
+                ? isCompact
+                    ? 42
+                    : 56
+                : 32),
+        color: isDesktop
+            ? Theme.of(context).extension<StackColors>()!.textFieldDefaultBG
+            : Theme.of(context).extension<StackColors>()!.background,
+        shadows: const [],
+        icon: SvgPicture.asset(
+          Assets.svg.arrowLeft,
+          width: iconSize ?? (isCompact ? 18 : 24),
+          height: iconSize ?? (isCompact ? 18 : 24),
+          color: Theme.of(context).extension<StackColors>()!.topNavIconPrimary,
+        ),
+        onPressed: onPressed ?? Navigator.of(context).pop,
+      ),
+    );
   }
 }

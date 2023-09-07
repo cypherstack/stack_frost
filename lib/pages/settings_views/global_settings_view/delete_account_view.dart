@@ -9,17 +9,18 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:stackwallet/db/hive/db.dart';
-import 'package:stackwallet/pages/intro_view.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/utilities/util.dart';
-import 'package:stackwallet/widgets/custom_buttons/app_bar_icon_button.dart';
-import 'package:stackwallet/widgets/desktop/desktop_app_bar.dart';
-import 'package:stackwallet/widgets/desktop/desktop_scaffold.dart';
-import 'package:stackwallet/widgets/desktop/primary_button.dart';
-import 'package:stackwallet/widgets/rounded_white_container.dart';
-import 'package:stackwallet/widgets/stack_dialog.dart';
+import 'package:stackfrost/db/hive/db.dart';
+import 'package:stackfrost/pages/pinpad_views/create_pin_view.dart';
+import 'package:stackfrost/pages_desktop_specific/password/create_password_view.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/utilities/util.dart';
+import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
+import 'package:stackfrost/widgets/desktop/desktop_app_bar.dart';
+import 'package:stackfrost/widgets/desktop/desktop_scaffold.dart';
+import 'package:stackfrost/widgets/desktop/primary_button.dart';
+import 'package:stackfrost/widgets/rounded_white_container.dart';
+import 'package:stackfrost/widgets/stack_dialog.dart';
 
 class DeleteAccountView extends StatefulWidget {
   const DeleteAccountView({Key? key}) : super(key: key);
@@ -65,7 +66,9 @@ class _DeleteAccountViewState extends State<DeleteAccountView> {
 
             if (mounted) {
               await Navigator.of(context).pushNamedAndRemoveUntil(
-                IntroView.routeName,
+                Util.isDesktop
+                    ? CreatePasswordView.routeName
+                    : CreatePinView.routeName,
                 (route) => false,
               );
             }

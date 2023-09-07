@@ -14,18 +14,17 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:stackwallet/models/isar/stack_theme.dart';
-import 'package:stackwallet/pages_desktop_specific/settings/settings_menu/appearance_settings/sub_widgets/desktop_manage_themes.dart';
-import 'package:stackwallet/providers/db/main_db_provider.dart';
-import 'package:stackwallet/providers/global/prefs_provider.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/themes/theme_providers.dart';
-import 'package:stackwallet/themes/theme_service.dart';
-import 'package:stackwallet/utilities/assets.dart';
-import 'package:stackwallet/utilities/constants.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/widgets/custom_buttons/draggable_switch_button.dart';
-import 'package:stackwallet/widgets/rounded_white_container.dart';
+import 'package:stackfrost/models/isar/stack_theme.dart';
+import 'package:stackfrost/pages_desktop_specific/settings/settings_menu/appearance_settings/sub_widgets/desktop_manage_themes.dart';
+import 'package:stackfrost/providers/db/main_db_provider.dart';
+import 'package:stackfrost/providers/global/prefs_provider.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/themes/theme_providers.dart';
+import 'package:stackfrost/themes/theme_service.dart';
+import 'package:stackfrost/utilities/assets.dart';
+import 'package:stackfrost/utilities/constants.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/widgets/rounded_white_container.dart';
 import 'package:tuple/tuple.dart';
 
 class AppearanceOptionSettings extends ConsumerStatefulWidget {
@@ -80,7 +79,7 @@ class _AppearanceOptionSettings
                                 ),
                                 TextSpan(
                                   text:
-                                      "\n\nCustomize how your Stack Wallet looks according to your preferences.",
+                                      "\n\nCustomize how your Stack Frost looks according to your preferences.",
                                   style: STextStyles.desktopTextExtraExtraSmall(
                                       context),
                                 ),
@@ -89,44 +88,6 @@ class _AppearanceOptionSettings
                           ),
                         ),
                       ],
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.all(10.0),
-                      child: Divider(
-                        thickness: 0.5,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Display favorite wallets",
-                            style: STextStyles.desktopTextExtraSmall(context)
-                                .copyWith(
-                                    color: Theme.of(context)
-                                        .extension<StackColors>()!
-                                        .textDark),
-                            textAlign: TextAlign.left,
-                          ),
-                          SizedBox(
-                            height: 20,
-                            width: 40,
-                            child: DraggableSwitchButton(
-                              isOn: ref.watch(
-                                prefsChangeNotifierProvider.select(
-                                    (value) => value.showFavoriteWallets),
-                              ),
-                              onValueChanged: (newValue) {
-                                ref
-                                    .read(prefsChangeNotifierProvider)
-                                    .showFavoriteWallets = newValue;
-                              },
-                            ),
-                          )
-                        ],
-                      ),
                     ),
                     const Padding(
                       padding: EdgeInsets.all(10.0),

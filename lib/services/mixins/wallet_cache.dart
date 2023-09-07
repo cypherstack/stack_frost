@@ -8,10 +8,10 @@
  *
  */
 
-import 'package:stackwallet/db/hive/db.dart';
-import 'package:stackwallet/models/balance.dart';
-import 'package:stackwallet/utilities/amount/amount.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/db/hive/db.dart';
+import 'package:stackfrost/models/balance.dart';
+import 'package:stackfrost/utilities/amount/amount.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
 
 mixin WalletCache {
   late final String _walletId;

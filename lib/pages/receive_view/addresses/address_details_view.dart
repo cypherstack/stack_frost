@@ -12,26 +12,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isar/isar.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:stackwallet/db/isar/main_db.dart';
-import 'package:stackwallet/models/isar/models/isar_models.dart';
-import 'package:stackwallet/pages/receive_view/addresses/address_tag.dart';
-import 'package:stackwallet/pages/wallet_view/sub_widgets/no_transactions_found.dart';
-import 'package:stackwallet/pages/wallet_view/transaction_views/transaction_details_view.dart';
-import 'package:stackwallet/providers/global/wallets_provider.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/address_utils.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/utilities/util.dart';
-import 'package:stackwallet/widgets/background.dart';
-import 'package:stackwallet/widgets/conditional_parent.dart';
-import 'package:stackwallet/widgets/custom_buttons/app_bar_icon_button.dart';
-import 'package:stackwallet/widgets/custom_buttons/blue_text_button.dart';
-import 'package:stackwallet/widgets/custom_buttons/simple_copy_button.dart';
-import 'package:stackwallet/widgets/custom_buttons/simple_edit_button.dart';
-import 'package:stackwallet/widgets/desktop/desktop_dialog.dart';
-import 'package:stackwallet/widgets/desktop/desktop_dialog_close_button.dart';
-import 'package:stackwallet/widgets/rounded_white_container.dart';
-import 'package:stackwallet/widgets/transaction_card.dart';
+import 'package:stackfrost/db/isar/main_db.dart';
+import 'package:stackfrost/models/isar/models/isar_models.dart';
+import 'package:stackfrost/pages/receive_view/addresses/address_tag.dart';
+import 'package:stackfrost/pages/wallet_view/sub_widgets/no_transactions_found.dart';
+import 'package:stackfrost/pages/wallet_view/transaction_views/transaction_details_view.dart';
+import 'package:stackfrost/providers/global/wallets_provider.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/address_utils.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/utilities/util.dart';
+import 'package:stackfrost/widgets/background.dart';
+import 'package:stackfrost/widgets/conditional_parent.dart';
+import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
+import 'package:stackfrost/widgets/custom_buttons/blue_text_button.dart';
+import 'package:stackfrost/widgets/custom_buttons/simple_copy_button.dart';
+import 'package:stackfrost/widgets/custom_buttons/simple_edit_button.dart';
+import 'package:stackfrost/widgets/desktop/desktop_dialog.dart';
+import 'package:stackfrost/widgets/desktop/desktop_dialog_close_button.dart';
+import 'package:stackfrost/widgets/detail_item.dart';
+import 'package:stackfrost/widgets/rounded_white_container.dart';
+import 'package:stackfrost/widgets/transaction_card.dart';
 
 class AddressDetailsView extends ConsumerStatefulWidget {
   const AddressDetailsView({
@@ -298,9 +299,10 @@ class _AddressDetailsViewState extends ConsumerState<AddressDetailsView> {
                   const SizedBox(
                     height: 16,
                   ),
-                _Item(
+                DetailItem(
+                  showEmptyDetail: false,
                   title: "Address",
-                  data: address.value,
+                  detail: address.value,
                   button: isDesktop
                       ? IconCopyButton(
                           data: address.value,
@@ -312,9 +314,10 @@ class _AddressDetailsViewState extends ConsumerState<AddressDetailsView> {
                 const _Div(
                   height: 12,
                 ),
-                _Item(
+                DetailItem(
+                  showEmptyDetail: false,
                   title: "Label",
-                  data: label!.value,
+                  detail: label!.value,
                   button: SimpleEditButton(
                     editValue: label!.value,
                     editLabel: 'label',
@@ -338,25 +341,28 @@ class _AddressDetailsViewState extends ConsumerState<AddressDetailsView> {
                     height: 12,
                   ),
                 if (address.derivationPath != null)
-                  _Item(
+                  DetailItem(
+                    showEmptyDetail: false,
                     title: "Derivation path",
-                    data: address.derivationPath!.value,
+                    detail: address.derivationPath!.value,
                     button: Container(),
                   ),
                 const _Div(
                   height: 12,
                 ),
-                _Item(
+                DetailItem(
+                  showEmptyDetail: false,
                   title: "Type",
-                  data: address.type.readableName,
+                  detail: address.type.readableName,
                   button: Container(),
                 ),
                 const _Div(
                   height: 12,
                 ),
-                _Item(
+                DetailItem(
+                  showEmptyDetail: false,
                   title: "Sub type",
-                  data: address.subType.prettyName,
+                  detail: address.subType.prettyName,
                   button: Container(),
                 ),
                 if (!isDesktop)
@@ -522,67 +528,6 @@ class _Tags extends StatelessWidget {
                   ),
                 ),
         ],
-      ),
-    );
-  }
-}
-
-class _Item extends StatelessWidget {
-  const _Item({
-    Key? key,
-    required this.title,
-    required this.data,
-    required this.button,
-  }) : super(key: key);
-
-  final String title;
-  final String data;
-  final Widget button;
-
-  @override
-  Widget build(BuildContext context) {
-    return ConditionalParent(
-      condition: !Util.isDesktop,
-      builder: (child) => RoundedWhiteContainer(
-        child: child,
-      ),
-      child: ConditionalParent(
-        condition: Util.isDesktop,
-        builder: (child) => Padding(
-          padding: const EdgeInsets.all(16),
-          child: child,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  title,
-                  style: STextStyles.itemSubtitle(context),
-                ),
-                button,
-              ],
-            ),
-            const SizedBox(
-              height: 5,
-            ),
-            data.isNotEmpty
-                ? SelectableText(
-                    data,
-                    style: STextStyles.w500_14(context),
-                  )
-                : Text(
-                    "$title will appear here",
-                    style: STextStyles.w500_14(context).copyWith(
-                      color: Theme.of(context)
-                          .extension<StackColors>()!
-                          .textSubtitle3,
-                    ),
-                  ),
-          ],
-        ),
       ),
     );
   }

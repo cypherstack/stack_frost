@@ -13,10 +13,10 @@ import 'dart:async';
 import 'package:event_bus/event_bus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackwallet/providers/providers.dart';
-import 'package:stackwallet/services/notifications_api.dart';
-import 'package:stackwallet/themes/coin_icon_provider.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/providers/providers.dart';
+import 'package:stackfrost/services/notifications_api.dart';
+import 'package:stackfrost/themes/coin_icon_provider.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
 
 abstract class CryptoNotificationsEventBus {
   static final instance = EventBus();

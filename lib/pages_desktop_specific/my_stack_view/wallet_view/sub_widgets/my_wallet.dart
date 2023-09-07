@@ -10,24 +10,23 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackwallet/pages/wallet_view/sub_widgets/transactions_list.dart';
-import 'package:stackwallet/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/desktop_receive.dart';
-import 'package:stackwallet/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/desktop_send.dart';
-import 'package:stackwallet/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/desktop_token_send.dart';
-import 'package:stackwallet/providers/global/wallets_provider.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/widgets/custom_tab_view.dart';
-import 'package:stackwallet/widgets/rounded_white_container.dart';
+import 'package:stackfrost/pages/send_view/frost_ms/frost_import_sign_config_view.dart';
+import 'package:stackfrost/pages/send_view/frost_ms/frost_send_view.dart';
+import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/desktop_receive.dart';
+import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/desktop_send.dart';
+import 'package:stackfrost/providers/global/wallets_provider.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/widgets/custom_tab_view.dart';
+import 'package:stackfrost/widgets/desktop/secondary_button.dart';
+import 'package:stackfrost/widgets/rounded_white_container.dart';
 
 class MyWallet extends ConsumerStatefulWidget {
   const MyWallet({
     Key? key,
     required this.walletId,
-    this.contractAddress,
   }) : super(key: key);
 
   final String walletId;
-  final String? contractAddress;
 
   @override
   ConsumerState<MyWallet> createState() => _MyWalletState();
@@ -39,20 +38,19 @@ class _MyWalletState extends ConsumerState<MyWallet> {
     "Receive",
   ];
 
-  late final bool isEth;
+  late final bool isFrost;
+  late final Coin coin;
 
   @override
   void initState() {
-    isEth = ref
-            .read(walletsChangeNotifierProvider)
-            .getManager(widget.walletId)
-            .coin ==
-        Coin.ethereum;
-
-    if (isEth && widget.contractAddress == null) {
-      titles.add("Transactions");
-    }
-
+    isFrost = ref
+        .read(walletsChangeNotifierProvider)
+        .getManager(widget.walletId)
+        .isFrostMS;
+    coin = ref
+        .read(walletsChangeNotifierProvider)
+        .getManager(widget.walletId)
+        .coin;
     super.initState();
   }
 
@@ -66,45 +64,43 @@ class _MyWalletState extends ConsumerState<MyWallet> {
           child: CustomTabView(
             titles: titles,
             children: [
-              widget.contractAddress == null
-                  ? Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: DesktopSend(
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: isFrost
+                    ? Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              SecondaryButton(
+                                width: 200,
+                                buttonHeight: ButtonHeight.l,
+                                label: "Import sign config",
+                                onPressed: () {
+                                  Navigator.of(context).pushNamed(
+                                    FrostImportSignConfigView.routeName,
+                                    arguments: widget.walletId,
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                          FrostSendView(
+                            walletId: widget.walletId,
+                            coin: coin,
+                          ),
+                        ],
+                      )
+                    : DesktopSend(
                         walletId: widget.walletId,
                       ),
-                    )
-                  : Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: DesktopTokenSend(
-                        walletId: widget.walletId,
-                      ),
-                    ),
+              ),
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: DesktopReceive(
                   walletId: widget.walletId,
-                  contractAddress: widget.contractAddress,
                 ),
               ),
-              if (isEth && widget.contractAddress == null)
-                Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxHeight: MediaQuery.of(context).size.height - 362,
-                    ),
-                    child: TransactionsList(
-                      walletId: widget.walletId,
-                      managerProvider: ref.watch(
-                        walletsChangeNotifierProvider.select(
-                          (value) => value.getManagerProvider(
-                            widget.walletId,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
             ],
           ),
         ),

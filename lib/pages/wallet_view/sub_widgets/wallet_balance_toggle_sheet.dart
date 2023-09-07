@@ -10,18 +10,17 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackwallet/models/balance.dart';
-import 'package:stackwallet/providers/providers.dart';
-import 'package:stackwallet/providers/wallet/public_private_balance_state_provider.dart';
-import 'package:stackwallet/providers/wallet/wallet_balance_toggle_state_provider.dart';
-import 'package:stackwallet/services/coins/firo/firo_wallet.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/amount/amount.dart';
-import 'package:stackwallet/utilities/amount/amount_formatter.dart';
-import 'package:stackwallet/utilities/constants.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/enums/wallet_balance_toggle_state.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
+import 'package:stackfrost/models/balance.dart';
+import 'package:stackfrost/providers/providers.dart';
+import 'package:stackfrost/providers/wallet/public_private_balance_state_provider.dart';
+import 'package:stackfrost/providers/wallet/wallet_balance_toggle_state_provider.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/amount/amount.dart';
+import 'package:stackfrost/utilities/amount/amount_formatter.dart';
+import 'package:stackfrost/utilities/constants.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/enums/wallet_balance_toggle_state.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
 
 enum _BalanceType {
   available,
@@ -55,23 +54,6 @@ class WalletBalanceToggleSheet extends ConsumerWidget {
             : _BalanceType.full;
 
     Balance? balanceSecondary;
-    if (coin == Coin.firo || coin == Coin.firoTestNet) {
-      balanceSecondary = ref
-          .watch(
-            walletsChangeNotifierProvider.select(
-              (value) => value.getManager(walletId).wallet as FiroWallet?,
-            ),
-          )
-          ?.balancePrivate;
-
-      if (ref.watch(publicPrivateBalanceStateProvider.state).state ==
-          "Private") {
-        _bal = _bal == _BalanceType.available
-            ? _BalanceType.privateAvailable
-            : _BalanceType.privateFull;
-      }
-    }
-
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).extension<StackColors>()!.popupBG,

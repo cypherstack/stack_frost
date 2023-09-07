@@ -11,44 +11,37 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:stackwallet/models/paynym/paynym_account_lite.dart';
-import 'package:stackwallet/notifications/show_flush_bar.dart';
-import 'package:stackwallet/pages/pinpad_views/lock_screen_view.dart';
-import 'package:stackwallet/pages/send_view/sub_widgets/sending_transaction_dialog.dart';
-import 'package:stackwallet/pages/token_view/token_view.dart';
-import 'package:stackwallet/pages/wallet_view/wallet_view.dart';
-import 'package:stackwallet/pages_desktop_specific/coin_control/desktop_coin_control_use_dialog.dart';
-import 'package:stackwallet/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/desktop_auth_send.dart';
-import 'package:stackwallet/providers/providers.dart';
-import 'package:stackwallet/providers/wallet/public_private_balance_state_provider.dart';
-import 'package:stackwallet/route_generator.dart';
-import 'package:stackwallet/services/coins/epiccash/epiccash_wallet.dart';
-import 'package:stackwallet/services/coins/firo/firo_wallet.dart';
-import 'package:stackwallet/services/mixins/paynym_wallet_interface.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/themes/theme_providers.dart';
-import 'package:stackwallet/utilities/amount/amount.dart';
-import 'package:stackwallet/utilities/amount/amount_formatter.dart';
-import 'package:stackwallet/utilities/constants.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/utilities/util.dart';
-import 'package:stackwallet/widgets/background.dart';
-import 'package:stackwallet/widgets/conditional_parent.dart';
-import 'package:stackwallet/widgets/custom_buttons/app_bar_icon_button.dart';
-import 'package:stackwallet/widgets/desktop/desktop_dialog.dart';
-import 'package:stackwallet/widgets/desktop/desktop_dialog_close_button.dart';
-import 'package:stackwallet/widgets/desktop/primary_button.dart';
-import 'package:stackwallet/widgets/icon_widgets/x_icon.dart';
-import 'package:stackwallet/widgets/rounded_container.dart';
-import 'package:stackwallet/widgets/rounded_white_container.dart';
-import 'package:stackwallet/widgets/stack_dialog.dart';
-import 'package:stackwallet/widgets/stack_text_field.dart';
-import 'package:stackwallet/widgets/textfield_icon_button.dart';
+import 'package:stackfrost/models/tx_data.dart';
+import 'package:stackfrost/notifications/show_flush_bar.dart';
+import 'package:stackfrost/pages/pinpad_views/lock_screen_view.dart';
+import 'package:stackfrost/pages/send_view/sub_widgets/sending_transaction_dialog.dart';
+import 'package:stackfrost/pages/wallet_view/wallet_view.dart';
+import 'package:stackfrost/pages_desktop_specific/coin_control/desktop_coin_control_use_dialog.dart';
+import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/desktop_auth_send.dart';
+import 'package:stackfrost/providers/providers.dart';
+import 'package:stackfrost/route_generator.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/themes/theme_providers.dart';
+import 'package:stackfrost/utilities/amount/amount_formatter.dart';
+import 'package:stackfrost/utilities/constants.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/utilities/util.dart';
+import 'package:stackfrost/widgets/background.dart';
+import 'package:stackfrost/widgets/conditional_parent.dart';
+import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
+import 'package:stackfrost/widgets/desktop/desktop_dialog.dart';
+import 'package:stackfrost/widgets/desktop/desktop_dialog_close_button.dart';
+import 'package:stackfrost/widgets/desktop/primary_button.dart';
+import 'package:stackfrost/widgets/icon_widgets/x_icon.dart';
+import 'package:stackfrost/widgets/rounded_container.dart';
+import 'package:stackfrost/widgets/rounded_white_container.dart';
+import 'package:stackfrost/widgets/stack_dialog.dart';
+import 'package:stackfrost/widgets/stack_text_field.dart';
+import 'package:stackfrost/widgets/textfield_icon_button.dart';
 
 class ConfirmTransactionView extends ConsumerStatefulWidget {
   const ConfirmTransactionView({
@@ -57,21 +50,15 @@ class ConfirmTransactionView extends ConsumerStatefulWidget {
     required this.walletId,
     this.routeOnSuccessName = WalletView.routeName,
     this.isTradeTransaction = false,
-    this.isPaynymTransaction = false,
-    this.isPaynymNotificationTransaction = false,
-    this.isTokenTx = false,
     this.onSuccessInsteadOfRouteOnSuccess,
   }) : super(key: key);
 
   static const String routeName = "/confirmTransactionView";
 
-  final Map<String, dynamic> transactionInfo;
+  final TxData transactionInfo;
   final String walletId;
   final String routeOnSuccessName;
   final bool isTradeTransaction;
-  final bool isPaynymTransaction;
-  final bool isPaynymNotificationTransaction;
-  final bool isTokenTx;
   final VoidCallback? onSuccessInsteadOfRouteOnSuccess;
 
   @override
@@ -81,7 +68,7 @@ class ConfirmTransactionView extends ConsumerStatefulWidget {
 
 class _ConfirmTransactionViewState
     extends ConsumerState<ConfirmTransactionView> {
-  late final Map<String, dynamic> transactionInfo;
+  late final TxData transactionInfo;
   late final String walletId;
   late final String routeOnSuccessName;
   late final bool isDesktop;
@@ -89,10 +76,8 @@ class _ConfirmTransactionViewState
   late final FocusNode _noteFocusNode;
   late final TextEditingController noteController;
 
-
   late final FocusNode _onChainNoteFocusNode;
   late final TextEditingController onChainNoteController;
-
 
   Future<void> _attemptSend(BuildContext context) async {
     final manager =
@@ -121,34 +106,12 @@ class _ConfirmTransactionViewState
     );
 
     late String txid;
-    Future<String> txidFuture;
+    Future<TxData> txidFuture;
 
     final note = noteController.text;
 
     try {
-      if (widget.isTokenTx) {
-        txidFuture = ref
-            .read(tokenServiceProvider)!
-            .confirmSend(txData: transactionInfo);
-      } else if (widget.isPaynymNotificationTransaction) {
-        txidFuture = (manager.wallet as PaynymWalletInterface)
-            .broadcastNotificationTx(preparedTx: transactionInfo);
-      } else if (widget.isPaynymTransaction) {
-        txidFuture = manager.confirmSend(txData: transactionInfo);
-      } else {
-        final coin = manager.coin;
-        if ((coin == Coin.firo || coin == Coin.firoTestNet) &&
-            ref.read(publicPrivateBalanceStateProvider.state).state !=
-                "Private") {
-          txidFuture = (manager.wallet as FiroWallet)
-              .confirmSendPublic(txData: transactionInfo);
-        } else {
-          if (coin == Coin.epicCash) {
-            transactionInfo["onChainNote"] = onChainNoteController.text;
-          }
-          txidFuture = manager.confirmSend(txData: transactionInfo);
-        }
-      }
+      txidFuture = manager.confirmSend(txData: transactionInfo);
 
       final results = await Future.wait([
         txidFuture,
@@ -158,7 +121,8 @@ class _ConfirmTransactionViewState
       sendProgressController.triggerSuccess?.call();
       await Future<void>.delayed(const Duration(seconds: 5));
 
-      txid = results.first as String;
+      final txData = results.first as TxData;
+      txid = txData.txid!;
       ref.refresh(desktopUseUTXOs);
 
       // save note
@@ -166,11 +130,7 @@ class _ConfirmTransactionViewState
           .read(notesServiceChangeNotifierProvider(walletId))
           .editOrAddNote(txid: txid, note: note);
 
-      if (widget.isTokenTx) {
-        unawaited(ref.read(tokenServiceProvider)!.refresh());
-      } else {
-        unawaited(manager.refresh());
-      }
+      unawaited(manager.refresh());
 
       // pop back to wallet
       if (mounted) {
@@ -180,20 +140,6 @@ class _ConfirmTransactionViewState
         } else {
           widget.onSuccessInsteadOfRouteOnSuccess!.call();
         }
-      }
-    } on BadEpicHttpAddressException catch (_) {
-      if (mounted) {
-        // pop building dialog
-        Navigator.of(context).pop();
-        unawaited(
-          showFloatingFlushBar(
-            type: FlushBarType.warning,
-            message:
-                "Connection failed. Please check the address and try again.",
-            context: context,
-          ),
-        );
-        return;
       }
     } catch (e, s) {
       //todo: comeback to this
@@ -279,11 +225,11 @@ class _ConfirmTransactionViewState
     routeOnSuccessName = widget.routeOnSuccessName;
     _noteFocusNode = FocusNode();
     noteController = TextEditingController();
-    noteController.text = transactionInfo["note"] as String? ?? "";
+    noteController.text = transactionInfo.note ?? "";
 
     _onChainNoteFocusNode = FocusNode();
     onChainNoteController = TextEditingController();
-    onChainNoteController.text = transactionInfo["onChainNote"] as String? ?? "";
+    onChainNoteController.text = transactionInfo.noteOnChain ?? "";
 
     super.initState();
   }
@@ -307,12 +253,7 @@ class _ConfirmTransactionViewState
         .select((value) => value.getManager(walletId).coin));
 
     final String unit;
-    if (widget.isTokenTx) {
-      unit = ref.watch(
-          tokenServiceProvider.select((value) => value!.tokenContract.symbol));
-    } else {
-      unit = coin.ticker;
-    }
+    unit = coin.ticker;
 
     return ConditionalParent(
       condition: !isDesktop,
@@ -408,20 +349,14 @@ class _ConfirmTransactionViewState
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Text(
-                          widget.isPaynymTransaction
-                              ? "PayNym recipient"
-                              : "Recipient",
+                          "Recipient",
                           style: STextStyles.smallMed12(context),
                         ),
                         const SizedBox(
                           height: 4,
                         ),
                         Text(
-                          widget.isPaynymTransaction
-                              ? (transactionInfo["paynymAccountLite"]
-                                      as PaynymAccountLite)
-                                  .nymName
-                              : "${transactionInfo["address"] ?? "ERROR"}",
+                          transactionInfo.recipients?.first.address ?? "ERROR",
                           style: STextStyles.itemSubtitle12(context),
                         ),
                       ],
@@ -440,10 +375,7 @@ class _ConfirmTransactionViewState
                         ),
                         Text(
                           ref.watch(pAmountFormatter(coin)).format(
-                                transactionInfo["recipientAmt"] as Amount,
-                                ethContract: ref
-                                    .watch(tokenServiceProvider)
-                                    ?.tokenContract,
+                                transactionInfo.amount!,
                               ),
                           style: STextStyles.itemSubtitle12(context),
                           textAlign: TextAlign.right,
@@ -451,45 +383,32 @@ class _ConfirmTransactionViewState
                       ],
                     ),
                   ),
-                  if (coin != Coin.banano && coin != Coin.nano)
+                  const SizedBox(
+                    height: 12,
+                  ),
+                  RoundedWhiteContainer(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Transaction fee",
+                          style: STextStyles.smallMed12(context),
+                        ),
+                        Text(
+                          ref
+                              .watch(pAmountFormatter(coin))
+                              .format(transactionInfo.fee!),
+                          style: STextStyles.itemSubtitle12(context),
+                          textAlign: TextAlign.right,
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (transactionInfo.estimatedSatsPerVByte != null)
                     const SizedBox(
                       height: 12,
                     ),
-                  if (coin != Coin.banano && coin != Coin.nano)
-                    RoundedWhiteContainer(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Transaction fee",
-                            style: STextStyles.smallMed12(context),
-                          ),
-                          Text(
-                            ref.watch(pAmountFormatter(coin)).format(
-                                  (transactionInfo["fee"] is Amount
-                                      ? transactionInfo["fee"] as Amount
-                                      : (transactionInfo["fee"] as int)
-                                          .toAmountAsRaw(
-                                          fractionDigits: ref.watch(
-                                            managerProvider.select(
-                                              (value) => value.coin.decimals,
-                                            ),
-                                          ),
-                                        )),
-                                ),
-                            style: STextStyles.itemSubtitle12(context),
-                            textAlign: TextAlign.right,
-                          ),
-                        ],
-                      ),
-                    ),
-                  if (transactionInfo["fee"] is int &&
-                      transactionInfo["vSize"] is int)
-                    const SizedBox(
-                      height: 12,
-                    ),
-                  if (transactionInfo["fee"] is int &&
-                      transactionInfo["vSize"] is int)
+                  if (transactionInfo.estimatedSatsPerVByte != null)
                     RoundedWhiteContainer(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -502,19 +421,19 @@ class _ConfirmTransactionViewState
                             height: 4,
                           ),
                           Text(
-                            "~${(transactionInfo["fee"] / transactionInfo["vSize"]).toInt()}",
+                            "~${transactionInfo.estimatedSatsPerVByte!}",
                             style: STextStyles.itemSubtitle12(context),
                           ),
                         ],
                       ),
                     ),
-                  if (coin == Coin.epicCash &&
-                      (transactionInfo["onChainNote"] as String).isNotEmpty)
+                  if (transactionInfo.noteOnChain != null &&
+                      transactionInfo.noteOnChain!.isNotEmpty)
                     const SizedBox(
                       height: 12,
                     ),
-                  if (coin == Coin.epicCash &&
-                      (transactionInfo["onChainNote"] as String).isNotEmpty)
+                  if (transactionInfo.noteOnChain != null &&
+                      transactionInfo.noteOnChain!.isNotEmpty)
                     RoundedWhiteContainer(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -527,30 +446,32 @@ class _ConfirmTransactionViewState
                             height: 4,
                           ),
                           Text(
-                            transactionInfo["onChainNote"] as String,
+                            transactionInfo.noteOnChain!,
                             style: STextStyles.itemSubtitle12(context),
                           ),
                         ],
                       ),
                     ),
-                  if ((transactionInfo["note"] as String).isNotEmpty)
+                  if (transactionInfo.note != null &&
+                      transactionInfo.note!.isNotEmpty)
                     const SizedBox(
                       height: 12,
                     ),
-                  if ((transactionInfo["note"] as String).isNotEmpty)
+                  if (transactionInfo.note != null &&
+                      transactionInfo.note!.isNotEmpty)
                     RoundedWhiteContainer(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           Text(
-                            (coin == Coin.epicCash) ? "Local Note" : "Note",
+                            "Note",
                             style: STextStyles.smallMed12(context),
                           ),
                           const SizedBox(
                             height: 4,
                           ),
                           Text(
-                            transactionInfo["note"] as String,
+                            transactionInfo.note!,
                             style: STextStyles.itemSubtitle12(context),
                           ),
                         ],
@@ -638,50 +559,37 @@ class _ConfirmTransactionViewState
                                     (value) => value.coin,
                                   ),
                                 );
-                                final amount =
-                                    transactionInfo["recipientAmt"] as Amount;
-                                final externalCalls = ref.watch(
-                                    prefsChangeNotifierProvider.select(
-                                        (value) => value.externalCalls));
+                                final amount = transactionInfo.amount!;
+                                final externalCalls = coin.isTestNet
+                                    ? false
+                                    : ref.watch(
+                                        prefsChangeNotifierProvider.select(
+                                            (value) => value.externalCalls));
                                 String fiatAmount = "N/A";
 
-                                if (externalCalls) {
-                                  final price = widget.isTokenTx
-                                      ? ref
-                                          .read(
-                                              priceAnd24hChangeNotifierProvider)
-                                          .getTokenPrice(
-                                            ref
-                                                .read(tokenServiceProvider)!
-                                                .tokenContract
-                                                .address,
-                                          )
-                                          .item1
-                                      : ref
-                                          .read(
-                                              priceAnd24hChangeNotifierProvider)
-                                          .getPrice(coin)
-                                          .item1;
-                                  if (price > Decimal.zero) {
-                                    fiatAmount = (amount.decimal * price)
-                                        .toAmount(fractionDigits: 2)
-                                        .fiatString(
-                                          locale: ref
-                                              .read(
-                                                  localeServiceChangeNotifierProvider)
-                                              .locale,
-                                        );
-                                  }
-                                }
+                                // if (externalCalls) {
+                                //   final price = ref
+                                //       .read(priceAnd24hChangeNotifierProvider)
+                                //       .getPrice(coin)
+                                //       .item1;
+                                //   if (price > Decimal.zero) {
+                                //     fiatAmount = (amount.decimal * price)
+                                //         .toAmount(fractionDigits: 2)
+                                //         .fiatString(
+                                //           locale: ref
+                                //               .read(
+                                //                   localeServiceChangeNotifierProvider)
+                                //               .locale,
+                                //         );
+                                //   }
+                                // }
 
                                 return Row(
                                   children: [
                                     Text(
                                       ref.watch(pAmountFormatter(coin)).format(
-                                          amount,
-                                          ethContract: ref
-                                              .read(tokenServiceProvider)
-                                              ?.tokenContract),
+                                            amount,
+                                          ),
                                       style: STextStyles
                                               .desktopTextExtraExtraSmall(
                                                   context)
@@ -727,9 +635,7 @@ class _ConfirmTransactionViewState
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              widget.isPaynymTransaction
-                                  ? "PayNym recipient"
-                                  : "Send to",
+                              "Send to",
                               style: STextStyles.desktopTextExtraExtraSmall(
                                   context),
                             ),
@@ -737,11 +643,8 @@ class _ConfirmTransactionViewState
                               height: 2,
                             ),
                             Text(
-                              widget.isPaynymTransaction
-                                  ? (transactionInfo["paynymAccountLite"]
-                                          as PaynymAccountLite)
-                                      .nymName
-                                  : "${transactionInfo["address"] ?? "ERROR"}",
+                              transactionInfo.recipients?.first.address ??
+                                  "ERROR",
                               style: STextStyles.desktopTextExtraExtraSmall(
                                       context)
                                   .copyWith(
@@ -753,61 +656,6 @@ class _ConfirmTransactionViewState
                           ],
                         ),
                       ),
-                      if (widget.isPaynymTransaction)
-                        Container(
-                          height: 1,
-                          color: Theme.of(context)
-                              .extension<StackColors>()!
-                              .background,
-                        ),
-                      if (widget.isPaynymTransaction)
-                        Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Transaction fee",
-                                style: STextStyles.desktopTextExtraExtraSmall(
-                                    context),
-                              ),
-                              const SizedBox(
-                                height: 2,
-                              ),
-                              Builder(
-                                builder: (context) {
-                                  final coin = ref
-                                      .watch(walletsChangeNotifierProvider
-                                          .select((value) =>
-                                              value.getManager(walletId)))
-                                      .coin;
-
-                                  final fee = transactionInfo["fee"] is Amount
-                                      ? transactionInfo["fee"] as Amount
-                                      : (transactionInfo["fee"] as int)
-                                          .toAmountAsRaw(
-                                          fractionDigits: coin.decimals,
-                                        );
-
-                                  return Text(
-                                    ref
-                                        .watch(pAmountFormatter(coin))
-                                        .format(fee),
-                                    style:
-                                        STextStyles.desktopTextExtraExtraSmall(
-                                                context)
-                                            .copyWith(
-                                      color: Theme.of(context)
-                                          .extension<StackColors>()!
-                                          .textDark,
-                                    ),
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
                       // Container(
                       //   height: 1,
                       //   color: Theme.of(context)
@@ -855,64 +703,8 @@ class _ConfirmTransactionViewState
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (coin == Coin.epicCash)
-                      Text(
-                        "On chain Note (optional)",
-                        style: STextStyles.smallMed12(context),
-                        textAlign: TextAlign.left,
-                      ),
-                    if (coin == Coin.epicCash)
-                      const SizedBox(
-                        height: 8,
-                      ),
-                    if (coin == Coin.epicCash)
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(
-                          Constants.size.circularBorderRadius,
-                        ),
-                        child: TextField(
-                          autocorrect: Util.isDesktop ? false : true,
-                          enableSuggestions: Util.isDesktop ? false : true,
-                          maxLength: 256,
-                          controller: onChainNoteController,
-                          focusNode: _onChainNoteFocusNode,
-                          style: STextStyles.field(context),
-                          onChanged: (_) => setState(() {}),
-                          decoration: standardInputDecoration(
-                            "Type something...",
-                            _onChainNoteFocusNode,
-                            context,
-                          ).copyWith(
-                            suffixIcon: onChainNoteController.text.isNotEmpty
-                                ? Padding(
-                              padding:
-                              const EdgeInsets.only(right: 0),
-                              child: UnconstrainedBox(
-                                child: Row(
-                                  children: [
-                                    TextFieldIconButton(
-                                      child: const XIcon(),
-                                      onTap: () async {
-                                        setState(() {
-                                          onChainNoteController.text = "";
-                                        });
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )
-                                : null,
-                          ),
-                        ),
-                      ),
-                    if (coin == Coin.epicCash)
-                      const SizedBox(
-                        height: 12,
-                      ),
                     Text(
-                      (coin == Coin.epicCash) ? "Local Note (optional)"
-                          : "Note (optional)",
+                      "Note (optional)",
                       style:
                           STextStyles.desktopTextExtraSmall(context).copyWith(
                         color: Theme.of(context)
@@ -983,7 +775,7 @@ class _ConfirmTransactionViewState
                   ],
                 ),
               ),
-            if (isDesktop && !widget.isPaynymTransaction)
+            if (isDesktop)
               Padding(
                 padding: const EdgeInsets.only(
                   left: 32,
@@ -993,7 +785,7 @@ class _ConfirmTransactionViewState
                   style: STextStyles.desktopTextExtraExtraSmall(context),
                 ),
               ),
-            if (isDesktop && !widget.isPaynymTransaction)
+            if (isDesktop)
               Padding(
                 padding: const EdgeInsets.only(
                   top: 10,
@@ -1015,11 +807,7 @@ class _ConfirmTransactionViewState
                               .select((value) => value.getManager(walletId)))
                           .coin;
 
-                      final fee = transactionInfo["fee"] is Amount
-                          ? transactionInfo["fee"] as Amount
-                          : (transactionInfo["fee"] as int).toAmountAsRaw(
-                              fractionDigits: coin.decimals,
-                            );
+                      final fee = transactionInfo.fee!;
 
                       return Text(
                         ref.watch(pAmountFormatter(coin)).format(fee),
@@ -1029,10 +817,7 @@ class _ConfirmTransactionViewState
                   ),
                 ),
               ),
-            if (isDesktop &&
-                !widget.isPaynymTransaction &&
-                transactionInfo["fee"] is int &&
-                transactionInfo["vSize"] is int)
+            if (isDesktop && transactionInfo.estimatedSatsPerVByte != null)
               Padding(
                 padding: const EdgeInsets.only(
                   left: 32,
@@ -1042,10 +827,7 @@ class _ConfirmTransactionViewState
                   style: STextStyles.desktopTextExtraExtraSmall(context),
                 ),
               ),
-            if (isDesktop &&
-                !widget.isPaynymTransaction &&
-                transactionInfo["fee"] is int &&
-                transactionInfo["vSize"] is int)
+            if (isDesktop && transactionInfo.estimatedSatsPerVByte != null)
               Padding(
                 padding: const EdgeInsets.only(
                   top: 10,
@@ -1061,7 +843,7 @@ class _ConfirmTransactionViewState
                       .extension<StackColors>()!
                       .textFieldDefaultBG,
                   child: Text(
-                    "~${(transactionInfo["fee"] / transactionInfo["vSize"]).toInt()}",
+                    "~${transactionInfo.estimatedSatsPerVByte!}",
                     style: STextStyles.itemSubtitle(context),
                   ),
                 ),
@@ -1070,28 +852,48 @@ class _ConfirmTransactionViewState
             SizedBox(
               height: isDesktop ? 23 : 12,
             ),
-            if (!widget.isTokenTx)
-              Padding(
+            Padding(
+              padding: isDesktop
+                  ? const EdgeInsets.symmetric(
+                      horizontal: 32,
+                    )
+                  : const EdgeInsets.all(0),
+              child: RoundedContainer(
                 padding: isDesktop
                     ? const EdgeInsets.symmetric(
-                        horizontal: 32,
+                        horizontal: 16,
+                        vertical: 18,
                       )
-                    : const EdgeInsets.all(0),
-                child: RoundedContainer(
-                  padding: isDesktop
-                      ? const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 18,
-                        )
-                      : const EdgeInsets.all(12),
-                  color: Theme.of(context)
-                      .extension<StackColors>()!
-                      .snackBarBackSuccess,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        isDesktop ? "Total amount to send" : "Total amount",
+                    : const EdgeInsets.all(12),
+                color: Theme.of(context)
+                    .extension<StackColors>()!
+                    .snackBarBackSuccess,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      isDesktop ? "Total amount to send" : "Total amount",
+                      style: isDesktop
+                          ? STextStyles.desktopTextExtraExtraSmall(context)
+                              .copyWith(
+                              color: Theme.of(context)
+                                  .extension<StackColors>()!
+                                  .textConfirmTotalAmount,
+                            )
+                          : STextStyles.titleBold12(context).copyWith(
+                              color: Theme.of(context)
+                                  .extension<StackColors>()!
+                                  .textConfirmTotalAmount,
+                            ),
+                    ),
+                    Builder(builder: (context) {
+                      final coin = ref.watch(walletsChangeNotifierProvider
+                          .select((value) => value.getManager(walletId).coin));
+                      final fee = transactionInfo.fee!;
+
+                      final amount = transactionInfo.amount!;
+                      return Text(
+                        ref.watch(pAmountFormatter(coin)).format(amount + fee),
                         style: isDesktop
                             ? STextStyles.desktopTextExtraExtraSmall(context)
                                 .copyWith(
@@ -1099,46 +901,18 @@ class _ConfirmTransactionViewState
                                     .extension<StackColors>()!
                                     .textConfirmTotalAmount,
                               )
-                            : STextStyles.titleBold12(context).copyWith(
+                            : STextStyles.itemSubtitle12(context).copyWith(
                                 color: Theme.of(context)
                                     .extension<StackColors>()!
                                     .textConfirmTotalAmount,
                               ),
-                      ),
-                      Builder(builder: (context) {
-                        final coin = ref.watch(
-                            walletsChangeNotifierProvider.select(
-                                (value) => value.getManager(walletId).coin));
-                        final fee = transactionInfo["fee"] is Amount
-                            ? transactionInfo["fee"] as Amount
-                            : (transactionInfo["fee"] as int)
-                                .toAmountAsRaw(fractionDigits: coin.decimals);
-
-                        final amount =
-                            transactionInfo["recipientAmt"] as Amount;
-                        return Text(
-                          ref
-                              .watch(pAmountFormatter(coin))
-                              .format(amount + fee),
-                          style: isDesktop
-                              ? STextStyles.desktopTextExtraExtraSmall(context)
-                                  .copyWith(
-                                  color: Theme.of(context)
-                                      .extension<StackColors>()!
-                                      .textConfirmTotalAmount,
-                                )
-                              : STextStyles.itemSubtitle12(context).copyWith(
-                                  color: Theme.of(context)
-                                      .extension<StackColors>()!
-                                      .textConfirmTotalAmount,
-                                ),
-                          textAlign: TextAlign.right,
-                        );
-                      }),
-                    ],
-                  ),
+                        textAlign: TextAlign.right,
+                      );
+                    }),
+                  ],
                 ),
               ),
+            ),
             SizedBox(
               height: isDesktop ? 28 : 16,
             ),
@@ -1168,9 +942,9 @@ class _ConfirmTransactionViewState
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Row(
+                            const Row(
                               mainAxisAlignment: MainAxisAlignment.end,
-                              children: const [
+                              children: [
                                 DesktopDialogCloseButton(),
                               ],
                             ),

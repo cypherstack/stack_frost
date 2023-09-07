@@ -13,15 +13,15 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:stackwallet/pages/manage_favorites_view/manage_favorites_view.dart';
-import 'package:stackwallet/pages/wallets_view/sub_widgets/favorite_card.dart';
-import 'package:stackwallet/providers/providers.dart';
-import 'package:stackwallet/services/coins/manager.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/assets.dart';
-import 'package:stackwallet/utilities/constants.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/widgets/custom_page_view/custom_page_view.dart'
+import 'package:stackfrost/pages/manage_favorites_view/manage_favorites_view.dart';
+import 'package:stackfrost/pages/wallets_view/sub_widgets/favorite_card.dart';
+import 'package:stackfrost/providers/providers.dart';
+import 'package:stackfrost/services/coins/manager.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/assets.dart';
+import 'package:stackfrost/utilities/constants.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/widgets/custom_page_view/custom_page_view.dart'
     as cpv;
 
 class FavoriteWallets extends ConsumerStatefulWidget {

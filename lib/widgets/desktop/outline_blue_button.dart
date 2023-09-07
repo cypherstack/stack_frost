@@ -9,12 +9,12 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/utilities/util.dart';
-import 'package:stackwallet/widgets/desktop/custom_text_button.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/utilities/util.dart';
+import 'package:stackfrost/widgets/desktop/custom_text_button.dart';
 
-export 'package:stackwallet/widgets/desktop/custom_text_button.dart';
+export 'package:stackfrost/widgets/desktop/custom_text_button.dart';
 
 class OutlineBlueButton extends StatelessWidget {
   const OutlineBlueButton({

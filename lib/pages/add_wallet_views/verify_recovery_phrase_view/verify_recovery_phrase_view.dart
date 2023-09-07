@@ -14,25 +14,22 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackwallet/notifications/show_flush_bar.dart';
-import 'package:stackwallet/pages/add_wallet_views/add_token_view/edit_wallet_tokens_view.dart';
-import 'package:stackwallet/pages/add_wallet_views/new_wallet_recovery_phrase_view/new_wallet_recovery_phrase_view.dart';
-import 'package:stackwallet/pages/add_wallet_views/select_wallet_for_token_view.dart';
-import 'package:stackwallet/pages/add_wallet_views/verify_recovery_phrase_view/sub_widgets/word_table.dart';
-import 'package:stackwallet/pages/home_view/home_view.dart';
-import 'package:stackwallet/pages_desktop_specific/desktop_home_view.dart';
-import 'package:stackwallet/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
-import 'package:stackwallet/providers/providers.dart';
-import 'package:stackwallet/services/coins/manager.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/assets.dart';
-import 'package:stackwallet/utilities/constants.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/utilities/util.dart';
-import 'package:stackwallet/widgets/custom_buttons/app_bar_icon_button.dart';
-import 'package:stackwallet/widgets/desktop/desktop_app_bar.dart';
-import 'package:stackwallet/widgets/desktop/desktop_scaffold.dart';
+import 'package:stackfrost/notifications/show_flush_bar.dart';
+import 'package:stackfrost/pages/add_wallet_views/new_wallet_recovery_phrase_view/new_wallet_recovery_phrase_view.dart';
+import 'package:stackfrost/pages/add_wallet_views/verify_recovery_phrase_view/sub_widgets/word_table.dart';
+import 'package:stackfrost/pages/home_view/home_view.dart';
+import 'package:stackfrost/pages_desktop_specific/desktop_home_view.dart';
+import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
+import 'package:stackfrost/providers/providers.dart';
+import 'package:stackfrost/services/coins/manager.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/assets.dart';
+import 'package:stackfrost/utilities/constants.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/utilities/util.dart';
+import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
+import 'package:stackfrost/widgets/desktop/desktop_app_bar.dart';
+import 'package:stackfrost/widgets/desktop/desktop_scaffold.dart';
 import 'package:tuple/tuple.dart';
 
 final createSpecialEthWalletRoutingFlag = StateProvider((ref) => false);
@@ -112,60 +109,22 @@ class _VerifyRecoveryPhraseViewState
           ref.read(createSpecialEthWalletRoutingFlag);
       if (isCreateSpecialEthWallet) {
         ref.read(createSpecialEthWalletRoutingFlag.notifier).state = false;
-        ref
-                .read(newEthWalletTriggerTempUntilHiveCompletelyDeleted.state)
-                .state =
-            !ref
-                .read(newEthWalletTriggerTempUntilHiveCompletelyDeleted.state)
-                .state;
       }
 
       if (mounted) {
         if (isDesktop) {
-          if (isCreateSpecialEthWallet) {
-            Navigator.of(context).popUntil(
-              ModalRoute.withName(
-                SelectWalletForTokenView.routeName,
-              ),
-            );
-          } else {
-            Navigator.of(context).popUntil(
-              ModalRoute.withName(
-                DesktopHomeView.routeName,
-              ),
-            );
-            if (widget.manager.coin == Coin.ethereum) {
-              unawaited(
-                Navigator.of(context).pushNamed(
-                  EditWalletTokensView.routeName,
-                  arguments: widget.manager.walletId,
-                ),
-              );
-            }
-          }
+          Navigator.of(context).popUntil(
+            ModalRoute.withName(
+              DesktopHomeView.routeName,
+            ),
+          );
         } else {
-          if (isCreateSpecialEthWallet) {
-            Navigator.of(context).popUntil(
-              ModalRoute.withName(
-                SelectWalletForTokenView.routeName,
-              ),
-            );
-          } else {
-            unawaited(
-              Navigator.of(context).pushNamedAndRemoveUntil(
-                HomeView.routeName,
-                (route) => false,
-              ),
-            );
-            if (widget.manager.coin == Coin.ethereum) {
-              unawaited(
-                Navigator.of(context).pushNamed(
-                  EditWalletTokensView.routeName,
-                  arguments: widget.manager.walletId,
-                ),
-              );
-            }
-          }
+          unawaited(
+            Navigator.of(context).pushNamedAndRemoveUntil(
+              HomeView.routeName,
+              (route) => false,
+            ),
+          );
         }
 
         unawaited(

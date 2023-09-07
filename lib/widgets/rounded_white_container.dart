@@ -9,8 +9,8 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/widgets/rounded_container.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/widgets/rounded_container.dart';
 
 class RoundedWhiteContainer extends StatelessWidget {
   const RoundedWhiteContainer({

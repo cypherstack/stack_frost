@@ -9,13 +9,13 @@
  */
 
 import 'package:flutter/cupertino.dart';
-import 'package:stackwallet/db/hive/db.dart';
-import 'package:stackwallet/utilities/amount/amount_unit.dart';
-import 'package:stackwallet/utilities/constants.dart';
-import 'package:stackwallet/utilities/enums/backup_frequency_type.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/enums/languages_enum.dart';
-import 'package:stackwallet/utilities/enums/sync_type_enum.dart';
+import 'package:stackfrost/db/hive/db.dart';
+import 'package:stackfrost/utilities/amount/amount_unit.dart';
+import 'package:stackfrost/utilities/constants.dart';
+import 'package:stackfrost/utilities/enums/backup_frequency_type.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/enums/languages_enum.dart';
+import 'package:stackfrost/utilities/enums/sync_type_enum.dart';
 import 'package:uuid/uuid.dart';
 
 class Prefs extends ChangeNotifier {
@@ -34,7 +34,6 @@ class Prefs extends ChangeNotifier {
       _useBiometrics = await _getUseBiometrics();
       _hasPin = await _getHasPin();
       _language = await _getPreferredLanguage();
-      _showFavoriteWallets = await _getShowFavoriteWallets();
       _wifiOnly = await _getUseWifiOnly();
       _syncType = await _getSyncType();
       _walletIdsSyncOnStartup = await _getWalletIdsSyncOnStartup();
@@ -160,7 +159,7 @@ class Prefs extends ChangeNotifier {
 
   // sync type
 
-  SyncingType _syncType = SyncingType.allWalletsOnStartup;
+  SyncingType _syncType = SyncingType.currentWalletOnly;
 
   SyncingType get syncType => _syncType;
 
@@ -178,7 +177,7 @@ class Prefs extends ChangeNotifier {
   Future<SyncingType> _getSyncType() async {
     final int index = await DB.instance.get<dynamic>(
             boxName: DB.boxNamePrefs, key: "syncTypeIndex") as int? ??
-        SyncingType.allWalletsOnStartup.index;
+        SyncingType.currentWalletOnly.index;
     return SyncingType.values[index];
   }
 
@@ -201,29 +200,6 @@ class Prefs extends ChangeNotifier {
     return await DB.instance
             .get<dynamic>(boxName: DB.boxNamePrefs, key: "wifiOnly") as bool? ??
         false;
-  }
-
-  // show favorites
-
-  bool _showFavoriteWallets = true;
-
-  bool get showFavoriteWallets => _showFavoriteWallets;
-
-  set showFavoriteWallets(bool showFavoriteWallets) {
-    if (_showFavoriteWallets != showFavoriteWallets) {
-      DB.instance.put<dynamic>(
-          boxName: DB.boxNamePrefs,
-          key: "showFavoriteWallets",
-          value: showFavoriteWallets);
-      _showFavoriteWallets = showFavoriteWallets;
-      notifyListeners();
-    }
-  }
-
-  Future<bool> _getShowFavoriteWallets() async {
-    return await DB.instance.get<dynamic>(
-            boxName: DB.boxNamePrefs, key: "showFavoriteWallets") as bool? ??
-        true;
   }
 
   // language
@@ -395,7 +371,7 @@ class Prefs extends ChangeNotifier {
 
   // show testnet coins
 
-  bool _showTestNetCoins = false;
+  bool _showTestNetCoins = true;
 
   bool get showTestNetCoins => _showTestNetCoins;
 
@@ -413,7 +389,7 @@ class Prefs extends ChangeNotifier {
   Future<bool> _getShowTestNetCoins() async {
     return await DB.instance.get<dynamic>(
             boxName: DB.boxNamePrefs, key: "showTestNetCoins") as bool? ??
-        false;
+        true;
   }
 
   // auto backup
@@ -611,7 +587,7 @@ class Prefs extends ChangeNotifier {
         boxName: DB.boxNamePrefs, key: "startupWalletId") as String?;
   }
 
-  // incognito mode off by default
+  // incognito mode on by default
   // allow external network calls such as exchange data and price info
   bool _externalCalls = true;
 
@@ -638,11 +614,11 @@ class Prefs extends ChangeNotifier {
   }
 
   Future<bool> isExternalCallsSet() async {
-    if (await DB.instance
-            .get<dynamic>(boxName: DB.boxNamePrefs, key: "externalCalls") ==
-        null) {
-      return false;
-    }
+    // if (await DB.instance
+    //         .get<dynamic>(boxName: DB.boxNamePrefs, key: "externalCalls") ==
+    //     null) {
+    //   return false;
+    // }
     return true;
   }
 

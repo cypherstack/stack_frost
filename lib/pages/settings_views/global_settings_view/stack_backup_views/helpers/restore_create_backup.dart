@@ -1,6 +1,6 @@
-/* 
+/*
  * This file is part of Stack Wallet.
- * 
+ *
  * Copyright (c) 2023 Cypher Stack
  * All Rights Reserved.
  * The code is distributed under GPLv3 license, see LICENSE file for details.
@@ -14,35 +14,37 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:stack_wallet_backup/stack_wallet_backup.dart';
-import 'package:stackwallet/db/hive/db.dart';
-import 'package:stackwallet/models/exchange/change_now/exchange_transaction.dart';
-import 'package:stackwallet/models/exchange/response_objects/trade.dart';
-import 'package:stackwallet/models/isar/models/contact_entry.dart';
-import 'package:stackwallet/models/node_model.dart';
-import 'package:stackwallet/models/stack_restoring_ui_state.dart';
-import 'package:stackwallet/models/trade_wallet_lookup.dart';
-import 'package:stackwallet/models/wallet_restore_state.dart';
-import 'package:stackwallet/services/address_book_service.dart';
-import 'package:stackwallet/services/coins/coin_service.dart';
-import 'package:stackwallet/services/coins/manager.dart';
-import 'package:stackwallet/services/node_service.dart';
-import 'package:stackwallet/services/notes_service.dart';
-import 'package:stackwallet/services/trade_notes_service.dart';
-import 'package:stackwallet/services/trade_sent_from_stack_service.dart';
-import 'package:stackwallet/services/trade_service.dart';
-import 'package:stackwallet/services/transaction_notification_tracker.dart';
-import 'package:stackwallet/services/wallets.dart';
-import 'package:stackwallet/services/wallets_service.dart';
-import 'package:stackwallet/utilities/default_nodes.dart';
-import 'package:stackwallet/utilities/enums/backup_frequency_type.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/enums/stack_restoring_status.dart';
-import 'package:stackwallet/utilities/enums/sync_type_enum.dart';
-import 'package:stackwallet/utilities/flutter_secure_storage_interface.dart';
-import 'package:stackwallet/utilities/format.dart';
-import 'package:stackwallet/utilities/logger.dart';
-import 'package:stackwallet/utilities/prefs.dart';
-import 'package:stackwallet/utilities/util.dart';
+import 'package:stackfrost/db/hive/db.dart';
+import 'package:stackfrost/electrumx_rpc/cached_electrumx.dart';
+import 'package:stackfrost/electrumx_rpc/electrumx.dart';
+import 'package:stackfrost/models/exchange/response_objects/trade.dart';
+import 'package:stackfrost/models/isar/models/contact_entry.dart';
+import 'package:stackfrost/models/node_model.dart';
+import 'package:stackfrost/models/stack_restoring_ui_state.dart';
+import 'package:stackfrost/models/trade_wallet_lookup.dart';
+import 'package:stackfrost/models/wallet_restore_state.dart';
+import 'package:stackfrost/services/address_book_service.dart';
+import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
+import 'package:stackfrost/services/coins/coin_service.dart';
+import 'package:stackfrost/services/coins/manager.dart';
+import 'package:stackfrost/services/node_service.dart';
+import 'package:stackfrost/services/notes_service.dart';
+import 'package:stackfrost/services/trade_notes_service.dart';
+import 'package:stackfrost/services/trade_sent_from_stack_service.dart';
+import 'package:stackfrost/services/trade_service.dart';
+import 'package:stackfrost/services/transaction_notification_tracker.dart';
+import 'package:stackfrost/services/wallets.dart';
+import 'package:stackfrost/services/wallets_service.dart';
+import 'package:stackfrost/utilities/default_nodes.dart';
+import 'package:stackfrost/utilities/enums/backup_frequency_type.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/enums/stack_restoring_status.dart';
+import 'package:stackfrost/utilities/enums/sync_type_enum.dart';
+import 'package:stackfrost/utilities/flutter_secure_storage_interface.dart';
+import 'package:stackfrost/utilities/format.dart';
+import 'package:stackfrost/utilities/logger.dart';
+import 'package:stackfrost/utilities/prefs.dart';
+import 'package:stackfrost/utilities/util.dart';
 import 'package:tuple/tuple.dart';
 import 'package:uuid/uuid.dart';
 import 'package:wakelock/wakelock.dart';
@@ -257,7 +259,7 @@ abstract class SWB {
       prefs['useBiometrics'] = _prefs.useBiometrics;
       prefs['hasPin'] = _prefs.hasPin;
       prefs['language'] = _prefs.language;
-      prefs['showFavoriteWallets'] = _prefs.showFavoriteWallets;
+      // prefs['showFavoriteWallets'] = _prefs.showFavoriteWallets;
       prefs['wifiOnly'] = _prefs.wifiOnly;
       prefs['syncType'] = _prefs.syncType.name;
       prefs['walletIdsSyncOnStartup'] = _prefs.walletIdsSyncOnStartup;
@@ -284,10 +286,14 @@ abstract class SWB {
         level: LogLevel.Warning,
       );
 
+      final walletInfoMap = await _wallets.walletsService.walletNames;
+
       List<dynamic> backupWallets = [];
       for (var manager in _wallets.managers) {
+        final type = walletInfoMap[manager.walletId]!.type;
         Map<String, dynamic> backupWallet = {};
         backupWallet['name'] = manager.walletName;
+        backupWallet['walletType'] = type.name;
         backupWallet['id'] = manager.walletId;
         backupWallet['isFavorite'] = manager.isFavorite;
         backupWallet['mnemonic'] = await manager.mnemonic;
@@ -295,6 +301,21 @@ abstract class SWB {
         backupWallet['coinName'] = manager.coin.name;
         backupWallet['storedChainHeight'] = DB.instance
             .get<dynamic>(boxName: manager.walletId, key: 'storedChainHeight');
+
+        if (manager.wallet is FrostWallet) {
+          final wallet = manager.wallet as FrostWallet;
+
+          backupWallet["serializedKeysFROST"] = await wallet.getSerializedKeys;
+          backupWallet["multisigConfigFROST"] = await wallet.multisigConfig;
+          backupWallet["recoveryStringFROST"] = await wallet.recoveryString;
+          backupWallet["participantsFROST"] = wallet.participants;
+          backupWallet["myNameFROST"] = wallet.myName;
+          backupWallet["thresholdFROST"] = wallet.threshold;
+          final mID = await wallet.multisigId;
+          if (mID != null) {
+            backupWallet["multisigIdFROST"] = Format.uint8listToString(mID);
+          }
+        }
 
         backupWallet['txidList'] = DB.instance.get<dynamic>(
             boxName: manager.walletId, key: "cachedTxids") as List?;
@@ -408,17 +429,40 @@ abstract class SWB {
         return false;
       }
 
-      // TODO GUI option to set maxUnusedAddressGap?
-      // default is 20 but it may miss some transactions if
-      // the previous wallet software generated many addresses
-      // without using them
-      await manager.recoverFromMnemonic(
-        mnemonic: mnemonic,
-        mnemonicPassphrase: mnemonicPassphrase,
-        maxUnusedAddressGap: manager.coin == Coin.firo ? 50 : 20,
-        maxNumberOfIndexesToCheck: 1000,
-        height: restoreHeight,
-      );
+      if (manager.wallet is FrostWallet) {
+        final wallet = manager.wallet as FrostWallet;
+
+        await wallet.saveMyName(walletbackup["myNameFROST"] as String);
+        await wallet.saveThreshold(walletbackup["thresholdFROST"] as int);
+        await wallet
+            .saveRecoveryString(walletbackup["recoveryStringFROST"] as String);
+        await wallet.saveMultisigId(
+          Format.stringToUint8List(
+            walletbackup["multisigIdFROST"] as String,
+          ),
+        );
+
+        final partsList = walletbackup["participantsFROST"] as List;
+        await wallet.updateParticipants(List<String>.from(partsList));
+
+        await wallet.recoverFromSerializedKeys(
+          serializedKeys: walletbackup["serializedKeysFROST"] as String,
+          multisigConfig: walletbackup["multisigConfigFROST"] as String,
+          isRescan: false,
+        );
+      } else {
+        // TODO GUI option to set maxUnusedAddressGap?
+        // default is 20 but it may miss some transactions if
+        // the previous wallet software generated many addresses
+        // without using them
+        await manager.recoverFromMnemonic(
+          mnemonic: mnemonic,
+          mnemonicPassphrase: mnemonicPassphrase,
+          maxUnusedAddressGap: 20,
+          maxNumberOfIndexesToCheck: 1000,
+          height: restoreHeight,
+        );
+      }
 
       if (_shouldCancelRestore) {
         return false;
@@ -657,6 +701,8 @@ abstract class SWB {
           .firstWhere((element) => element.name == walletbackup['coinName']);
       String walletName = walletbackup['name'] as String;
       final walletId = oldToNewWalletIdMap[walletbackup["id"] as String]!;
+      final walletType = WalletType.values.byName(
+          walletbackup["walletType"] as String? ?? WalletType.normal.name);
 
       // TODO: use these for monero and possibly other coins later on?
       // final List<String> txidList = List<String>.from(walletbackup['txidList'] as List? ?? []);
@@ -672,6 +718,7 @@ abstract class SWB {
         name: walletName,
         walletId: walletId,
         coin: coin,
+        type: walletType,
         shouldNotifyListeners: false,
       );
 
@@ -694,16 +741,54 @@ abstract class SWB {
         return false;
       }
 
-      final wallet = CoinServiceAPI.from(
-        coin,
-        walletId,
-        walletName,
-        secureStorageInterface,
-        node,
-        txTracker,
-        _prefs,
-        failovers,
-      );
+      final CoinServiceAPI wallet;
+
+      if (walletType == WalletType.frostMS) {
+        final electrumxNode = ElectrumXNode(
+          address: node.host,
+          port: node.port,
+          name: node.name,
+          id: node.id,
+          useSSL: node.useSSL,
+        );
+        final client = ElectrumX.from(
+          node: electrumxNode,
+          failovers: failovers
+              .map((e) => ElectrumXNode(
+                    address: e.host,
+                    port: e.port,
+                    name: e.name,
+                    id: e.id,
+                    useSSL: e.useSSL,
+                  ))
+              .toList(),
+          prefs: _prefs,
+        );
+        final cachedClient = CachedElectrumX.from(
+          electrumXClient: client,
+        );
+
+        wallet = FrostWallet(
+          walletId: walletId,
+          walletName: walletName,
+          coin: coin,
+          client: client,
+          cachedClient: cachedClient,
+          tracker: txTracker,
+          secureStore: secureStorageInterface,
+        );
+      } else {
+        wallet = CoinServiceAPI.from(
+          coin,
+          walletId,
+          walletName,
+          secureStorageInterface,
+          node,
+          txTracker,
+          _prefs,
+          failovers,
+        );
+      }
 
       final manager = Manager(wallet);
 
@@ -1005,7 +1090,7 @@ abstract class SWB {
     // _prefs.useBiometrics = prefs['useBiometrics'] as bool;
     // _prefs.hasPin = prefs['hasPin'] as bool;
     _prefs.language = prefs['language'] as String;
-    _prefs.showFavoriteWallets = prefs['showFavoriteWallets'] as bool;
+    // _prefs.showFavoriteWallets = prefs['showFavoriteWallets'] as bool;
     _prefs.wifiOnly = prefs['wifiOnly'] as bool;
     _prefs.syncType = prefs['syncType'] == "currentWalletOnly"
         ? SyncingType.currentWalletOnly
@@ -1101,20 +1186,8 @@ abstract class SWB {
   ) async {
     final tradesService = TradesService();
     for (int i = 0; i < trades.length - 1; i++) {
-      ExchangeTransaction? exTx;
-      try {
-        exTx = ExchangeTransaction.fromJson(trades[i] as Map<String, dynamic>);
-      } catch (e) {
-        // unneeded log
-        // Logging.instance.log("$e\n$s", level: LogLevel.Warning);
-      }
-
       Trade trade;
-      if (exTx != null) {
-        trade = Trade.fromExchangeTransaction(exTx, false);
-      } else {
-        trade = Trade.fromMap(trades[i] as Map<String, dynamic>);
-      }
+      trade = Trade.fromMap(trades[i] as Map<String, dynamic>);
 
       await tradesService.add(
         trade: trade,
@@ -1123,21 +1196,8 @@ abstract class SWB {
     }
     // only call notifyListeners on last one added
     if (trades.isNotEmpty) {
-      ExchangeTransaction? exTx;
-      try {
-        exTx =
-            ExchangeTransaction.fromJson(trades.last as Map<String, dynamic>);
-      } catch (e) {
-        // unneeded log
-        // Logging.instance.log("$e\n$s", level: LogLevel.Warning);
-      }
-
       Trade trade;
-      if (exTx != null) {
-        trade = Trade.fromExchangeTransaction(exTx, false);
-      } else {
-        trade = Trade.fromMap(trades.last as Map<String, dynamic>);
-      }
+      trade = Trade.fromMap(trades.last as Map<String, dynamic>);
 
       await tradesService.add(
         trade: trade,

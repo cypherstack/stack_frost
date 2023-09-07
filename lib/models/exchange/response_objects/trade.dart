@@ -9,8 +9,6 @@
  */
 
 import 'package:hive/hive.dart';
-import 'package:stackwallet/models/exchange/change_now/exchange_transaction.dart';
-import 'package:stackwallet/services/exchange/change_now/change_now_exchange.dart';
 
 part 'trade.g.dart';
 
@@ -209,36 +207,6 @@ class Trade {
       refundExtraId: map["refundExtraId"] as String,
       status: map["status"] as String,
       exchangeName: map["exchangeName"] as String,
-    );
-  }
-
-  factory Trade.fromExchangeTransaction(
-      ExchangeTransaction exTx, bool reversed) {
-    return Trade(
-      uuid: exTx.uuid,
-      tradeId: exTx.id,
-      rateType: "",
-      direction: reversed ? "reverse" : "direct",
-      timestamp: exTx.date,
-      updatedAt: DateTime.tryParse(exTx.statusObject!.updatedAt) ?? exTx.date,
-      payInCurrency: exTx.fromCurrency,
-      payInAmount: exTx.statusObject!.amountSendDecimal.isEmpty
-          ? exTx.statusObject!.expectedSendAmountDecimal
-          : exTx.statusObject!.amountSendDecimal,
-      payInAddress: exTx.payinAddress,
-      payInNetwork: "",
-      payInExtraId: exTx.payinExtraId,
-      payInTxid: exTx.statusObject!.payinHash,
-      payOutCurrency: exTx.toCurrency,
-      payOutAmount: exTx.amount,
-      payOutAddress: exTx.payoutAddress,
-      payOutNetwork: "",
-      payOutExtraId: exTx.payoutExtraId,
-      payOutTxid: exTx.statusObject!.payoutHash,
-      refundAddress: exTx.refundAddress,
-      refundExtraId: exTx.refundExtraId,
-      status: exTx.statusObject!.status.name,
-      exchangeName: ChangeNowExchange.exchangeName,
     );
   }
 

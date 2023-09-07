@@ -11,31 +11,42 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_libmonero/monero/monero.dart';
-import 'package:flutter_libmonero/wownero/wownero.dart';
-import 'package:stackwallet/db/hive/db.dart';
-import 'package:stackwallet/db/isar/main_db.dart';
-import 'package:stackwallet/services/coins/epiccash/epiccash_wallet.dart';
-import 'package:stackwallet/services/notifications_service.dart';
-import 'package:stackwallet/services/trade_sent_from_stack_service.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/flutter_secure_storage_interface.dart';
-import 'package:stackwallet/utilities/logger.dart';
+import 'package:stackfrost/db/hive/db.dart';
+import 'package:stackfrost/db/isar/main_db.dart';
+import 'package:stackfrost/services/notifications_service.dart';
+import 'package:stackfrost/services/trade_sent_from_stack_service.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/flutter_secure_storage_interface.dart';
+import 'package:stackfrost/utilities/logger.dart';
 import 'package:uuid/uuid.dart';
+
+enum WalletType {
+  normal,
+  frostMS,
+}
 
 class WalletInfo {
   final Coin coin;
   final String walletId;
   final String name;
 
-  const WalletInfo(
-      {required this.coin, required this.walletId, required this.name});
+  late final WalletType type;
+
+  WalletInfo({
+    required this.coin,
+    required this.walletId,
+    required this.name,
+    this.type = WalletType.normal,
+  });
 
   factory WalletInfo.fromJson(Map<String, dynamic> jsonObject) {
     return WalletInfo(
       coin: Coin.values.byName(jsonObject["coin"] as String),
       walletId: jsonObject["id"] as String,
       name: jsonObject["name"] as String,
+      type: WalletType.values.byName(
+        jsonObject["type"] as String? ?? WalletType.normal.name,
+      ),
     );
   }
 
@@ -44,6 +55,7 @@ class WalletInfo {
       "name": name,
       "id": walletId,
       "coin": coin.name,
+      "type": type.name,
     };
   }
 
@@ -177,6 +189,7 @@ class WalletsService extends ChangeNotifier {
     required String name,
     required String walletId,
     required Coin coin,
+    required WalletType type,
     required bool shouldNotifyListeners,
   }) async {
     final _names = DB.instance
@@ -196,10 +209,16 @@ class WalletsService extends ChangeNotifier {
       throw Exception("Wallet with name \"$name\" already exists!");
     }
 
+    if (names[walletId] != null) {
+      throw Exception(
+          "Found duplicate wallet id on addExistingStackWallet creation!");
+    }
+
     names[walletId] = {
       "id": walletId,
       "coin": coin.name,
       "name": name,
+      "type": type.name,
     };
 
     await DB.instance.put<dynamic>(
@@ -220,6 +239,7 @@ class WalletsService extends ChangeNotifier {
   Future<String?> addNewWallet({
     required String name,
     required Coin coin,
+    required WalletType type,
     required bool shouldNotifyListeners,
   }) async {
     final _names = DB.instance
@@ -239,10 +259,20 @@ class WalletsService extends ChangeNotifier {
     }
 
     final id = const Uuid().v1();
+
+    if (names[id] != null) {
+      Logging.instance.log(
+        "Found duplicate wallet id on addNewWallet creation",
+        level: LogLevel.Error,
+      );
+      return null;
+    }
+
     names[id] = {
       "id": id,
       "coin": coin.name,
       "name": name,
+      "type": type.name,
     };
 
     await DB.instance.put<dynamic>(
@@ -399,25 +429,6 @@ class WalletsService extends ChangeNotifier {
     await DB.instance.delete<dynamic>(
         boxName: DB.boxNameAllWalletsData,
         key: "${walletId}_mnemonicHasBeenVerified");
-    if (coinFromPrettyName(shell['coin'] as String) == Coin.wownero) {
-      final wowService =
-          wownero.createWowneroWalletService(DB.instance.moneroWalletInfoBox);
-      await wowService.remove(walletId);
-      Logging.instance
-          .log("monero wallet: $walletId deleted", level: LogLevel.Info);
-    } else if (coinFromPrettyName(shell['coin'] as String) == Coin.monero) {
-      final xmrService =
-          monero.createMoneroWalletService(DB.instance.moneroWalletInfoBox);
-      await xmrService.remove(walletId);
-      Logging.instance
-          .log("monero wallet: $walletId deleted", level: LogLevel.Info);
-    } else if (coinFromPrettyName(shell['coin'] as String) == Coin.epicCash) {
-      final deleteResult =
-          await deleteEpicWallet(walletId: walletId, secureStore: _secureStore);
-      Logging.instance.log(
-          "epic wallet: $walletId deleted with result: $deleteResult",
-          level: LogLevel.Info);
-    }
 
     // delete wallet data in main db
     await MainDB.instance.deleteWalletBlockchainData(walletId);

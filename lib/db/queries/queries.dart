@@ -8,7 +8,7 @@
  *
  */
 
-part of 'package:stackwallet/db/isar/main_db.dart';
+part of 'package:stackfrost/db/isar/main_db.dart';
 
 enum CCFilter {
   all,

@@ -13,24 +13,19 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:stackwallet/electrumx_rpc/electrumx.dart';
-import 'package:stackwallet/models/node_model.dart';
-import 'package:stackwallet/notifications/show_flush_bar.dart';
-import 'package:stackwallet/pages/settings_views/global_settings_view/manage_nodes_views/add_edit_node_view.dart';
-import 'package:stackwallet/pages/settings_views/global_settings_view/manage_nodes_views/node_details_view.dart';
-import 'package:stackwallet/providers/providers.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/assets.dart';
-import 'package:stackwallet/utilities/constants.dart';
-import 'package:stackwallet/utilities/default_nodes.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/enums/sync_type_enum.dart';
-import 'package:stackwallet/utilities/logger.dart';
-import 'package:stackwallet/utilities/test_epic_box_connection.dart';
-import 'package:stackwallet/utilities/test_eth_node_connection.dart';
-import 'package:stackwallet/utilities/test_monero_node_connection.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/widgets/rounded_white_container.dart';
+import 'package:stackfrost/electrumx_rpc/electrumx.dart';
+import 'package:stackfrost/models/node_model.dart';
+import 'package:stackfrost/notifications/show_flush_bar.dart';
+import 'package:stackfrost/pages/settings_views/global_settings_view/manage_nodes_views/node_details_view.dart';
+import 'package:stackfrost/providers/providers.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/assets.dart';
+import 'package:stackfrost/utilities/constants.dart';
+import 'package:stackfrost/utilities/default_nodes.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/enums/sync_type_enum.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/widgets/rounded_white_container.dart';
 import 'package:tuple/tuple.dart';
 
 class NodeOptionsSheet extends ConsumerWidget {
@@ -85,72 +80,8 @@ class NodeOptionsSheet extends ConsumerWidget {
     bool testPassed = false;
 
     switch (coin) {
-      case Coin.epicCash:
-        try {
-          testPassed = await testEpicNodeConnection(
-                NodeFormData()
-                  ..host = node.host
-                  ..useSSL = node.useSSL
-                  ..port = node.port,
-              ) !=
-              null;
-        } catch (e, s) {
-          Logging.instance.log("$e\n$s", level: LogLevel.Warning);
-        }
-        break;
-
-      case Coin.monero:
-      case Coin.wownero:
-        try {
-          final uri = Uri.parse(node.host);
-          if (uri.scheme.startsWith("http")) {
-            final String path = uri.path.isEmpty ? "/json_rpc" : uri.path;
-
-            String uriString = "${uri.scheme}://${uri.host}:${node.port}$path";
-
-            final response = await testMoneroNodeConnection(
-              Uri.parse(uriString),
-              false,
-            );
-
-            if (response.cert != null) {
-              // if (mounted) {
-              final shouldAllowBadCert = await showBadX509CertificateDialog(
-                response.cert!,
-                response.url!,
-                response.port!,
-                context,
-              );
-
-              if (shouldAllowBadCert) {
-                final response =
-                    await testMoneroNodeConnection(Uri.parse(uriString), true);
-                testPassed = response.success;
-              }
-              // }
-            } else {
-              testPassed = response.success;
-            }
-          }
-        } catch (e, s) {
-          Logging.instance.log("$e\n$s", level: LogLevel.Warning);
-        }
-
-        break;
-
       case Coin.bitcoin:
-      case Coin.litecoin:
-      case Coin.dogecoin:
-      case Coin.firo:
-      case Coin.particl:
       case Coin.bitcoinTestNet:
-      case Coin.firoTestNet:
-      case Coin.dogecoinTestNet:
-      case Coin.bitcoincash:
-      case Coin.litecoinTestNet:
-      case Coin.namecoin:
-      case Coin.bitcoincashTestnet:
-      case Coin.eCash:
         final client = ElectrumX(
           host: node.host,
           port: node.port,
@@ -166,21 +97,6 @@ class NodeOptionsSheet extends ConsumerWidget {
         }
 
         break;
-
-      case Coin.ethereum:
-        try {
-          testPassed = await testEthNodeConnection(node.host);
-        } catch (_) {
-          testPassed = false;
-        }
-        break;
-
-      case Coin.nano:
-      case Coin.banano:
-      case Coin.stellar:
-      case Coin.stellarTestnet:
-        throw UnimplementedError();
-        //TODO: check network/node
     }
 
     if (testPassed) {

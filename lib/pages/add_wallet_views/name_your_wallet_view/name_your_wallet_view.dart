@@ -12,30 +12,37 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackwallet/notifications/show_flush_bar.dart';
-import 'package:stackwallet/pages/add_wallet_views/create_or_restore_wallet_view/sub_widgets/coin_image.dart';
-import 'package:stackwallet/pages/add_wallet_views/new_wallet_recovery_phrase_warning_view/new_wallet_recovery_phrase_warning_view.dart';
-import 'package:stackwallet/pages/add_wallet_views/restore_wallet_view/restore_options_view/restore_options_view.dart';
-import 'package:stackwallet/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
-import 'package:stackwallet/providers/global/wallets_service_provider.dart';
-import 'package:stackwallet/providers/ui/verify_recovery_phrase/mnemonic_word_count_state_provider.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/assets.dart';
-import 'package:stackwallet/utilities/constants.dart';
-import 'package:stackwallet/utilities/enums/add_wallet_type_enum.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/name_generator.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/utilities/util.dart';
-import 'package:stackwallet/widgets/background.dart';
-import 'package:stackwallet/widgets/custom_buttons/app_bar_icon_button.dart';
-import 'package:stackwallet/widgets/desktop/desktop_app_bar.dart';
-import 'package:stackwallet/widgets/desktop/desktop_scaffold.dart';
-import 'package:stackwallet/widgets/icon_widgets/dice_icon.dart';
-import 'package:stackwallet/widgets/icon_widgets/x_icon.dart';
-import 'package:stackwallet/widgets/rounded_white_container.dart';
-import 'package:stackwallet/widgets/stack_text_field.dart';
-import 'package:stackwallet/widgets/textfield_icon_button.dart';
+import 'package:stackfrost/notifications/show_flush_bar.dart';
+import 'package:stackfrost/pages/add_wallet_views/create_or_restore_wallet_view/sub_widgets/coin_image.dart';
+import 'package:stackfrost/pages/add_wallet_views/frost_ms/new/create_new_frost_ms_wallet_view.dart';
+import 'package:stackfrost/pages/add_wallet_views/frost_ms/new/import_new_frost_ms_wallet_view.dart';
+import 'package:stackfrost/pages/add_wallet_views/frost_ms/restore/restore_frost_ms_wallet_view.dart';
+import 'package:stackfrost/pages/add_wallet_views/new_wallet_recovery_phrase_warning_view/new_wallet_recovery_phrase_warning_view.dart';
+import 'package:stackfrost/pages/add_wallet_views/restore_wallet_view/restore_options_view/restore_options_view.dart';
+import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/resharing/new/new_import_resharer_config_view.dart';
+import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
+import 'package:stackfrost/providers/global/wallets_service_provider.dart';
+import 'package:stackfrost/providers/ui/verify_recovery_phrase/mnemonic_word_count_state_provider.dart';
+import 'package:stackfrost/services/wallets_service.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/assets.dart';
+import 'package:stackfrost/utilities/constants.dart';
+import 'package:stackfrost/utilities/enums/add_wallet_type_enum.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/name_generator.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/utilities/util.dart';
+import 'package:stackfrost/widgets/background.dart';
+import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
+import 'package:stackfrost/widgets/desktop/desktop_app_bar.dart';
+import 'package:stackfrost/widgets/desktop/desktop_scaffold.dart';
+import 'package:stackfrost/widgets/desktop/primary_button.dart';
+import 'package:stackfrost/widgets/desktop/secondary_button.dart';
+import 'package:stackfrost/widgets/icon_widgets/dice_icon.dart';
+import 'package:stackfrost/widgets/icon_widgets/x_icon.dart';
+import 'package:stackfrost/widgets/rounded_white_container.dart';
+import 'package:stackfrost/widgets/stack_text_field.dart';
+import 'package:stackfrost/widgets/textfield_icon_button.dart';
 import 'package:tuple/tuple.dart';
 
 class NameYourWalletView extends ConsumerStatefulWidget {
@@ -43,12 +50,14 @@ class NameYourWalletView extends ConsumerStatefulWidget {
     Key? key,
     required this.addWalletType,
     required this.coin,
+    required this.walletType,
   }) : super(key: key);
 
   static const routeName = "/nameYourWallet";
 
   final AddWalletType addWalletType;
   final Coin coin;
+  final WalletType walletType;
 
   @override
   ConsumerState<NameYourWalletView> createState() => _NameYourWalletViewState();
@@ -103,10 +112,6 @@ class _NameYourWalletViewState extends ConsumerState<NameYourWalletView> {
 
   @override
   Widget build(BuildContext context) {
-    //todo: check if print needed
-    // debugPrint(
-    //     "BUILD: NameYourWalletView with ${coin.name} ${addWalletType.name}");
-
     if (isDesktop) {
       return DesktopScaffold(
         appBar: const DesktopAppBar(
@@ -185,7 +190,9 @@ class _NameYourWalletViewState extends ConsumerState<NameYourWalletView> {
             height: isDesktop ? 0 : 16,
           ),
           Text(
-            "Name your ${coin.prettyName} wallet",
+            "Name your ${coin.prettyName} "
+            "${widget.walletType == WalletType.frostMS ? "FROST multisig " : ""}"
+            "wallet",
             textAlign: TextAlign.center,
             style: isDesktop
                 ? STextStyles.desktopH2(context)
@@ -324,80 +331,224 @@ class _NameYourWalletViewState extends ConsumerState<NameYourWalletView> {
             const SizedBox(
               height: 32,
             ),
-          ConstrainedBox(
-            constraints: BoxConstraints(
-              minWidth: isDesktop ? 480 : 0,
-              minHeight: isDesktop ? 70 : 0,
-            ),
-            child: TextButton(
-              onPressed: _nextEnabled
-                  ? () async {
-                      final walletsService =
-                          ref.read(walletsServiceChangeNotifierProvider);
-                      final name = textEditingController.text;
+          widget.walletType == WalletType.frostMS
+              ? widget.addWalletType == AddWalletType.Restore
+                  ? PrimaryButton(
+                      label: "Next",
+                      enabled: _nextEnabled,
+                      onPressed: () async {
+                        final walletsService =
+                            ref.read(walletsServiceChangeNotifierProvider);
+                        final name = textEditingController.text;
 
-                      if (await walletsService.checkForDuplicate(name)) {
-                        unawaited(showFloatingFlushBar(
-                          type: FlushBarType.warning,
-                          message: "Wallet name already in use.",
-                          iconAsset: Assets.svg.circleAlert,
-                          context: context,
-                        ));
-                      } else {
-                        // hide keyboard if has focus
-                        if (FocusScope.of(context).hasFocus) {
-                          FocusScope.of(context).unfocus();
-                          await Future<void>.delayed(
-                              const Duration(milliseconds: 50));
-                        }
-
-                        if (mounted) {
-                          switch (widget.addWalletType) {
-                            case AddWalletType.New:
-                              unawaited(Navigator.of(context).pushNamed(
-                                NewWalletRecoveryPhraseWarningView.routeName,
-                                arguments: Tuple2(
-                                  name,
-                                  coin,
-                                ),
-                              ));
-                              break;
-                            case AddWalletType.Restore:
-                              ref
-                                  .read(mnemonicWordCountStateProvider.state)
-                                  .state = Constants.possibleLengthsForCoin(
-                                      coin)
-                                  .first;
-                              unawaited(Navigator.of(context).pushNamed(
-                                RestoreOptionsView.routeName,
-                                arguments: Tuple2(
-                                  name,
-                                  coin,
-                                ),
-                              ));
-                              break;
+                        if (await walletsService.checkForDuplicate(name)) {
+                          if (mounted) {
+                            unawaited(
+                              showFloatingFlushBar(
+                                type: FlushBarType.warning,
+                                message: "Wallet name already in use.",
+                                iconAsset: Assets.svg.circleAlert,
+                                context: context,
+                              ),
+                            );
                           }
+                        } else if (mounted) {
+                          await Navigator.of(context).pushNamed(
+                            RestoreFrostMsWalletView.routeName,
+                            arguments: (
+                              walletName: name,
+                              coin: coin,
+                            ),
+                          );
                         }
-                      }
-                    }
-                  : null,
-              style: _nextEnabled
-                  ? Theme.of(context)
-                      .extension<StackColors>()!
-                      .getPrimaryEnabledButtonStyle(context)
-                  : Theme.of(context)
-                      .extension<StackColors>()!
-                      .getPrimaryDisabledButtonStyle(context),
-              child: Text(
-                "Next",
-                style: isDesktop
-                    ? _nextEnabled
-                        ? STextStyles.desktopButtonEnabled(context)
-                        : STextStyles.desktopButtonDisabled(context)
-                    : STextStyles.button(context),
-              ),
-            ),
-          ),
+                      },
+                    )
+                  : Column(
+                      children: [
+                        PrimaryButton(
+                          label: "Create config",
+                          enabled: _nextEnabled,
+                          onPressed: () async {
+                            final walletsService =
+                                ref.read(walletsServiceChangeNotifierProvider);
+                            final name = textEditingController.text;
+
+                            if (await walletsService.checkForDuplicate(name)) {
+                              if (mounted) {
+                                unawaited(
+                                  showFloatingFlushBar(
+                                    type: FlushBarType.warning,
+                                    message: "Wallet name already in use.",
+                                    iconAsset: Assets.svg.circleAlert,
+                                    context: context,
+                                  ),
+                                );
+                              }
+                            } else if (mounted) {
+                              await Navigator.of(context).pushNamed(
+                                CreateNewFrostMsWalletView.routeName,
+                                arguments: (
+                                  walletName: name,
+                                  coin: coin,
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                        const SizedBox(
+                          height: 12,
+                        ),
+                        SecondaryButton(
+                          label: "Import multisig config",
+                          enabled: _nextEnabled,
+                          onPressed: () async {
+                            final walletsService =
+                                ref.read(walletsServiceChangeNotifierProvider);
+                            final name = textEditingController.text;
+
+                            if (await walletsService.checkForDuplicate(name)) {
+                              if (mounted) {
+                                unawaited(
+                                  showFloatingFlushBar(
+                                    type: FlushBarType.warning,
+                                    message: "Wallet name already in use.",
+                                    iconAsset: Assets.svg.circleAlert,
+                                    context: context,
+                                  ),
+                                );
+                              }
+                            } else if (mounted) {
+                              await Navigator.of(context).pushNamed(
+                                ImportNewFrostMsWalletView.routeName,
+                                arguments: (
+                                  walletName: name,
+                                  coin: coin,
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                        const SizedBox(
+                          height: 12,
+                        ),
+                        SecondaryButton(
+                          label: "Import resharer config",
+                          enabled: _nextEnabled,
+                          onPressed: () async {
+                            final walletsService =
+                                ref.read(walletsServiceChangeNotifierProvider);
+                            final name = textEditingController.text;
+
+                            if (await walletsService.checkForDuplicate(name)) {
+                              if (mounted) {
+                                unawaited(
+                                  showFloatingFlushBar(
+                                    type: FlushBarType.warning,
+                                    message: "Wallet name already in use.",
+                                    iconAsset: Assets.svg.circleAlert,
+                                    context: context,
+                                  ),
+                                );
+                              }
+                            } else if (mounted) {
+                              await Navigator.of(context).pushNamed(
+                                NewImportResharerConfigView.routeName,
+                                arguments: (
+                                  walletName: name,
+                                  coin: coin,
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                      ],
+                    )
+              : ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minWidth: isDesktop ? 480 : 0,
+                    minHeight: isDesktop ? 70 : 0,
+                  ),
+                  child: TextButton(
+                    onPressed: _nextEnabled
+                        ? () async {
+                            final walletsService =
+                                ref.read(walletsServiceChangeNotifierProvider);
+                            final name = textEditingController.text;
+
+                            if (await walletsService.checkForDuplicate(name)) {
+                              if (mounted) {
+                                unawaited(
+                                  showFloatingFlushBar(
+                                    type: FlushBarType.warning,
+                                    message: "Wallet name already in use.",
+                                    iconAsset: Assets.svg.circleAlert,
+                                    context: context,
+                                  ),
+                                );
+                              }
+                            } else {
+                              // hide keyboard if has focus
+                              if (mounted && FocusScope.of(context).hasFocus) {
+                                FocusScope.of(context).unfocus();
+                                await Future<void>.delayed(
+                                    const Duration(milliseconds: 50));
+                              }
+
+                              if (mounted) {
+                                switch (widget.addWalletType) {
+                                  case AddWalletType.New:
+                                    unawaited(
+                                      Navigator.of(context).pushNamed(
+                                        NewWalletRecoveryPhraseWarningView
+                                            .routeName,
+                                        arguments: Tuple2(
+                                          name,
+                                          coin,
+                                        ),
+                                      ),
+                                    );
+
+                                    break;
+                                  case AddWalletType.Restore:
+                                    ref
+                                            .read(mnemonicWordCountStateProvider
+                                                .state)
+                                            .state =
+                                        Constants.possibleLengthsForCoin(coin)
+                                            .first;
+                                    unawaited(
+                                      Navigator.of(context).pushNamed(
+                                        RestoreOptionsView.routeName,
+                                        arguments: Tuple2(
+                                          name,
+                                          coin,
+                                        ),
+                                      ),
+                                    );
+
+                                    break;
+                                }
+                              }
+                            }
+                          }
+                        : null,
+                    style: _nextEnabled
+                        ? Theme.of(context)
+                            .extension<StackColors>()!
+                            .getPrimaryEnabledButtonStyle(context)
+                        : Theme.of(context)
+                            .extension<StackColors>()!
+                            .getPrimaryDisabledButtonStyle(context),
+                    child: Text(
+                      "Next",
+                      style: isDesktop
+                          ? _nextEnabled
+                              ? STextStyles.desktopButtonEnabled(context)
+                              : STextStyles.desktopButtonDisabled(context)
+                          : STextStyles.button(context),
+                    ),
+                  ),
+                ),
           if (isDesktop)
             const Spacer(
               flex: 15,

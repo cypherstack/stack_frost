@@ -1,10 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackwallet/models/isar/models/ethereum/eth_contract.dart';
-import 'package:stackwallet/providers/global/locale_provider.dart';
-import 'package:stackwallet/providers/global/prefs_provider.dart';
-import 'package:stackwallet/utilities/amount/amount.dart';
-import 'package:stackwallet/utilities/amount/amount_unit.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/providers/global/locale_provider.dart';
+import 'package:stackfrost/providers/global/prefs_provider.dart';
+import 'package:stackfrost/utilities/amount/amount.dart';
+import 'package:stackfrost/utilities/amount/amount_unit.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
 
 final pAmountUnit = Provider.family<AmountUnit, Coin>(
   (ref, coin) => ref.watch(
@@ -50,7 +49,6 @@ class AmountFormatter {
   String format(
     Amount amount, {
     String? overrideUnit,
-    EthContract? ethContract,
     bool withUnitName = true,
     bool indicatePrecisionLoss = true,
   }) {
@@ -62,19 +60,16 @@ class AmountFormatter {
       withUnitName: withUnitName,
       indicatePrecisionLoss: indicatePrecisionLoss,
       overrideUnit: overrideUnit,
-      tokenContract: ethContract,
     );
   }
 
   Amount? tryParse(
-    String string, {
-    EthContract? ethContract,
-  }) {
+    String string,
+  ) {
     return unit.tryParse(
       string,
       locale: locale,
       coin: coin,
-      tokenContract: ethContract,
     );
   }
 }

@@ -13,34 +13,29 @@ import 'dart:async';
 import 'package:event_bus/event_bus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackwallet/models/epicbox_config_model.dart';
-import 'package:stackwallet/notifications/show_flush_bar.dart';
-import 'package:stackwallet/pages/address_book_views/address_book_view.dart';
-import 'package:stackwallet/pages/home_view/home_view.dart';
-import 'package:stackwallet/pages/pinpad_views/lock_screen_view.dart';
-import 'package:stackwallet/pages/settings_views/global_settings_view/advanced_views/debug_view.dart';
-import 'package:stackwallet/pages/settings_views/global_settings_view/syncing_preferences_views/syncing_preferences_view.dart';
-import 'package:stackwallet/pages/settings_views/sub_widgets/settings_list_button.dart';
-import 'package:stackwallet/pages/settings_views/wallet_settings_view/wallet_backup_views/wallet_backup_view.dart';
-import 'package:stackwallet/pages/settings_views/wallet_settings_view/wallet_network_settings_view/wallet_network_settings_view.dart';
-import 'package:stackwallet/pages/settings_views/wallet_settings_view/wallet_settings_wallet_settings/change_representative_view.dart';
-import 'package:stackwallet/pages/settings_views/wallet_settings_view/wallet_settings_wallet_settings/wallet_settings_wallet_settings_view.dart';
-import 'package:stackwallet/pages/settings_views/wallet_settings_view/wallet_settings_wallet_settings/xpub_view.dart';
-import 'package:stackwallet/providers/global/wallets_provider.dart';
-import 'package:stackwallet/providers/ui/transaction_filter_provider.dart';
-import 'package:stackwallet/route_generator.dart';
-import 'package:stackwallet/services/coins/epiccash/epiccash_wallet.dart';
-import 'package:stackwallet/services/event_bus/events/global/node_connection_status_changed_event.dart';
-import 'package:stackwallet/services/event_bus/events/global/wallet_sync_status_changed_event.dart';
-import 'package:stackwallet/services/event_bus/global_event_bus.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/assets.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/utilities/util.dart';
-import 'package:stackwallet/widgets/background.dart';
-import 'package:stackwallet/widgets/custom_buttons/app_bar_icon_button.dart';
-import 'package:stackwallet/widgets/rounded_white_container.dart';
+import 'package:stackfrost/pages/home_view/home_view.dart';
+import 'package:stackfrost/pages/pinpad_views/lock_screen_view.dart';
+import 'package:stackfrost/pages/settings_views/global_settings_view/advanced_views/debug_view.dart';
+import 'package:stackfrost/pages/settings_views/sub_widgets/settings_list_button.dart';
+import 'package:stackfrost/pages/settings_views/wallet_settings_view/frost_ms/frost_ms_options_view.dart';
+import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_backup_views/wallet_backup_view.dart';
+import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_network_settings_view/wallet_network_settings_view.dart';
+import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_settings_wallet_settings/wallet_settings_wallet_settings_view.dart';
+import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_settings_wallet_settings/xpub_view.dart';
+import 'package:stackfrost/providers/global/wallets_provider.dart';
+import 'package:stackfrost/providers/ui/transaction_filter_provider.dart';
+import 'package:stackfrost/route_generator.dart';
+import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
+import 'package:stackfrost/services/event_bus/events/global/node_connection_status_changed_event.dart';
+import 'package:stackfrost/services/event_bus/events/global/wallet_sync_status_changed_event.dart';
+import 'package:stackfrost/services/event_bus/global_event_bus.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/assets.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/widgets/background.dart';
+import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
+import 'package:stackfrost/widgets/rounded_white_container.dart';
 import 'package:tuple/tuple.dart';
 
 /// [eventBus] should only be set during testing
@@ -187,20 +182,28 @@ class _WalletSettingsViewState extends ConsumerState<WalletSettingsView> {
                             padding: const EdgeInsets.all(4),
                             child: Column(
                               children: [
-                                SettingsListButton(
-                                  iconAssetName: Assets.svg.addressBook,
-                                  iconSize: 16,
-                                  title: "Address book",
-                                  onPressed: () {
-                                    Navigator.of(context).pushNamed(
-                                      AddressBookView.routeName,
-                                      arguments: coin,
-                                    );
-                                  },
-                                ),
-                                const SizedBox(
-                                  height: 8,
-                                ),
+                                if (ref.watch(walletsChangeNotifierProvider
+                                    .select((value) => value
+                                        .getManager(widget.walletId)
+                                        .wallet)) is FrostWallet)
+                                  SettingsListButton(
+                                    iconAssetName: Assets.svg.addressBook,
+                                    iconSize: 16,
+                                    title: "FROST Multisig options",
+                                    onPressed: () {
+                                      Navigator.of(context).pushNamed(
+                                        FrostMSWalletOptionsView.routeName,
+                                        arguments: walletId,
+                                      );
+                                    },
+                                  ),
+                                if (ref.watch(walletsChangeNotifierProvider
+                                    .select((value) => value
+                                        .getManager(widget.walletId)
+                                        .wallet)) is FrostWallet)
+                                  const SizedBox(
+                                    height: 8,
+                                  ),
                                 SettingsListButton(
                                   iconAssetName: Assets.svg.node,
                                   iconSize: 16,
@@ -226,10 +229,57 @@ class _WalletSettingsViewState extends ConsumerState<WalletSettingsView> {
                                       iconSize: 16,
                                       title: "Wallet backup",
                                       onPressed: () async {
-                                        final mnemonic = await ref
+                                        final wallet = ref
                                             .read(walletsChangeNotifierProvider)
                                             .getManager(walletId)
-                                            .mnemonic;
+                                            .wallet;
+
+                                        ({
+                                          String myName,
+                                          String config,
+                                          String keys,
+                                          ({
+                                            String config,
+                                            String keys
+                                          })? prevGen,
+                                        })? frostWalletData;
+
+                                        List<Future<dynamic>> futures = [
+                                          wallet.mnemonic,
+                                        ];
+
+                                        if (wallet is FrostWallet) {
+                                          futures.addAll(
+                                            [
+                                              wallet.getSerializedKeys,
+                                              wallet.multisigConfig,
+                                              wallet.getSerializedKeysPrevGen,
+                                              wallet.multisigConfigPrevGen,
+                                            ],
+                                          );
+                                        }
+
+                                        final results =
+                                            await Future.wait(futures);
+
+                                        final List<String> mnemonic =
+                                            results.first as List<String>;
+
+                                        if (results.length == 5) {
+                                          frostWalletData = (
+                                            myName:
+                                                (wallet as FrostWallet).myName,
+                                            config: results[2],
+                                            keys: results[1],
+                                            prevGen: results[3] == null ||
+                                                    results[4] == null
+                                                ? null
+                                                : (
+                                                    config: results[3],
+                                                    keys: results[4],
+                                                  ),
+                                          );
+                                        }
 
                                         if (mounted) {
                                           await Navigator.push(
@@ -239,15 +289,19 @@ class _WalletSettingsViewState extends ConsumerState<WalletSettingsView> {
                                                   RouteGenerator
                                                       .useMaterialPageRoute,
                                               builder: (_) => LockscreenView(
-                                                routeOnSuccessArguments:
-                                                    Tuple2(walletId, mnemonic),
+                                                routeOnSuccessArguments: (
+                                                  walletId: walletId,
+                                                  mnemonic: mnemonic,
+                                                  frostWalletData:
+                                                      frostWalletData,
+                                                ),
                                                 showBackButton: true,
                                                 routeOnSuccess:
                                                     WalletBackupView.routeName,
                                                 biometricsCancelButtonString:
                                                     "CANCEL",
                                                 biometricsLocalizedReason:
-                                                    "Authenticate to view recovery phrase",
+                                                    "Authenticate to view recovery info",
                                                 biometricsAuthenticationTitle:
                                                     "View recovery phrase",
                                               ),
@@ -276,17 +330,6 @@ class _WalletSettingsViewState extends ConsumerState<WalletSettingsView> {
                                     );
                                   },
                                 ),
-                                const SizedBox(
-                                  height: 8,
-                                ),
-                                SettingsListButton(
-                                  iconAssetName: Assets.svg.arrowRotate,
-                                  title: "Syncing preferences",
-                                  onPressed: () {
-                                    Navigator.of(context).pushNamed(
-                                        SyncingPreferencesView.routeName);
-                                  },
-                                ),
                                 if (xPubEnabled)
                                   const SizedBox(
                                     height: 8,
@@ -300,25 +343,6 @@ class _WalletSettingsViewState extends ConsumerState<WalletSettingsView> {
                                         onPressed: () {
                                           Navigator.of(context).pushNamed(
                                             XPubView.routeName,
-                                            arguments: widget.walletId,
-                                          );
-                                        },
-                                      );
-                                    },
-                                  ),
-                                if (coin == Coin.nano || coin == Coin.banano)
-                                  const SizedBox(
-                                    height: 8,
-                                  ),
-                                if (coin == Coin.nano || coin == Coin.banano)
-                                  Consumer(
-                                    builder: (_, ref, __) {
-                                      return SettingsListButton(
-                                        iconAssetName: Assets.svg.eye,
-                                        title: "Change representative",
-                                        onPressed: () {
-                                          Navigator.of(context).pushNamed(
-                                            ChangeRepresentativeView.routeName,
                                             arguments: widget.walletId,
                                           );
                                         },
@@ -381,108 +405,6 @@ class _WalletSettingsViewState extends ConsumerState<WalletSettingsView> {
             );
           },
         ),
-      ),
-    );
-  }
-}
-
-class EpicBoxInfoForm extends ConsumerStatefulWidget {
-  const EpicBoxInfoForm({
-    Key? key,
-    required this.walletId,
-  }) : super(key: key);
-
-  final String walletId;
-
-  @override
-  ConsumerState<EpicBoxInfoForm> createState() => _EpiBoxInfoFormState();
-}
-
-class _EpiBoxInfoFormState extends ConsumerState<EpicBoxInfoForm> {
-  final hostController = TextEditingController();
-  final portController = TextEditingController();
-
-  late EpicCashWallet wallet;
-
-  @override
-  void initState() {
-    wallet = ref
-        .read(walletsChangeNotifierProvider)
-        .getManager(widget.walletId)
-        .wallet as EpicCashWallet;
-
-    wallet.getEpicBoxConfig().then((EpicBoxConfigModel epicBoxConfig) {
-      hostController.text = epicBoxConfig.host;
-      portController.text = "${epicBoxConfig.port ?? 443}";
-    });
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    hostController.dispose();
-    portController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return RoundedWhiteContainer(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          TextField(
-            autocorrect: Util.isDesktop ? false : true,
-            enableSuggestions: Util.isDesktop ? false : true,
-            controller: hostController,
-            decoration: const InputDecoration(hintText: "Host"),
-          ),
-          const SizedBox(
-            height: 8,
-          ),
-          TextField(
-            autocorrect: Util.isDesktop ? false : true,
-            enableSuggestions: Util.isDesktop ? false : true,
-            controller: portController,
-            decoration: const InputDecoration(hintText: "Port"),
-            keyboardType:
-                Util.isDesktop ? null : const TextInputType.numberWithOptions(),
-          ),
-          const SizedBox(
-            height: 8,
-          ),
-          TextButton(
-            onPressed: () async {
-              try {
-                await wallet.updateEpicboxConfig(
-                  hostController.text,
-                  int.parse(portController.text),
-                );
-                if (mounted) {
-                  await showFloatingFlushBar(
-                    context: context,
-                    message: "Epicbox info saved!",
-                    type: FlushBarType.success,
-                  );
-                }
-                unawaited(wallet.refresh());
-              } catch (e) {
-                await showFloatingFlushBar(
-                  context: context,
-                  message: "Failed to save epicbox info: $e",
-                  type: FlushBarType.warning,
-                );
-              }
-            },
-            child: Text(
-              "Save",
-              style: STextStyles.button(context).copyWith(
-                  color: Theme.of(context)
-                      .extension<StackColors>()!
-                      .accentColorDark),
-            ),
-          ),
-        ],
       ),
     );
   }

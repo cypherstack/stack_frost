@@ -12,21 +12,18 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackwallet/models/isar/models/isar_models.dart';
-import 'package:stackwallet/notifications/show_flush_bar.dart';
-import 'package:stackwallet/pages/wallet_view/sub_widgets/tx_icon.dart';
-import 'package:stackwallet/pages/wallet_view/transaction_views/transaction_details_view.dart';
-import 'package:stackwallet/providers/db/main_db_provider.dart';
-import 'package:stackwallet/providers/providers.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/amount/amount.dart';
-import 'package:stackwallet/utilities/amount/amount_formatter.dart';
-import 'package:stackwallet/utilities/constants.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/format.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/utilities/util.dart';
-import 'package:stackwallet/widgets/desktop/desktop_dialog.dart';
+import 'package:stackfrost/models/isar/models/isar_models.dart';
+import 'package:stackfrost/pages/wallet_view/sub_widgets/tx_icon.dart';
+import 'package:stackfrost/pages/wallet_view/transaction_views/transaction_details_view.dart';
+import 'package:stackfrost/providers/providers.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/amount/amount_formatter.dart';
+import 'package:stackfrost/utilities/constants.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/format.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/utilities/util.dart';
+import 'package:stackfrost/widgets/desktop/desktop_dialog.dart';
 import 'package:tuple/tuple.dart';
 
 class TransactionCard extends ConsumerStatefulWidget {
@@ -50,45 +47,18 @@ class _TransactionCardState extends ConsumerState<TransactionCard> {
   late final String prefix;
   late final String unit;
   late final Coin coin;
-  late final EthContract? tokenContract;
 
   String whatIsIt(
     TransactionType type,
     Coin coin,
     int currentHeight,
   ) {
-    if (coin == Coin.epicCash && _transaction.slateId == null) {
-      return "Restored Funds";
-    }
-
     final confirmedStatus = _transaction.isConfirmed(
       currentHeight,
       coin.requiredConfirmations,
     );
 
-    if (type != TransactionType.incoming &&
-        _transaction.subType == TransactionSubType.mint) {
-      // if (type == "Received") {
-      if (confirmedStatus) {
-        return "Anonymized";
-      } else {
-        return "Anonymizing";
-      }
-      // } else if (type == "Sent") {
-      //   if (_transaction.confirmedStatus) {
-      //     return "Sent MINT";
-      //   } else {
-      //     return "Sending MINT";
-      //   }
-      // } else {
-      //   return type;
-      // }
-    }
-
     if (type == TransactionType.incoming) {
-      // if (_transaction.isMinting) {
-      //   return "Minting";
-      // } else
       if (confirmedStatus) {
         return "Received";
       } else {
@@ -128,11 +98,7 @@ class _TransactionCardState extends ConsumerState<TransactionCard> {
         .getManager(widget.walletId)
         .coin;
 
-    tokenContract = ref
-        .read(mainDBProvider)
-        .getEthContractSync(_transaction.otherData ?? "");
-
-    unit = isTokenTx ? tokenContract!.symbol : coin.ticker;
+    unit = coin.ticker;
     super.initState();
   }
 
@@ -144,11 +110,11 @@ class _TransactionCardState extends ConsumerState<TransactionCard> {
     final baseCurrency = ref
         .watch(prefsChangeNotifierProvider.select((value) => value.currency));
 
-    final price = ref
-        .watch(priceAnd24hChangeNotifierProvider.select((value) => isTokenTx
-            ? value.getTokenPrice(_transaction.otherData!)
-            : value.getPrice(coin)))
-        .item1;
+    // final price = ref
+    //     .watch(priceAnd24hChangeNotifierProvider.select((value) => isTokenTx
+    //         ? value.getTokenPrice(_transaction.otherData!)
+    //         : value.getPrice(coin)))
+    //     .item1;
 
     final currentHeight = ref.watch(walletsChangeNotifierProvider
         .select((value) => value.getManager(walletId).currentHeight));
@@ -169,16 +135,6 @@ class _TransactionCardState extends ConsumerState<TransactionCard> {
             ),
           ),
           onPressed: () async {
-            if (coin == Coin.epicCash && _transaction.slateId == null) {
-              unawaited(showFloatingFlushBar(
-                context: context,
-                message:
-                    "Restored Epic funds from your Seed have no Data.\nUse Stack Backup to keep your transaction history.",
-                type: FlushBarType.warning,
-                duration: const Duration(seconds: 5),
-              ));
-              return;
-            }
             if (Util.isDesktop) {
               await showDialog<void>(
                 context: context,
@@ -230,9 +186,7 @@ class _TransactionCardState extends ConsumerState<TransactionCard> {
                               fit: BoxFit.scaleDown,
                               child: Text(
                                 _transaction.isCancelled
-                                    ? coin == Coin.ethereum
-                                        ? "Failed"
-                                        : "Cancelled"
+                                    ? "Cancelled"
                                     : whatIsIt(
                                         _transaction.type,
                                         coin,
@@ -253,7 +207,7 @@ class _TransactionCardState extends ConsumerState<TransactionCard> {
                                   final amount = _transaction.realAmount;
 
                                   return Text(
-                                    "$prefix${ref.watch(pAmountFormatter(coin)).format(amount, ethContract: tokenContract)}",
+                                    "$prefix${ref.watch(pAmountFormatter(coin)).format(amount)}",
                                     style: STextStyles.itemSubtitle12(context),
                                   );
                                 },
@@ -278,33 +232,33 @@ class _TransactionCardState extends ConsumerState<TransactionCard> {
                               ),
                             ),
                           ),
-                          if (ref.watch(prefsChangeNotifierProvider
-                              .select((value) => value.externalCalls)))
-                            const SizedBox(
-                              width: 10,
-                            ),
-                          if (ref.watch(prefsChangeNotifierProvider
-                              .select((value) => value.externalCalls)))
-                            Flexible(
-                              child: FittedBox(
-                                fit: BoxFit.scaleDown,
-                                child: Builder(
-                                  builder: (_) {
-                                    final amount = _transaction.realAmount;
-
-                                    return Text(
-                                      "$prefix${Amount.fromDecimal(
-                                        amount.decimal * price,
-                                        fractionDigits: 2,
-                                      ).fiatString(
-                                        locale: locale,
-                                      )} $baseCurrency",
-                                      style: STextStyles.label(context),
-                                    );
-                                  },
-                                ),
-                              ),
-                            ),
+                          // if (ref.watch(prefsChangeNotifierProvider
+                          //     .select((value) => value.externalCalls)))
+                          //   const SizedBox(
+                          //     width: 10,
+                          //   ),
+                          // if (ref.watch(prefsChangeNotifierProvider
+                          //     .select((value) => value.externalCalls)))
+                          //   Flexible(
+                          //     child: FittedBox(
+                          //       fit: BoxFit.scaleDown,
+                          //       child: Builder(
+                          //         builder: (_) {
+                          //           final amount = _transaction.realAmount;
+                          //
+                          //           return Text(
+                          //             "$prefix${Amount.fromDecimal(
+                          //               amount.decimal * price,
+                          //               fractionDigits: 2,
+                          //             ).fiatString(
+                          //               locale: locale,
+                          //             )} $baseCurrency",
+                          //             style: STextStyles.label(context),
+                          //           );
+                          //         },
+                          //       ),
+                          //     ),
+                          //   ),
                         ],
                       ),
                     ],

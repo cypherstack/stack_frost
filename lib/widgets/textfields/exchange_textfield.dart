@@ -11,15 +11,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:stackwallet/models/exchange/aggregate_currency.dart';
-import 'package:stackwallet/pages/buy_view/sub_widgets/crypto_selection_view.dart';
-import 'package:stackwallet/providers/global/locale_provider.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/amount/amount_input_formatter.dart';
-import 'package:stackwallet/utilities/assets.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/utilities/util.dart';
-import 'package:stackwallet/widgets/loading_indicator.dart';
+import 'package:stackfrost/models/exchange/aggregate_currency.dart';
+import 'package:stackfrost/providers/global/locale_provider.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/amount/amount_input_formatter.dart';
+import 'package:stackfrost/utilities/assets.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/utilities/util.dart';
+import 'package:stackfrost/widgets/loading_indicator.dart';
 
 class ExchangeTextField extends ConsumerStatefulWidget {
   const ExchangeTextField({
@@ -173,18 +172,7 @@ class _ExchangeTextFieldState extends ConsumerState<ExchangeTextField> {
                           ),
                           child: Builder(
                             builder: (context) {
-                              if (isStackCoin(widget.currency?.ticker)) {
-                                return Center(
-                                  child: CoinIconForTicker(
-                                    size: 18,
-                                    ticker: widget.currency!.ticker,
-                                  ),
-                                  // child: getIconForTicker(
-                                  //   widget.currency!.ticker,
-                                  //   size: 18,
-                                  // ),
-                                );
-                              } else if (widget.currency != null &&
+                              if (widget.currency != null &&
                                   widget.currency!.image.isNotEmpty) {
                                 return Center(
                                   child: SvgPicture.network(

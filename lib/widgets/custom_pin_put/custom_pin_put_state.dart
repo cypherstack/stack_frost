@@ -11,8 +11,8 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:stackwallet/widgets/custom_pin_put/custom_pin_put.dart';
-import 'package:stackwallet/widgets/custom_pin_put/pin_keyboard.dart';
+import 'package:stackfrost/widgets/custom_pin_put/custom_pin_put.dart';
+import 'package:stackfrost/widgets/custom_pin_put/pin_keyboard.dart';
 
 class CustomPinPutState extends State<CustomPinPut>
     with WidgetsBindingObserver, SingleTickerProviderStateMixin {

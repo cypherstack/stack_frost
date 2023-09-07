@@ -10,16 +10,15 @@
 
 import 'dart:isolate';
 
-import 'package:cw_core/wallet_info.dart' as xmr;
 import 'package:hive/hive.dart';
 import 'package:mutex/mutex.dart';
-import 'package:stackwallet/models/exchange/response_objects/trade.dart';
-import 'package:stackwallet/models/node_model.dart';
-import 'package:stackwallet/models/notification_model.dart';
-import 'package:stackwallet/models/trade_wallet_lookup.dart';
-import 'package:stackwallet/services/wallets_service.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/logger.dart';
+import 'package:stackfrost/models/exchange/response_objects/trade.dart';
+import 'package:stackfrost/models/node_model.dart';
+import 'package:stackfrost/models/notification_model.dart';
+import 'package:stackfrost/models/trade_wallet_lookup.dart';
+import 'package:stackfrost/services/wallets_service.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/logger.dart';
 
 class DB {
   // legacy (required for migrations)
@@ -64,7 +63,6 @@ class DB {
   Box<Trade>? _boxTradesV2;
   Box<String>? _boxTradeNotes;
   Box<String>? _boxFavoriteWallets;
-  Box<xmr.WalletInfo>? _walletInfoSource;
   Box<dynamic>? _boxPrefs;
   Box<TradeWalletLookup>? _boxTradeLookup;
   Box<dynamic>? _boxDBInfo;
@@ -75,9 +73,6 @@ class DB {
   final Map<Coin, Box<dynamic>> _txCacheBoxes = {};
   final Map<Coin, Box<dynamic>> _setCacheBoxes = {};
   final Map<Coin, Box<dynamic>> _usedSerialsCacheBoxes = {};
-
-  // exposed for monero
-  Box<xmr.WalletInfo> get moneroWalletInfoBox => _walletInfoSource!;
 
   // mutex for stack backup
   final mutex = Mutex();
@@ -138,8 +133,6 @@ class DB {
     _boxTradesV2 = await Hive.openBox<Trade>(boxNameTradesV2);
     _boxTradeNotes = await Hive.openBox<String>(boxNameTradeNotes);
     _boxTradeLookup = await Hive.openBox<TradeWalletLookup>(boxNameTradeLookup);
-    _walletInfoSource =
-        await Hive.openBox<xmr.WalletInfo>(xmr.WalletInfo.boxName);
     _boxFavoriteWallets = await Hive.openBox<String>(boxNameFavoriteWallets);
 
     await Future.wait([
@@ -215,10 +208,6 @@ class DB {
   /// Clear all cached transactions for the specified coin
   Future<void> clearSharedTransactionCache({required Coin coin}) async {
     await deleteAll<dynamic>(boxName: _boxNameTxCache(coin: coin));
-    if (coin == Coin.firo) {
-      await deleteAll<dynamic>(boxName: _boxNameSetCache(coin: coin));
-      await deleteAll<dynamic>(boxName: _boxNameUsedSerialsCache(coin: coin));
-    }
   }
 
   /////////////////////////////////////////

@@ -9,9 +9,9 @@
  */
 
 import 'package:flutter/cupertino.dart';
-import 'package:stackwallet/services/coins/manager.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/enums/stack_restoring_status.dart';
+import 'package:stackfrost/services/coins/manager.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/enums/stack_restoring_status.dart';
 
 class WalletRestoreState extends ChangeNotifier {
   final String walletId;

@@ -15,24 +15,24 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:stackwallet/notifications/show_flush_bar.dart';
-import 'package:stackwallet/pages/receive_view/generate_receiving_uri_qr_code_view.dart';
-import 'package:stackwallet/pages/token_view/token_view.dart';
-import 'package:stackwallet/providers/providers.dart';
-import 'package:stackwallet/route_generator.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/address_utils.dart';
-import 'package:stackwallet/utilities/assets.dart';
-import 'package:stackwallet/utilities/clipboard_interface.dart';
-import 'package:stackwallet/utilities/constants.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/utilities/util.dart';
-import 'package:stackwallet/widgets/custom_buttons/app_bar_icon_button.dart';
-import 'package:stackwallet/widgets/custom_loading_overlay.dart';
-import 'package:stackwallet/widgets/desktop/desktop_dialog.dart';
-import 'package:stackwallet/widgets/desktop/secondary_button.dart';
-import 'package:stackwallet/widgets/rounded_white_container.dart';
+import 'package:stackfrost/notifications/show_flush_bar.dart';
+import 'package:stackfrost/pages/receive_view/generate_receiving_uri_qr_code_view.dart';
+import 'package:stackfrost/providers/providers.dart';
+import 'package:stackfrost/route_generator.dart';
+import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/address_utils.dart';
+import 'package:stackfrost/utilities/assets.dart';
+import 'package:stackfrost/utilities/clipboard_interface.dart';
+import 'package:stackfrost/utilities/constants.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/utilities/util.dart';
+import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
+import 'package:stackfrost/widgets/custom_loading_overlay.dart';
+import 'package:stackfrost/widgets/desktop/desktop_dialog.dart';
+import 'package:stackfrost/widgets/desktop/secondary_button.dart';
+import 'package:stackfrost/widgets/rounded_white_container.dart';
 import 'package:tuple/tuple.dart';
 
 class DesktopReceive extends ConsumerStatefulWidget {
@@ -122,9 +122,7 @@ class _DesktopReceiveState extends ConsumerState<DesktopReceive> {
             .getManagerProvider(walletId)
             .select((value) => value.currentReceivingAddress),
         (previous, next) {
-      if (next is Future<String>) {
-        next.then((value) => setState(() => receivingAddress = value));
-      }
+      next.then((value) => setState(() => receivingAddress = value));
     });
 
     return Column(
@@ -162,11 +160,7 @@ class _DesktopReceiveState extends ConsumerState<DesktopReceive> {
                     Row(
                       children: [
                         Text(
-                          "Your ${widget.contractAddress == null ? coin.ticker : ref.watch(
-                              tokenServiceProvider.select(
-                                (value) => value!.tokenContract.symbol,
-                              ),
-                            )} address",
+                          "Your ${coin.ticker} address",
                           style: STextStyles.itemSubtitle(context),
                         ),
                         const Spacer(),
@@ -216,17 +210,12 @@ class _DesktopReceiveState extends ConsumerState<DesktopReceive> {
             ),
           ),
         ),
-        if (coin != Coin.epicCash &&
-            coin != Coin.ethereum &&
-            coin != Coin.banano &&
-            coin != Coin.nano)
-          const SizedBox(
-            height: 20,
-          ),
-        if (coin != Coin.epicCash &&
-            coin != Coin.ethereum &&
-            coin != Coin.banano &&
-            coin != Coin.nano)
+        const SizedBox(
+          height: 20,
+        ),
+        if (ref.watch(walletsChangeNotifierProvider
+                .select((value) => value.getManager(widget.walletId).wallet))
+            is! FrostWallet)
           SecondaryButton(
             buttonHeight: ButtonHeight.l,
             onPressed: generateNewAddress,

@@ -8,8 +8,8 @@
  *
  */
 
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/logger.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/logger.dart';
 
 enum NodeConnectionStatus { disconnected, connected }
 

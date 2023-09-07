@@ -9,8 +9,8 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:stackwallet/db/hive/db.dart';
-import 'package:stackwallet/utilities/logger.dart';
+import 'package:stackfrost/db/hive/db.dart';
+import 'package:stackfrost/utilities/logger.dart';
 
 class NotesService extends ChangeNotifier {
   final String walletId;

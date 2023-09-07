@@ -9,9 +9,9 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/utilities/util.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/utilities/util.dart';
 
 class StackDialogBase extends StatelessWidget {
   const StackDialogBase({
@@ -140,8 +140,9 @@ class StackOkDialog extends StatelessWidget {
     this.icon,
     required this.title,
     this.message,
+    this.desktopPopRootNavigator = false,
   }) : super(key: key);
-
+  final bool desktopPopRootNavigator;
   final Widget? leftButton;
   final void Function(String)? onOkPressed;
 
@@ -201,8 +202,13 @@ class StackOkDialog extends StatelessWidget {
                           onOkPressed?.call("OK");
                         }
                       : () {
-                          int count = 0;
-                          Navigator.of(context).popUntil((_) => count++ >= 2);
+                          if (desktopPopRootNavigator) {
+                            Navigator.of(context, rootNavigator: true).pop();
+                          } else {
+                            // TODO: find out if this is used anywhere and why
+                            int count = 0;
+                            Navigator.of(context).popUntil((_) => count++ >= 2);
+                          }
                           // onOkPressed?.call("OK");
                         },
                   style: Theme.of(context)

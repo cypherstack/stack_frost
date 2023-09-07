@@ -12,25 +12,18 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackwallet/models/isar/models/isar_models.dart';
-import 'package:stackwallet/pages/exchange_view/trade_details_view.dart';
-import 'package:stackwallet/pages/wallet_view/sub_widgets/no_transactions_found.dart';
-import 'package:stackwallet/pages/wallet_view/wallet_view.dart';
-import 'package:stackwallet/providers/global/trades_service_provider.dart';
-import 'package:stackwallet/providers/global/wallets_provider.dart';
-import 'package:stackwallet/route_generator.dart';
-import 'package:stackwallet/services/coins/manager.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/constants.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/utilities/util.dart';
-import 'package:stackwallet/widgets/desktop/desktop_dialog.dart';
-import 'package:stackwallet/widgets/desktop/desktop_dialog_close_button.dart';
-import 'package:stackwallet/widgets/loading_indicator.dart';
-import 'package:stackwallet/widgets/trade_card.dart';
-import 'package:stackwallet/widgets/transaction_card.dart';
-import 'package:tuple/tuple.dart';
+import 'package:stackfrost/models/isar/models/isar_models.dart';
+import 'package:stackfrost/pages/wallet_view/sub_widgets/no_transactions_found.dart';
+import 'package:stackfrost/pages/wallet_view/wallet_view.dart';
+import 'package:stackfrost/providers/global/trades_service_provider.dart';
+import 'package:stackfrost/providers/global/wallets_provider.dart';
+import 'package:stackfrost/services/coins/manager.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/constants.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/util.dart';
+import 'package:stackfrost/widgets/loading_indicator.dart';
+import 'package:stackfrost/widgets/transaction_card.dart';
 
 class TransactionsList extends ConsumerStatefulWidget {
   const TransactionsList({
@@ -107,86 +100,86 @@ class _TransactionsListState extends ConsumerState<TransactionsList> {
               transaction: tx,
               walletId: widget.walletId,
             ),
-            TradeCard(
-              // this may mess with combined firo transactions
-              key: Key(tx.txid +
-                  tx.type.name +
-                  tx.address.value.toString() +
-                  trade.uuid), //
-              trade: trade,
-              onTap: () async {
-                if (Util.isDesktop) {
-                  await showDialog<void>(
-                    context: context,
-                    builder: (context) => Navigator(
-                      initialRoute: TradeDetailsView.routeName,
-                      onGenerateRoute: RouteGenerator.generateRoute,
-                      onGenerateInitialRoutes: (_, __) {
-                        return [
-                          FadePageRoute(
-                            DesktopDialog(
-                              maxHeight: null,
-                              maxWidth: 580,
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                      left: 32,
-                                      bottom: 16,
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          "Trade details",
-                                          style: STextStyles.desktopH3(context),
-                                        ),
-                                        DesktopDialogCloseButton(
-                                          onPressedOverride: Navigator.of(
-                                            context,
-                                            rootNavigator: true,
-                                          ).pop,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Flexible(
-                                    child: TradeDetailsView(
-                                      tradeId: trade.tradeId,
-                                      transactionIfSentFromStack: tx,
-                                      walletName:
-                                          ref.read(managerProvider).walletName,
-                                      walletId: widget.walletId,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const RouteSettings(
-                              name: TradeDetailsView.routeName,
-                            ),
-                          ),
-                        ];
-                      },
-                    ),
-                  );
-                } else {
-                  unawaited(
-                    Navigator.of(context).pushNamed(
-                      TradeDetailsView.routeName,
-                      arguments: Tuple4(
-                        trade.tradeId,
-                        tx,
-                        widget.walletId,
-                        ref.read(managerProvider).walletName,
-                      ),
-                    ),
-                  );
-                }
-              },
-            )
+            // TradeCard(
+            //   // this may mess with combined firo transactions
+            //   key: Key(tx.txid +
+            //       tx.type.name +
+            //       tx.address.value.toString() +
+            //       trade.uuid), //
+            //   trade: trade,
+            //   onTap: () async {
+            //     if (Util.isDesktop) {
+            //       await showDialog<void>(
+            //         context: context,
+            //         builder: (context) => Navigator(
+            //           initialRoute: TradeDetailsView.routeName,
+            //           onGenerateRoute: RouteGenerator.generateRoute,
+            //           onGenerateInitialRoutes: (_, __) {
+            //             return [
+            //               FadePageRoute(
+            //                 DesktopDialog(
+            //                   maxHeight: null,
+            //                   maxWidth: 580,
+            //                   child: Column(
+            //                     mainAxisSize: MainAxisSize.min,
+            //                     children: [
+            //                       Padding(
+            //                         padding: const EdgeInsets.only(
+            //                           left: 32,
+            //                           bottom: 16,
+            //                         ),
+            //                         child: Row(
+            //                           mainAxisAlignment:
+            //                               MainAxisAlignment.spaceBetween,
+            //                           children: [
+            //                             Text(
+            //                               "Trade details",
+            //                               style: STextStyles.desktopH3(context),
+            //                             ),
+            //                             DesktopDialogCloseButton(
+            //                               onPressedOverride: Navigator.of(
+            //                                 context,
+            //                                 rootNavigator: true,
+            //                               ).pop,
+            //                             ),
+            //                           ],
+            //                         ),
+            //                       ),
+            //                       Flexible(
+            //                         child: TradeDetailsView(
+            //                           tradeId: trade.tradeId,
+            //                           transactionIfSentFromStack: tx,
+            //                           walletName:
+            //                               ref.read(managerProvider).walletName,
+            //                           walletId: widget.walletId,
+            //                         ),
+            //                       ),
+            //                     ],
+            //                   ),
+            //                 ),
+            //                 const RouteSettings(
+            //                   name: TradeDetailsView.routeName,
+            //                 ),
+            //               ),
+            //             ];
+            //           },
+            //         ),
+            //       );
+            //     } else {
+            //       unawaited(
+            //         Navigator.of(context).pushNamed(
+            //           TradeDetailsView.routeName,
+            //           arguments: Tuple4(
+            //             trade.tradeId,
+            //             tx,
+            //             widget.walletId,
+            //             ref.read(managerProvider).walletName,
+            //           ),
+            //         ),
+            //       );
+            //     }
+            //   },
+            // )
           ],
         ),
       );

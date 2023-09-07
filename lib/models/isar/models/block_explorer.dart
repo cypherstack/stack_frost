@@ -9,7 +9,7 @@
  */
 
 import 'package:isar/isar.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
 
 part 'block_explorer.g.dart';
 

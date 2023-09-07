@@ -10,7 +10,7 @@
 
 import 'dart:convert';
 
-import 'package:stackwallet/utilities/logger.dart';
+import 'package:stackfrost/utilities/logger.dart';
 import 'package:web3dart/web3dart.dart';
 
 extension ContractAbiExtensions on ContractAbi {

@@ -12,26 +12,24 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackwallet/notifications/show_flush_bar.dart';
-import 'package:stackwallet/pages/home_view/home_view.dart';
-import 'package:stackwallet/pages/wallet_view/wallet_view.dart';
-// import 'package:stackwallet/providers/global/has_authenticated_start_state_provider.dart';
-import 'package:stackwallet/providers/global/prefs_provider.dart';
-import 'package:stackwallet/providers/global/secure_store_provider.dart';
-import 'package:stackwallet/providers/global/wallets_provider.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-// import 'package:stackwallet/providers/global/should_show_lockscreen_on_resume_state_provider.dart';
-import 'package:stackwallet/utilities/assets.dart';
-import 'package:stackwallet/utilities/biometrics.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/flutter_secure_storage_interface.dart';
-import 'package:stackwallet/utilities/show_loading.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/widgets/background.dart';
-import 'package:stackwallet/widgets/custom_buttons/app_bar_icon_button.dart';
-import 'package:stackwallet/widgets/custom_buttons/blue_text_button.dart';
-import 'package:stackwallet/widgets/custom_pin_put/custom_pin_put.dart';
-import 'package:stackwallet/widgets/shake/shake.dart';
+import 'package:stackfrost/notifications/show_flush_bar.dart';
+import 'package:stackfrost/pages/home_view/home_view.dart';
+import 'package:stackfrost/pages/wallet_view/wallet_view.dart';
+// import 'package:stackfrost/providers/global/has_authenticated_start_state_provider.dart';
+import 'package:stackfrost/providers/global/prefs_provider.dart';
+import 'package:stackfrost/providers/global/secure_store_provider.dart';
+import 'package:stackfrost/providers/global/wallets_provider.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+// import 'package:stackfrost/providers/global/should_show_lockscreen_on_resume_state_provider.dart';
+import 'package:stackfrost/utilities/assets.dart';
+import 'package:stackfrost/utilities/biometrics.dart';
+import 'package:stackfrost/utilities/flutter_secure_storage_interface.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/widgets/background.dart';
+import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
+import 'package:stackfrost/widgets/custom_buttons/blue_text_button.dart';
+import 'package:stackfrost/widgets/custom_pin_put/custom_pin_put.dart';
+import 'package:stackfrost/widgets/shake/shake.dart';
 import 'package:tuple/tuple.dart';
 
 class LockscreenView extends ConsumerStatefulWidget {
@@ -100,14 +98,6 @@ class _LockscreenViewState extends ConsumerState<LockscreenView> {
 
         final manager =
             ref.read(walletsChangeNotifierProvider).getManager(walletId);
-        if (manager.coin == Coin.monero) {
-          await showLoading(
-            opaqueBG: true,
-            whileFuture: manager.initializeExisting(),
-            context: context,
-            message: "Loading ${manager.coin.prettyName} wallet...",
-          );
-        }
       }
 
       if (mounted) {

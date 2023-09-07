@@ -1,8 +1,6 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
 
 class FeeSlider extends StatefulWidget {
   const FeeSlider({
@@ -19,8 +17,8 @@ class FeeSlider extends StatefulWidget {
 }
 
 class _FeeSliderState extends State<FeeSlider> {
-  static const double min = 1;
-  static const double max = 4;
+  static const double min = 4;
+  static const double max = 128;
 
   double sliderValue = 0;
 
@@ -34,7 +32,7 @@ class _FeeSliderState extends State<FeeSlider> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              "sat/vByte",
+              "Fees (sat/WU)",
               style: STextStyles.smallMed12(context),
             ),
             Text(
@@ -48,14 +46,8 @@ class _FeeSliderState extends State<FeeSlider> {
           onChanged: (value) {
             setState(() {
               sliderValue = value;
-              final number = pow(sliderValue * (max - min) + min, 4).toDouble();
-              switch (widget.coin) {
-                case Coin.dogecoin:
-                case Coin.dogecoinTestNet:
-                  rate = (number * 1000).toInt();
-                default:
-                  rate = number.toInt();
-              }
+              final number = (sliderValue * (max - min) + min).toDouble();
+              rate = number.toInt();
             });
             widget.onSatVByteChanged(rate);
           },

@@ -8,24 +8,21 @@
  *
  */
 
-import 'package:cw_core/monero_transaction_priority.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackwallet/models/paymint/fee_object_model.dart';
-import 'package:stackwallet/pages/token_view/token_view.dart';
-import 'package:stackwallet/providers/providers.dart';
-import 'package:stackwallet/providers/ui/fee_rate_type_state_provider.dart';
-import 'package:stackwallet/providers/wallet/public_private_balance_state_provider.dart';
-import 'package:stackwallet/services/coins/firo/firo_wallet.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/amount/amount.dart';
-import 'package:stackwallet/utilities/amount/amount_formatter.dart';
-import 'package:stackwallet/utilities/constants.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/enums/fee_rate_type_enum.dart';
-import 'package:stackwallet/utilities/logger.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/widgets/animated_text.dart';
+import 'package:stackfrost/models/paymint/fee_object_model.dart';
+import 'package:stackfrost/providers/providers.dart';
+import 'package:stackfrost/providers/ui/fee_rate_type_state_provider.dart';
+import 'package:stackfrost/providers/wallet/public_private_balance_state_provider.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/amount/amount.dart';
+import 'package:stackfrost/utilities/amount/amount_formatter.dart';
+import 'package:stackfrost/utilities/constants.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/enums/fee_rate_type_enum.dart';
+import 'package:stackfrost/utilities/logger.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/widgets/animated_text.dart';
 
 final feeSheetSessionCacheProvider =
     ChangeNotifierProvider<FeeSheetSessionCache>((ref) {
@@ -86,78 +83,43 @@ class _TransactionFeeSelectionSheetState
             final manager =
                 ref.read(walletsChangeNotifierProvider).getManager(walletId);
 
-            if (coin == Coin.monero || coin == Coin.wownero) {
-              final fee = await manager.estimateFeeFor(
-                  amount, MoneroTransactionPriority.fast.raw!);
-              ref.read(feeSheetSessionCacheProvider).fast[amount] = fee;
-            } else if ((coin == Coin.firo || coin == Coin.firoTestNet) &&
-                ref.read(publicPrivateBalanceStateProvider.state).state !=
-                    "Private") {
-              ref.read(feeSheetSessionCacheProvider).fast[amount] =
-                  await (manager.wallet as FiroWallet)
-                      .estimateFeeForPublic(amount, feeRate);
+            /// TODO: come back to this; privateBalance
+            if (ref.read(publicPrivateBalanceStateProvider.state).state !=
+                "Private") {
             } else {
               ref.read(feeSheetSessionCacheProvider).fast[amount] =
                   await manager.estimateFeeFor(amount, feeRate);
             }
-          } else {
-            final tokenWallet = ref.read(tokenServiceProvider)!;
-            final fee = tokenWallet.estimateFeeFor(feeRate);
-            ref.read(feeSheetSessionCacheProvider).fast[amount] = fee;
           }
         }
         return ref.read(feeSheetSessionCacheProvider).fast[amount]!;
 
       case FeeRateType.average:
         if (ref.read(feeSheetSessionCacheProvider).average[amount] == null) {
-          if (widget.isToken == false) {
-            final manager =
-                ref.read(walletsChangeNotifierProvider).getManager(walletId);
-            if (coin == Coin.monero || coin == Coin.wownero) {
-              final fee = await manager.estimateFeeFor(
-                  amount, MoneroTransactionPriority.regular.raw!);
-              ref.read(feeSheetSessionCacheProvider).average[amount] = fee;
-            } else if ((coin == Coin.firo || coin == Coin.firoTestNet) &&
-                ref.read(publicPrivateBalanceStateProvider.state).state !=
-                    "Private") {
-              ref.read(feeSheetSessionCacheProvider).average[amount] =
-                  await (manager.wallet as FiroWallet)
-                      .estimateFeeForPublic(amount, feeRate);
-            } else {
-              ref.read(feeSheetSessionCacheProvider).average[amount] =
-                  await manager.estimateFeeFor(amount, feeRate);
-            }
+          final manager =
+              ref.read(walletsChangeNotifierProvider).getManager(walletId);
+
+          /// TODO: come back to this; privateBalance
+          if (ref.read(publicPrivateBalanceStateProvider.state).state !=
+              "Private") {
           } else {
-            final tokenWallet = ref.read(tokenServiceProvider)!;
-            final fee = tokenWallet.estimateFeeFor(feeRate);
-            ref.read(feeSheetSessionCacheProvider).average[amount] = fee;
+            ref.read(feeSheetSessionCacheProvider).average[amount] =
+                await manager.estimateFeeFor(amount, feeRate);
           }
         }
         return ref.read(feeSheetSessionCacheProvider).average[amount]!;
 
       case FeeRateType.slow:
         if (ref.read(feeSheetSessionCacheProvider).slow[amount] == null) {
-          if (widget.isToken == false) {
-            final manager =
-                ref.read(walletsChangeNotifierProvider).getManager(walletId);
-            if (coin == Coin.monero || coin == Coin.wownero) {
-              final fee = await manager.estimateFeeFor(
-                  amount, MoneroTransactionPriority.slow.raw!);
-              ref.read(feeSheetSessionCacheProvider).slow[amount] = fee;
-            } else if ((coin == Coin.firo || coin == Coin.firoTestNet) &&
-                ref.read(publicPrivateBalanceStateProvider.state).state !=
-                    "Private") {
-              ref.read(feeSheetSessionCacheProvider).slow[amount] =
-                  await (manager.wallet as FiroWallet)
-                      .estimateFeeForPublic(amount, feeRate);
-            } else {
-              ref.read(feeSheetSessionCacheProvider).slow[amount] =
-                  await manager.estimateFeeFor(amount, feeRate);
-            }
+          final manager =
+              ref.read(walletsChangeNotifierProvider).getManager(walletId);
+
+          /// TODO: come back to this; privateBalance
+          if (ref.read(publicPrivateBalanceStateProvider.state).state !=
+              "Private") {
           } else {
-            final tokenWallet = ref.read(tokenServiceProvider)!;
-            final fee = tokenWallet.estimateFeeFor(feeRate);
-            ref.read(feeSheetSessionCacheProvider).slow[amount] = fee;
+            ref.read(feeSheetSessionCacheProvider).slow[amount] =
+                await manager.estimateFeeFor(amount, feeRate);
           }
         }
         return ref.read(feeSheetSessionCacheProvider).slow[amount]!;
@@ -242,9 +204,7 @@ class _TransactionFeeSelectionSheetState
               height: 36,
             ),
             FutureBuilder(
-              future: widget.isToken
-                  ? ref.read(tokenServiceProvider)!.fees
-                  : manager.fees,
+              future: manager.fees,
               builder: (context, AsyncSnapshot<FeeObject> snapshot) {
                 if (snapshot.connectionState == ConnectionState.done &&
                     snapshot.hasData) {
@@ -372,15 +332,13 @@ class _TransactionFeeSelectionSheetState
                                   const SizedBox(
                                     height: 2,
                                   ),
-                                  if (feeObject == null &&
-                                      manager.coin != Coin.ethereum)
+                                  if (feeObject == null)
                                     AnimatedText(
                                       stringsToLoopThrough:
                                           stringsToLoopThrough,
                                       style: STextStyles.itemSubtitle(context),
                                     ),
-                                  if (feeObject != null &&
-                                      manager.coin != Coin.ethereum)
+                                  if (feeObject != null)
                                     Text(
                                       estimatedTimeToBeIncludedInNextBlock(
                                         Constants.targetBlockTimeInSeconds(
@@ -509,15 +467,13 @@ class _TransactionFeeSelectionSheetState
                                   const SizedBox(
                                     height: 2,
                                   ),
-                                  if (feeObject == null &&
-                                      manager.coin != Coin.ethereum)
+                                  if (feeObject == null)
                                     AnimatedText(
                                       stringsToLoopThrough:
                                           stringsToLoopThrough,
                                       style: STextStyles.itemSubtitle(context),
                                     ),
-                                  if (feeObject != null &&
-                                      manager.coin != Coin.ethereum)
+                                  if (feeObject != null)
                                     Text(
                                       estimatedTimeToBeIncludedInNextBlock(
                                         Constants.targetBlockTimeInSeconds(
@@ -645,15 +601,13 @@ class _TransactionFeeSelectionSheetState
                                   const SizedBox(
                                     height: 2,
                                   ),
-                                  if (feeObject == null &&
-                                      manager.coin != Coin.ethereum)
+                                  if (feeObject == null)
                                     AnimatedText(
                                       stringsToLoopThrough:
                                           stringsToLoopThrough,
                                       style: STextStyles.itemSubtitle(context),
                                     ),
-                                  if (feeObject != null &&
-                                      manager.coin != Coin.ethereum)
+                                  if (feeObject != null)
                                     Text(
                                       estimatedTimeToBeIncludedInNextBlock(
                                         Constants.targetBlockTimeInSeconds(

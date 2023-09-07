@@ -13,37 +13,35 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:stackwallet/models/isar/models/blockchain_data/transaction.dart';
-import 'package:stackwallet/models/isar/models/contact_entry.dart';
-import 'package:stackwallet/models/transaction_filter.dart';
-import 'package:stackwallet/notifications/show_flush_bar.dart';
-import 'package:stackwallet/pages/wallet_view/sub_widgets/tx_icon.dart';
-import 'package:stackwallet/pages/wallet_view/transaction_views/transaction_details_view.dart';
-import 'package:stackwallet/pages/wallet_view/transaction_views/transaction_search_filter_view.dart';
-import 'package:stackwallet/providers/global/address_book_service_provider.dart';
-import 'package:stackwallet/providers/providers.dart';
-import 'package:stackwallet/providers/ui/transaction_filter_provider.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/amount/amount.dart';
-import 'package:stackwallet/utilities/amount/amount_formatter.dart';
-import 'package:stackwallet/utilities/assets.dart';
-import 'package:stackwallet/utilities/constants.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/format.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/utilities/util.dart';
-import 'package:stackwallet/widgets/conditional_parent.dart';
-import 'package:stackwallet/widgets/custom_buttons/app_bar_icon_button.dart';
-import 'package:stackwallet/widgets/desktop/desktop_app_bar.dart';
-import 'package:stackwallet/widgets/desktop/desktop_dialog.dart';
-import 'package:stackwallet/widgets/desktop/desktop_scaffold.dart';
-import 'package:stackwallet/widgets/desktop/secondary_button.dart';
-import 'package:stackwallet/widgets/icon_widgets/x_icon.dart';
-import 'package:stackwallet/widgets/loading_indicator.dart';
-import 'package:stackwallet/widgets/rounded_white_container.dart';
-import 'package:stackwallet/widgets/stack_text_field.dart';
-import 'package:stackwallet/widgets/textfield_icon_button.dart';
-import 'package:stackwallet/widgets/transaction_card.dart';
+import 'package:stackfrost/models/isar/models/blockchain_data/transaction.dart';
+import 'package:stackfrost/models/isar/models/contact_entry.dart';
+import 'package:stackfrost/models/transaction_filter.dart';
+import 'package:stackfrost/pages/wallet_view/sub_widgets/tx_icon.dart';
+import 'package:stackfrost/pages/wallet_view/transaction_views/transaction_details_view.dart';
+import 'package:stackfrost/pages/wallet_view/transaction_views/transaction_search_filter_view.dart';
+import 'package:stackfrost/providers/global/address_book_service_provider.dart';
+import 'package:stackfrost/providers/providers.dart';
+import 'package:stackfrost/providers/ui/transaction_filter_provider.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/amount/amount_formatter.dart';
+import 'package:stackfrost/utilities/assets.dart';
+import 'package:stackfrost/utilities/constants.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/format.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/utilities/util.dart';
+import 'package:stackfrost/widgets/conditional_parent.dart';
+import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
+import 'package:stackfrost/widgets/desktop/desktop_app_bar.dart';
+import 'package:stackfrost/widgets/desktop/desktop_dialog.dart';
+import 'package:stackfrost/widgets/desktop/desktop_scaffold.dart';
+import 'package:stackfrost/widgets/desktop/secondary_button.dart';
+import 'package:stackfrost/widgets/icon_widgets/x_icon.dart';
+import 'package:stackfrost/widgets/loading_indicator.dart';
+import 'package:stackfrost/widgets/rounded_white_container.dart';
+import 'package:stackfrost/widgets/stack_text_field.dart';
+import 'package:stackfrost/widgets/textfield_icon_button.dart';
+import 'package:stackfrost/widgets/transaction_card.dart';
 import 'package:tuple/tuple.dart';
 
 class AllTransactionsView extends ConsumerStatefulWidget {
@@ -445,12 +443,12 @@ class _TransactionDetailsViewState extends ConsumerState<AllTransactionsView> {
               ),
             if (isDesktop &&
                 ref.watch(transactionFilterProvider.state).state != null)
-              Padding(
-                padding: const EdgeInsets.symmetric(
+              const Padding(
+                padding: EdgeInsets.symmetric(
                   vertical: 8,
                 ),
                 child: Row(
-                  children: const [
+                  children: [
                     TransactionFilterOptionBar(),
                   ],
                 ),
@@ -802,18 +800,6 @@ class _DesktopTransactionCardRowState
   late final String walletId;
 
   String whatIsIt(TransactionType type, Coin coin, int height) {
-    if (coin == Coin.epicCash && _transaction.slateId == null) {
-      return "Restored Funds";
-    }
-
-    if (_transaction.subType == TransactionSubType.mint) {
-      if (_transaction.isConfirmed(height, coin.requiredConfirmations)) {
-        return "Anonymized";
-      } else {
-        return "Anonymizing";
-      }
-    }
-
     if (type == TransactionType.incoming) {
       if (_transaction.isConfirmed(height, coin.requiredConfirmations)) {
         return "Received";
@@ -852,11 +838,11 @@ class _DesktopTransactionCardRowState
 
     final coin = manager.coin;
 
-    final price = ref
-        .watch(priceAnd24hChangeNotifierProvider
-            .select((value) => value.getPrice(coin)))
-        .item1;
-
+    // final price = ref
+    //     .watch(priceAnd24hChangeNotifierProvider
+    //         .select((value) => value.getPrice(coin)))
+    //     .item1;
+    //
     late final String prefix;
     if (Util.isDesktop) {
       if (_transaction.type == TransactionType.outgoing) {
@@ -887,18 +873,6 @@ class _DesktopTransactionCardRowState
           ),
         ),
         onPressed: () async {
-          if (coin == Coin.epicCash && _transaction.slateId == null) {
-            unawaited(
-              showFloatingFlushBar(
-                context: context,
-                message:
-                    "Restored Epic funds from your Seed have no Data.\nUse Stack Backup to keep your transaction history.",
-                type: FlushBarType.warning,
-                duration: const Duration(seconds: 5),
-              ),
-            );
-            return;
-          }
           if (Util.isDesktop) {
             await showDialog<void>(
               context: context,
@@ -980,25 +954,25 @@ class _DesktopTransactionCardRowState
                   },
                 ),
               ),
-              if (ref.watch(prefsChangeNotifierProvider
-                  .select((value) => value.externalCalls)))
-                Expanded(
-                  flex: 4,
-                  child: Builder(
-                    builder: (_) {
-                      final amount = _transaction.realAmount;
-
-                      return Text(
-                        "$prefix${(amount.decimal * price).toAmount(
-                              fractionDigits: 2,
-                            ).fiatString(
-                              locale: locale,
-                            )} $baseCurrency",
-                        style: STextStyles.desktopTextExtraExtraSmall(context),
-                      );
-                    },
-                  ),
-                ),
+              // if (ref.watch(prefsChangeNotifierProvider
+              //     .select((value) => value.externalCalls)))
+              //   Expanded(
+              //     flex: 4,
+              //     child: Builder(
+              //       builder: (_) {
+              //         final amount = _transaction.realAmount;
+              //
+              //         return Text(
+              //           "$prefix${(amount.decimal * price).toAmount(
+              //                 fractionDigits: 2,
+              //               ).fiatString(
+              //                 locale: locale,
+              //               )} $baseCurrency",
+              //           style: STextStyles.desktopTextExtraExtraSmall(context),
+              //         );
+              //       },
+              //     ),
+              //   ),
               SvgPicture.asset(
                 Assets.svg.circleInfo,
                 width: 20,

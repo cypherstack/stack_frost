@@ -4,10 +4,10 @@ project(runner LANGUAGES CXX)
 
 # The name of the executable created for the application. Change this to change
 # the on-disk name of your application.
-set(BINARY_NAME "stack_wallet")
+set(BINARY_NAME "stack_frost")
 # The unique GTK application identifier for this application. See:
 # https://wiki.gnome.org/HowDoI/ChooseApplicationID
-set(APPLICATION_ID "com.cypherstack.stackwallet")
+set(APPLICATION_ID "com.cypherstack.stackfrost")
 
 # Explicitly opt in to modern CMake behaviors to avoid warnings with recent
 # versions of CMake.
@@ -132,18 +132,6 @@ install(FILES "${FLUTTER_ICU_DATA_FILE}" DESTINATION "${INSTALL_BUNDLE_DATA_DIR}
   COMPONENT Runtime)
 
 install(FILES "${FLUTTER_LIBRARY}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
-  COMPONENT Runtime)
-
-install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/../crypto_plugins/flutter_libmonero/scripts/linux/build/libcw_monero.so" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
-  COMPONENT Runtime)
-
-install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/../crypto_plugins/flutter_libmonero/scripts/linux/build/libcw_wownero.so" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
-  COMPONENT Runtime)
-
-install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/../crypto_plugins/flutter_libepiccash/scripts/linux/build/rust/target/x86_64-unknown-linux-gnu/release/libepic_cash_wallet.so" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
-  COMPONENT Runtime)
-
-install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/../crypto_plugins/flutter_liblelantus/scripts/linux/build/libmobileliblelantus.so" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
   COMPONENT Runtime)
 
 install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/../scripts/linux/build/jsoncpp/build/src/lib_json/libjsoncpp.so.1.7.4" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"

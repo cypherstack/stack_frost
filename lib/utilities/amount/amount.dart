@@ -11,7 +11,7 @@
 import 'dart:convert';
 
 import 'package:decimal/decimal.dart';
-import 'package:stackwallet/utilities/util.dart';
+import 'package:stackfrost/utilities/util.dart';
 
 class Amount {
   Amount({

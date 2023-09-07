@@ -10,9 +10,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackwallet/providers/global/node_service_provider.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/widgets/node_card.dart';
+import 'package:stackfrost/providers/global/node_service_provider.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/widgets/node_card.dart';
 
 class NodesList extends ConsumerWidget {
   const NodesList({

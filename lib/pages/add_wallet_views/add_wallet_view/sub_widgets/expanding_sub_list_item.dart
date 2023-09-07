@@ -10,14 +10,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:stackwallet/models/add_wallet_list_entity/add_wallet_list_entity.dart';
-import 'package:stackwallet/pages/add_wallet_views/add_wallet_view/sub_widgets/add_wallet_entity_list.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/assets.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/utilities/util.dart';
-import 'package:stackwallet/widgets/animated_widgets/rotate_icon.dart';
-import 'package:stackwallet/widgets/expandable.dart';
+import 'package:stackfrost/models/add_wallet_list_entity/add_wallet_list_entity.dart';
+import 'package:stackfrost/pages/add_wallet_views/add_wallet_view/sub_widgets/add_wallet_entity_list.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/assets.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/utilities/util.dart';
+import 'package:stackfrost/widgets/animated_widgets/rotate_icon.dart';
+import 'package:stackfrost/widgets/expandable.dart';
 
 class ExpandingSubListItem extends StatefulWidget {
   const ExpandingSubListItem({

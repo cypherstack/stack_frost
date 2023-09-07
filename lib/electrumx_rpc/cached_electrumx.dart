@@ -10,10 +10,10 @@
 
 import 'dart:convert';
 
-import 'package:stackwallet/db/hive/db.dart';
-import 'package:stackwallet/electrumx_rpc/electrumx.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/logger.dart';
+import 'package:stackfrost/db/hive/db.dart';
+import 'package:stackfrost/electrumx_rpc/electrumx.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/logger.dart';
 import 'package:string_validator/string_validator.dart';
 
 class CachedElectrumX {

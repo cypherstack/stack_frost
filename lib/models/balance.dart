@@ -10,7 +10,7 @@
 
 import 'dart:convert';
 
-import 'package:stackwallet/utilities/amount/amount.dart';
+import 'package:stackfrost/utilities/amount/amount.dart';
 
 class Balance {
   final Amount total;

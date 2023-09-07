@@ -10,12 +10,10 @@
 
 import 'dart:convert';
 
-import 'package:bip47/src/util.dart';
 import 'package:decimal/decimal.dart';
-import 'package:stackwallet/models/isar/models/isar_models.dart';
-import 'package:stackwallet/services/mixins/paynym_wallet_interface.dart';
-import 'package:stackwallet/utilities/amount/amount.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/models/isar/models/isar_models.dart';
+import 'package:stackfrost/utilities/amount/amount.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
 import 'package:tuple/tuple.dart';
 
 mixin ElectrumXParsing {
@@ -28,10 +26,7 @@ mixin ElectrumXParsing {
     String walletId,
   ) async {
     Set<String> receivingAddresses = myAddresses
-        .where((e) =>
-            e.subType == AddressSubType.receiving ||
-            e.subType == AddressSubType.paynymReceive ||
-            e.subType == AddressSubType.paynymNotification)
+        .where((e) => e.subType == AddressSubType.receiving)
         .map((e) => e.value)
         .toSet();
     Set<String> changeAddresses = myAddresses
@@ -145,8 +140,11 @@ mixin ElectrumXParsing {
     Address transactionAddress = txData["address"] as Address;
 
     TransactionType type;
-    Amount amount;
-    if (mySentFromAddresses.isNotEmpty && myReceivedOnAddresses.isNotEmpty) {
+    Amount amount =
+        amountSentFromWallet - amountReceivedInWallet - fee - changeAmount;
+    if (mySentFromAddresses.isNotEmpty &&
+        myReceivedOnAddresses.isNotEmpty &&
+        amount.raw == BigInt.zero) {
       // tx is sent to self
       type = TransactionType.sentToSelf;
 
@@ -157,6 +155,10 @@ mixin ElectrumXParsing {
       // outgoing tx
       type = TransactionType.outgoing;
       amount = amountSentFromWallet - changeAmount - fee;
+
+      // normally amountReceivedInWallet should be zero but when using the
+      // receiving address as a change address as we do in frost...
+      amount = amount - amountReceivedInWallet;
 
       // non wallet addresses found in tx outputs
       final nonWalletOutAddresses = outputAddresses.difference(
@@ -234,20 +236,6 @@ mixin ElectrumXParsing {
     }
 
     TransactionSubType txSubType = TransactionSubType.none;
-    if (this is PaynymWalletInterface && outs.length > 1 && ins.isNotEmpty) {
-      for (int i = 0; i < outs.length; i++) {
-        List<String>? scriptChunks = outs[i].scriptPubKeyAsm?.split(" ");
-        if (scriptChunks?.length == 2 && scriptChunks?[0] == "OP_RETURN") {
-          final blindedPaymentCode = scriptChunks![1];
-          final bytes = blindedPaymentCode.fromHex;
-
-          // https://en.bitcoin.it/wiki/BIP_0047#Sending
-          if (bytes.length == 80 && bytes.first == 1) {
-            txSubType = TransactionSubType.bip47Notification;
-          }
-        }
-      }
-    }
 
     final tx = Transaction(
       walletId: walletId,

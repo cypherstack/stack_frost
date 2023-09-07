@@ -13,20 +13,21 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:stackwallet/notifications/show_flush_bar.dart';
-import 'package:stackwallet/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/wallet_keys_desktop_popup.dart';
-import 'package:stackwallet/providers/desktop/storage_crypto_handler_provider.dart';
-import 'package:stackwallet/providers/providers.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/assets.dart';
-import 'package:stackwallet/utilities/constants.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/widgets/desktop/desktop_dialog.dart';
-import 'package:stackwallet/widgets/desktop/desktop_dialog_close_button.dart';
-import 'package:stackwallet/widgets/desktop/primary_button.dart';
-import 'package:stackwallet/widgets/desktop/secondary_button.dart';
-import 'package:stackwallet/widgets/loading_indicator.dart';
-import 'package:stackwallet/widgets/stack_text_field.dart';
+import 'package:stackfrost/notifications/show_flush_bar.dart';
+import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/wallet_keys_desktop_popup.dart';
+import 'package:stackfrost/providers/desktop/storage_crypto_handler_provider.dart';
+import 'package:stackfrost/providers/providers.dart';
+import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/assets.dart';
+import 'package:stackfrost/utilities/constants.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/widgets/desktop/desktop_dialog.dart';
+import 'package:stackfrost/widgets/desktop/desktop_dialog_close_button.dart';
+import 'package:stackfrost/widgets/desktop/primary_button.dart';
+import 'package:stackfrost/widgets/desktop/secondary_button.dart';
+import 'package:stackfrost/widgets/loading_indicator.dart';
+import 'package:stackfrost/widgets/stack_text_field.dart';
 
 class UnlockWalletKeysDesktop extends ConsumerStatefulWidget {
   const UnlockWalletKeysDesktop({
@@ -78,15 +79,28 @@ class _UnlockWalletKeysDesktopState
     if (verified) {
       Navigator.of(context, rootNavigator: true).pop();
 
-      final words = await ref
+      final wallet = ref
           .read(walletsChangeNotifierProvider)
           .getManager(widget.walletId)
-          .mnemonic;
+          .wallet;
+
+      final words = await wallet.mnemonic;
+
+      ({String keys, String config})? frostData;
+      if (wallet is FrostWallet) {
+        frostData = (
+          keys: (await wallet.getSerializedKeys)!,
+          config: (await wallet.multisigConfig)!,
+        );
+      }
 
       if (mounted) {
         await Navigator.of(context).pushReplacementNamed(
           WalletKeysDesktopPopup.routeName,
-          arguments: words,
+          arguments: (
+            mnemonic: words,
+            frostData: frostData,
+          ),
         );
       }
     } else {
@@ -295,16 +309,29 @@ class _UnlockWalletKeysDesktopState
                             if (verified) {
                               Navigator.of(context, rootNavigator: true).pop();
 
-                              final words = await ref
+                              final wallet = ref
                                   .read(walletsChangeNotifierProvider)
                                   .getManager(widget.walletId)
-                                  .mnemonic;
+                                  .wallet;
+
+                              final words = await wallet.mnemonic;
+
+                              ({String keys, String config})? frostData;
+                              if (wallet is FrostWallet) {
+                                frostData = (
+                                  keys: (await wallet.getSerializedKeys)!,
+                                  config: (await wallet.multisigConfig)!,
+                                );
+                              }
 
                               if (mounted) {
                                 await Navigator.of(context)
                                     .pushReplacementNamed(
                                   WalletKeysDesktopPopup.routeName,
-                                  arguments: words,
+                                  arguments: (
+                                    mnemonic: words,
+                                    frostData: frostData,
+                                  ),
                                 );
                               }
                             } else {

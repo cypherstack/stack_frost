@@ -13,20 +13,18 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:stackwallet/pages/wallet_view/wallet_view.dart';
-import 'package:stackwallet/pages_desktop_specific/my_stack_view/wallet_view/desktop_wallet_view.dart';
-import 'package:stackwallet/providers/providers.dart';
-import 'package:stackwallet/services/coins/firo/firo_wallet.dart';
-import 'package:stackwallet/themes/coin_icon_provider.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/amount/amount.dart';
-import 'package:stackwallet/utilities/amount/amount_formatter.dart';
-import 'package:stackwallet/utilities/constants.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/utilities/util.dart';
-import 'package:stackwallet/widgets/coin_card.dart';
-import 'package:stackwallet/widgets/conditional_parent.dart';
+import 'package:stackfrost/pages/wallet_view/wallet_view.dart';
+import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/desktop_wallet_view.dart';
+import 'package:stackfrost/providers/providers.dart';
+import 'package:stackfrost/themes/coin_icon_provider.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/amount/amount.dart';
+import 'package:stackfrost/utilities/amount/amount_formatter.dart';
+import 'package:stackfrost/utilities/constants.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/utilities/util.dart';
+import 'package:stackfrost/widgets/coin_card.dart';
+import 'package:stackfrost/widgets/conditional_parent.dart';
 import 'package:tuple/tuple.dart';
 
 class FavoriteCard extends ConsumerStatefulWidget {
@@ -116,12 +114,6 @@ class _FavoriteCardState extends ConsumerState<FavoriteCard> {
       ),
       child: GestureDetector(
         onTap: () async {
-          if (coin == Coin.monero || coin == Coin.wownero) {
-            await ref
-                .read(walletsChangeNotifierProvider)
-                .getManager(walletId)
-                .initializeExisting();
-          }
           if (mounted) {
             if (Util.isDesktop) {
               await Navigator.of(context).pushNamed(
@@ -196,31 +188,19 @@ class _FavoriteCardState extends ConsumerState<FavoriteCard> {
                       );
 
                       Amount total = balance.total;
-                      if (coin == Coin.firo || coin == Coin.firoTestNet) {
-                        final balancePrivate = ref.watch(
-                          walletsChangeNotifierProvider.select(
-                            (value) => (value.getManager(walletId).wallet
-                                    as FiroWallet)
-                                .balancePrivate,
-                          ),
-                        );
-
-                        total += balancePrivate.total;
-                      }
-
                       Amount fiatTotal = Amount.zero;
 
-                      if (externalCalls && total > Amount.zero) {
-                        fiatTotal = (total.decimal *
-                                ref
-                                    .watch(
-                                      priceAnd24hChangeNotifierProvider.select(
-                                        (value) => value.getPrice(coin),
-                                      ),
-                                    )
-                                    .item1)
-                            .toAmount(fractionDigits: 2);
-                      }
+                      // if (externalCalls && total > Amount.zero) {
+                      //   fiatTotal = (total.decimal *
+                      //           ref
+                      //               .watch(
+                      //                 priceAnd24hChangeNotifierProvider.select(
+                      //                   (value) => value.getPrice(coin),
+                      //                 ),
+                      //               )
+                      //               .item1)
+                      //       .toAmount(fractionDigits: 2);
+                      // }
 
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

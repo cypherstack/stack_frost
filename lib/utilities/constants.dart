@@ -10,8 +10,8 @@
 
 import 'dart:io';
 
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/util.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/util.dart';
 
 class _LayoutSizing {
   const _LayoutSizing();
@@ -43,7 +43,8 @@ abstract class Constants {
       BigInt.parse("1000000000000000000000000000000"); // 1*10^30
   static final BigInt _satsPerCoinBanano =
       BigInt.parse("100000000000000000000000000000"); // 1*10^29
-  static final BigInt _satsPerCoinStellar = BigInt.from(10000000); // https://developers.stellar.org/docs/fundamentals-and-concepts/stellar-data-structures/assets#amount-precision
+  static final BigInt _satsPerCoinStellar = BigInt.from(
+      10000000); // https://developers.stellar.org/docs/fundamentals-and-concepts/stellar-data-structures/assets#amount-precision
   static final BigInt _satsPerCoin = BigInt.from(100000000);
   static const int _decimalPlaces = 8;
   static const int _decimalPlacesNano = 30;
@@ -67,82 +68,16 @@ abstract class Constants {
   static BigInt satsPerCoin(Coin coin) {
     switch (coin) {
       case Coin.bitcoin:
-      case Coin.litecoin:
-      case Coin.litecoinTestNet:
-      case Coin.bitcoincash:
-      case Coin.bitcoincashTestnet:
-      case Coin.dogecoin:
-      case Coin.firo:
       case Coin.bitcoinTestNet:
-      case Coin.dogecoinTestNet:
-      case Coin.firoTestNet:
-      case Coin.epicCash:
-      case Coin.namecoin:
-      case Coin.particl:
         return _satsPerCoin;
-
-      case Coin.nano:
-        return _satsPerCoinNano;
-
-      case Coin.banano:
-        return _satsPerCoinBanano;
-
-      case Coin.wownero:
-        return _satsPerCoinWownero;
-
-      case Coin.monero:
-        return _satsPerCoinMonero;
-
-      case Coin.ethereum:
-        return _satsPerCoinEthereum;
-
-      case Coin.eCash:
-        return _satsPerCoinECash;
-
-      case Coin.stellar:
-      case Coin.stellarTestnet:
-        return _satsPerCoinStellar;
     }
   }
 
   static int decimalPlacesForCoin(Coin coin) {
     switch (coin) {
       case Coin.bitcoin:
-      case Coin.litecoin:
-      case Coin.litecoinTestNet:
-      case Coin.bitcoincash:
-      case Coin.bitcoincashTestnet:
-      case Coin.dogecoin:
-      case Coin.firo:
       case Coin.bitcoinTestNet:
-      case Coin.dogecoinTestNet:
-      case Coin.firoTestNet:
-      case Coin.epicCash:
-      case Coin.namecoin:
-      case Coin.particl:
         return _decimalPlaces;
-
-      case Coin.nano:
-        return _decimalPlacesNano;
-
-      case Coin.banano:
-        return _decimalPlacesBanano;
-
-      case Coin.wownero:
-        return _decimalPlacesWownero;
-
-      case Coin.monero:
-        return _decimalPlacesMonero;
-
-      case Coin.ethereum:
-        return _decimalPlacesEthereum;
-
-      case Coin.eCash:
-        return _decimalPlacesECash;
-
-      case Coin.stellar:
-      case Coin.stellarTestnet:
-        return _decimalPlacesStellar;
     }
   }
 
@@ -150,34 +85,8 @@ abstract class Constants {
     final List<int> values = [];
     switch (coin) {
       case Coin.bitcoin:
-      case Coin.litecoin:
-      case Coin.litecoinTestNet:
-      case Coin.bitcoincash:
-      case Coin.bitcoincashTestnet:
-      case Coin.dogecoin:
-      case Coin.firo:
       case Coin.bitcoinTestNet:
-      case Coin.dogecoinTestNet:
-      case Coin.firoTestNet:
-      case Coin.eCash:
-      case Coin.epicCash:
-      case Coin.ethereum:
-      case Coin.namecoin:
-      case Coin.particl:
-      case Coin.nano:
-      case Coin.stellar:
-      case Coin.stellarTestnet:
         values.addAll([24, 12]);
-        break;
-      case Coin.banano:
-        values.addAll([24, 12]);
-        break;
-
-      case Coin.monero:
-        values.addAll([25]);
-        break;
-      case Coin.wownero:
-        values.addAll([14, 25]);
         break;
     }
     return values;
@@ -188,48 +97,7 @@ abstract class Constants {
     switch (coin) {
       case Coin.bitcoin:
       case Coin.bitcoinTestNet:
-      case Coin.bitcoincash:
-      case Coin.bitcoincashTestnet:
-      case Coin.eCash:
         return 600;
-
-      case Coin.dogecoin:
-      case Coin.dogecoinTestNet:
-        return 60;
-
-      case Coin.litecoin:
-      case Coin.litecoinTestNet:
-        return 150;
-
-      case Coin.firo:
-      case Coin.firoTestNet:
-        return 150;
-
-      case Coin.epicCash:
-        return 60;
-
-      case Coin.ethereum:
-        return 15;
-
-      case Coin.monero:
-        return 120;
-
-      case Coin.wownero:
-        return 120;
-
-      case Coin.namecoin:
-        return 600;
-
-      case Coin.particl:
-        return 600;
-
-      case Coin.nano: // TODO: Verify this
-      case Coin.banano: // TODO: Verify this
-        return 1;
-
-      case Coin.stellar:
-      case Coin.stellarTestnet:
-        return 5;
     }
   }
 
@@ -237,32 +105,7 @@ abstract class Constants {
     switch (coin) {
       case Coin.bitcoin:
       case Coin.bitcoinTestNet:
-      case Coin.bitcoincash:
-      case Coin.bitcoincashTestnet:
-      case Coin.eCash:
-      case Coin.dogecoin:
-      case Coin.dogecoinTestNet:
-      case Coin.litecoin:
-      case Coin.litecoinTestNet:
-      case Coin.firo:
-      case Coin.firoTestNet:
-      case Coin.epicCash:
-      case Coin.namecoin:
-      case Coin.particl:
-      case Coin.ethereum:
         return 12;
-
-      case Coin.wownero:
-        return 14;
-
-      case Coin.nano:
-      case Coin.banano:
-      case Coin.stellar:
-      case Coin.stellarTestnet:
-        return 24;
-
-      case Coin.monero:
-        return 25;
     }
   }
 

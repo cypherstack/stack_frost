@@ -10,14 +10,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackwallet/pages_desktop_specific/desktop_home_view.dart';
-import 'package:stackwallet/pages_desktop_specific/my_stack_view/wallet_view/desktop_wallet_view.dart';
-import 'package:stackwallet/providers/global/wallets_provider.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/constants.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/widgets/rounded_container.dart';
-import 'package:stackwallet/widgets/wallet_info_row/wallet_info_row.dart';
+import 'package:stackfrost/pages_desktop_specific/desktop_home_view.dart';
+import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/desktop_wallet_view.dart';
+import 'package:stackfrost/providers/global/wallets_provider.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/constants.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/widgets/rounded_container.dart';
+import 'package:stackfrost/widgets/wallet_info_row/wallet_info_row.dart';
 
 class CoinWalletsTable extends ConsumerWidget {
   const CoinWalletsTable({
@@ -74,10 +74,6 @@ class CoinWalletsTable extends ConsumerWidget {
                             final manager = ref
                                 .read(walletsChangeNotifierProvider)
                                 .getManager(walletIds[i]);
-                            if (manager.coin == Coin.monero ||
-                                manager.coin == Coin.wownero) {
-                              await manager.initializeExisting();
-                            }
 
                             await Navigator.of(context).pushNamed(
                               DesktopWalletView.routeName,

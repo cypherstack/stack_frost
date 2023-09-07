@@ -10,50 +10,43 @@
 
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:event_bus/event_bus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:stackwallet/pages/add_wallet_views/add_token_view/edit_wallet_tokens_view.dart';
-import 'package:stackwallet/pages/special/firo_rescan_recovery_error_dialog.dart';
-import 'package:stackwallet/pages/token_view/my_tokens_view.dart';
-import 'package:stackwallet/pages/wallet_view/sub_widgets/transactions_list.dart';
-import 'package:stackwallet/pages/wallet_view/transaction_views/all_transactions_view.dart';
-import 'package:stackwallet/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/desktop_wallet_features.dart';
-import 'package:stackwallet/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/desktop_wallet_summary.dart';
-import 'package:stackwallet/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/my_wallet.dart';
-import 'package:stackwallet/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/network_info_button.dart';
-import 'package:stackwallet/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/wallet_keys_button.dart';
-import 'package:stackwallet/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/wallet_options_button.dart';
-import 'package:stackwallet/providers/global/auto_swb_service_provider.dart';
-import 'package:stackwallet/providers/providers.dart';
-import 'package:stackwallet/providers/ui/transaction_filter_provider.dart';
-import 'package:stackwallet/services/coins/banano/banano_wallet.dart';
-import 'package:stackwallet/services/coins/firo/firo_wallet.dart';
-import 'package:stackwallet/services/event_bus/events/global/wallet_sync_status_changed_event.dart';
-import 'package:stackwallet/services/event_bus/global_event_bus.dart';
-import 'package:stackwallet/themes/coin_icon_provider.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/assets.dart';
-import 'package:stackwallet/utilities/constants.dart';
-import 'package:stackwallet/utilities/enums/backup_frequency_type.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/widgets/background.dart';
-import 'package:stackwallet/widgets/conditional_parent.dart';
-import 'package:stackwallet/widgets/custom_buttons/app_bar_icon_button.dart';
-import 'package:stackwallet/widgets/custom_buttons/blue_text_button.dart';
-import 'package:stackwallet/widgets/custom_loading_overlay.dart';
-import 'package:stackwallet/widgets/desktop/desktop_app_bar.dart';
-import 'package:stackwallet/widgets/desktop/desktop_dialog.dart';
-import 'package:stackwallet/widgets/desktop/desktop_dialog_close_button.dart';
-import 'package:stackwallet/widgets/desktop/desktop_scaffold.dart';
-import 'package:stackwallet/widgets/desktop/primary_button.dart';
-import 'package:stackwallet/widgets/desktop/secondary_button.dart';
-import 'package:stackwallet/widgets/hover_text_field.dart';
-import 'package:stackwallet/widgets/rounded_white_container.dart';
+import 'package:stackfrost/pages/wallet_view/sub_widgets/transactions_list.dart';
+import 'package:stackfrost/pages/wallet_view/transaction_views/all_transactions_view.dart';
+import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/desktop_wallet_features.dart';
+import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/desktop_wallet_summary.dart';
+import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/my_wallet.dart';
+import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/network_info_button.dart';
+import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/wallet_keys_button.dart';
+import 'package:stackfrost/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/wallet_options_button.dart';
+import 'package:stackfrost/providers/global/auto_swb_service_provider.dart';
+import 'package:stackfrost/providers/providers.dart';
+import 'package:stackfrost/providers/ui/transaction_filter_provider.dart';
+import 'package:stackfrost/services/event_bus/events/global/wallet_sync_status_changed_event.dart';
+import 'package:stackfrost/services/event_bus/global_event_bus.dart';
+import 'package:stackfrost/themes/coin_icon_provider.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/assets.dart';
+import 'package:stackfrost/utilities/constants.dart';
+import 'package:stackfrost/utilities/enums/backup_frequency_type.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/widgets/background.dart';
+import 'package:stackfrost/widgets/conditional_parent.dart';
+import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
+import 'package:stackfrost/widgets/custom_buttons/blue_text_button.dart';
+import 'package:stackfrost/widgets/custom_loading_overlay.dart';
+import 'package:stackfrost/widgets/desktop/desktop_app_bar.dart';
+import 'package:stackfrost/widgets/desktop/desktop_dialog.dart';
+import 'package:stackfrost/widgets/desktop/desktop_dialog_close_button.dart';
+import 'package:stackfrost/widgets/desktop/desktop_scaffold.dart';
+import 'package:stackfrost/widgets/desktop/primary_button.dart';
+import 'package:stackfrost/widgets/desktop/secondary_button.dart';
+import 'package:stackfrost/widgets/hover_text_field.dart';
+import 'package:stackfrost/widgets/rounded_white_container.dart';
 
 /// [eventBus] should only be set during testing
 class DesktopWalletView extends ConsumerStatefulWidget {
@@ -106,38 +99,6 @@ class _DesktopWalletViewState extends ConsumerState<DesktopWalletView> {
     ref.read(managerProvider.notifier).isActiveWallet = false;
   }
 
-  Future<void> _firoRescanRecovery() async {
-    final success = await (ref
-            .read(walletsChangeNotifierProvider)
-            .getManager(widget.walletId)
-            .wallet as FiroWallet)
-        .firoRescanRecovery();
-
-    if (success) {
-      // go into wallet
-      WidgetsBinding.instance.addPostFrameCallback(
-        (_) => setState(() {
-          _rescanningOnOpen = false;
-          _lelantusRescanRecovery = false;
-        }),
-      );
-    } else {
-      // show error message dialog w/ options
-      if (mounted) {
-        final shouldRetry = await Navigator.of(context).pushNamed(
-          FiroRescanRecoveryErrorView.routeName,
-          arguments: widget.walletId,
-        );
-
-        if (shouldRetry is bool && shouldRetry) {
-          await _firoRescanRecovery();
-        }
-      } else {
-        return await _firoRescanRecovery();
-      }
-    }
-  }
-
   @override
   void initState() {
     controller = TextEditingController();
@@ -159,14 +120,7 @@ class _DesktopWalletViewState extends ConsumerState<DesktopWalletView> {
       _shouldDisableAutoSyncOnLogOut = false;
     }
 
-    if (ref.read(managerProvider).coin == Coin.firo &&
-        (ref.read(managerProvider).wallet as FiroWallet)
-            .lelantusCoinIsarRescanRequired) {
-      _rescanningOnOpen = true;
-      _lelantusRescanRecovery = true;
-      _firoRescanRecovery();
-    } else if (ref.read(managerProvider).coin != Coin.ethereum &&
-        ref.read(managerProvider).rescanOnOpenVersion == Constants.rescanV1) {
+    if (ref.read(managerProvider).rescanOnOpenVersion == Constants.rescanV1) {
       _rescanningOnOpen = true;
       ref.read(managerProvider).fullRescan(20, 1000).then(
             (_) => ref.read(managerProvider).resetRescanOnOpen().then(
@@ -195,10 +149,6 @@ class _DesktopWalletViewState extends ConsumerState<DesktopWalletView> {
     final coin = manager.coin;
     final managerProvider = ref.watch(walletsChangeNotifierProvider
         .select((value) => value.getManagerProvider(widget.walletId)));
-
-    final monke = coin == Coin.banano
-        ? (manager.wallet as BananoWallet).getMonkeyImageBytes()
-        : null;
 
     return ConditionalParent(
       condition: _rescanningOnOpen,
@@ -384,23 +334,6 @@ class _DesktopWalletViewState extends ConsumerState<DesktopWalletView> {
                 padding: const EdgeInsets.all(20),
                 child: Row(
                   children: [
-                    if (monke != null)
-                      SvgPicture.memory(
-                        Uint8List.fromList(monke!),
-                        width: 60,
-                        height: 60,
-                      ),
-                    if (monke == null)
-                      SvgPicture.file(
-                        File(
-                          ref.watch(coinIconProvider(coin)),
-                        ),
-                        width: 40,
-                        height: 40,
-                      ),
-                    const SizedBox(
-                      width: 10,
-                    ),
                     DesktopWalletSummary(
                       walletId: widget.walletId,
                       initialSyncStatus: ref.watch(managerProvider
@@ -440,12 +373,7 @@ class _DesktopWalletViewState extends ConsumerState<DesktopWalletView> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          ref.watch(walletsChangeNotifierProvider.select(
-                                  (value) => value
-                                      .getManager(widget.walletId)
-                                      .hasTokenSupport))
-                              ? "Tokens"
-                              : "Recent transactions",
+                          "Recent transactions",
                           style: STextStyles.desktopTextExtraSmall(context)
                               .copyWith(
                             color: Theme.of(context)
@@ -454,36 +382,13 @@ class _DesktopWalletViewState extends ConsumerState<DesktopWalletView> {
                           ),
                         ),
                         CustomTextButton(
-                          text: ref.watch(walletsChangeNotifierProvider.select(
-                                  (value) => value
-                                      .getManager(widget.walletId)
-                                      .hasTokenSupport))
-                              ? "Edit"
-                              : "See all",
-                          onTap: ref.watch(walletsChangeNotifierProvider.select(
-                                  (value) => value
-                                      .getManager(widget.walletId)
-                                      .hasTokenSupport))
-                              ? () async {
-                                  final result = await showDialog<int?>(
-                                    context: context,
-                                    builder: (context) => EditWalletTokensView(
-                                      walletId: widget.walletId,
-                                      isDesktopPopup: true,
-                                    ),
-                                  );
-
-                                  if (result == 42) {
-                                    // wallet tokens were edited so update ui
-                                    setState(() {});
-                                  }
-                                }
-                              : () {
-                                  Navigator.of(context).pushNamed(
-                                    AllTransactionsView.routeName,
-                                    arguments: widget.walletId,
-                                  );
-                                },
+                          text: "See all",
+                          onTap: () {
+                            Navigator.of(context).pushNamed(
+                              AllTransactionsView.routeName,
+                              arguments: widget.walletId,
+                            );
+                          },
                         ),
                       ],
                     ),
@@ -507,20 +412,12 @@ class _DesktopWalletViewState extends ConsumerState<DesktopWalletView> {
                       width: 16,
                     ),
                     Expanded(
-                      child: ref.watch(walletsChangeNotifierProvider.select(
-                              (value) => value
-                                  .getManager(widget.walletId)
-                                  .hasTokenSupport))
-                          ? MyTokensView(
-                              walletId: widget.walletId,
-                            )
-                          : TransactionsList(
-                              managerProvider: ref.watch(
-                                  walletsChangeNotifierProvider.select(
-                                      (value) => value.getManagerProvider(
-                                          widget.walletId))),
-                              walletId: widget.walletId,
-                            ),
+                      child: TransactionsList(
+                        managerProvider: ref.watch(
+                            walletsChangeNotifierProvider.select((value) =>
+                                value.getManagerProvider(widget.walletId))),
+                        walletId: widget.walletId,
+                      ),
                     ),
                   ],
                 ),

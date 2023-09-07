@@ -8,17 +8,15 @@
  *
  */
 
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:stackwallet/pages/add_wallet_views/name_your_wallet_view/name_your_wallet_view.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/enums/add_wallet_type_enum.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:tuple/tuple.dart';
+import 'package:stackfrost/pages/add_wallet_views/name_your_wallet_view/name_your_wallet_view.dart';
+import 'package:stackfrost/services/wallets_service.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/enums/add_wallet_type_enum.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
 
-class CreateWalletButtonGroup extends StatelessWidget {
+class CreateWalletButtonGroup extends StatefulWidget {
   const CreateWalletButtonGroup({
     Key? key,
     required this.coin,
@@ -29,46 +27,75 @@ class CreateWalletButtonGroup extends StatelessWidget {
   final bool isDesktop;
 
   @override
+  State<CreateWalletButtonGroup> createState() =>
+      _CreateWalletButtonGroupState();
+}
+
+class _CreateWalletButtonGroupState extends State<CreateWalletButtonGroup> {
+  bool _frostMS = true;
+
+  @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment:
-          isDesktop ? CrossAxisAlignment.center : CrossAxisAlignment.stretch,
+      crossAxisAlignment: widget.isDesktop
+          ? CrossAxisAlignment.center
+          : CrossAxisAlignment.stretch,
       children: [
-        if (Platform.isAndroid || coin != Coin.wownero)
-          ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: isDesktop ? 70 : 0,
-              minWidth: isDesktop ? 480 : 0,
-            ),
-            child: TextButton(
-              style: Theme.of(context)
-                  .extension<StackColors>()!
-                  .getPrimaryEnabledButtonStyle(context),
-              onPressed: () {
-                Navigator.of(context).pushNamed(
-                  NameYourWalletView.routeName,
-                  arguments: Tuple2(
-                    AddWalletType.New,
-                    coin,
-                  ),
-                );
-              },
-              child: Text(
-                "Create new wallet",
-                style: isDesktop
-                    ? STextStyles.desktopButtonEnabled(context)
-                    : STextStyles.button(context),
-              ),
-            ),
-          ),
-        if (Platform.isAndroid || coin != Coin.wownero)
-          SizedBox(
-            height: isDesktop ? 16 : 12,
-          ),
+        // Row(
+        //   children: [
+        //     Checkbox(
+        //       value: _frostMS,
+        //       onChanged: (v) {
+        //         setState(() {
+        //           _frostMS = v!;
+        //         });
+        //       },
+        //     ),
+        //     Text(
+        //       "FROST Multisig",
+        //       style: widget.isDesktop
+        //           ? STextStyles.desktopSubtitleH2(context)
+        //           : STextStyles.subtitle(context),
+        //     ),
+        //   ],
+        // ),
+        // SizedBox(
+        //   height: widget.isDesktop ? 12 : 8,
+        // ),
         ConstrainedBox(
           constraints: BoxConstraints(
-            minHeight: isDesktop ? 70 : 0,
-            minWidth: isDesktop ? 480 : 0,
+            minHeight: widget.isDesktop ? 70 : 0,
+            minWidth: widget.isDesktop ? 480 : 0,
+          ),
+          child: TextButton(
+            style: Theme.of(context)
+                .extension<StackColors>()!
+                .getPrimaryEnabledButtonStyle(context),
+            onPressed: () {
+              Navigator.of(context).pushNamed(
+                NameYourWalletView.routeName,
+                arguments: (
+                  addWalletType: AddWalletType.New,
+                  coin: widget.coin,
+                  walletType: _frostMS ? WalletType.frostMS : WalletType.normal,
+                ),
+              );
+            },
+            child: Text(
+              "Create new wallet",
+              style: widget.isDesktop
+                  ? STextStyles.desktopButtonEnabled(context)
+                  : STextStyles.button(context),
+            ),
+          ),
+        ),
+        SizedBox(
+          height: widget.isDesktop ? 16 : 12,
+        ),
+        ConstrainedBox(
+          constraints: BoxConstraints(
+            minHeight: widget.isDesktop ? 70 : 0,
+            minWidth: widget.isDesktop ? 480 : 0,
           ),
           child: TextButton(
             style: Theme.of(context)
@@ -77,15 +104,16 @@ class CreateWalletButtonGroup extends StatelessWidget {
             onPressed: () {
               Navigator.of(context).pushNamed(
                 NameYourWalletView.routeName,
-                arguments: Tuple2(
-                  AddWalletType.Restore,
-                  coin,
+                arguments: (
+                  addWalletType: AddWalletType.Restore,
+                  coin: widget.coin,
+                  walletType: _frostMS ? WalletType.frostMS : WalletType.normal,
                 ),
               );
             },
             child: Text(
               "Restore wallet",
-              style: isDesktop
+              style: widget.isDesktop
                   ? STextStyles.desktopButtonSecondaryEnabled(context)
                   : STextStyles.button(context).copyWith(
                       color: Theme.of(context)

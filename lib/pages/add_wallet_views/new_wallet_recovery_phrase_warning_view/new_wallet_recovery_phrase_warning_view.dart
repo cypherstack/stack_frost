@@ -13,29 +13,30 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:stackwallet/pages/add_wallet_views/new_wallet_recovery_phrase_view/new_wallet_recovery_phrase_view.dart';
-import 'package:stackwallet/pages/add_wallet_views/new_wallet_recovery_phrase_warning_view/recovery_phrase_explanation_dialog.dart';
-import 'package:stackwallet/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
-import 'package:stackwallet/providers/global/secure_store_provider.dart';
-import 'package:stackwallet/providers/providers.dart';
-import 'package:stackwallet/services/coins/coin_service.dart';
-import 'package:stackwallet/services/coins/manager.dart';
-import 'package:stackwallet/services/transaction_notification_tracker.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/assets.dart';
-import 'package:stackwallet/utilities/constants.dart';
-import 'package:stackwallet/utilities/default_nodes.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/logger.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/utilities/util.dart';
-import 'package:stackwallet/widgets/conditional_parent.dart';
-import 'package:stackwallet/widgets/custom_buttons/app_bar_icon_button.dart';
-import 'package:stackwallet/widgets/desktop/desktop_app_bar.dart';
-import 'package:stackwallet/widgets/desktop/desktop_scaffold.dart';
-import 'package:stackwallet/widgets/loading_indicator.dart';
-import 'package:stackwallet/widgets/rounded_container.dart';
-import 'package:stackwallet/widgets/rounded_white_container.dart';
+import 'package:stackfrost/pages/add_wallet_views/new_wallet_recovery_phrase_view/new_wallet_recovery_phrase_view.dart';
+import 'package:stackfrost/pages/add_wallet_views/new_wallet_recovery_phrase_warning_view/recovery_phrase_explanation_dialog.dart';
+import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
+import 'package:stackfrost/providers/global/secure_store_provider.dart';
+import 'package:stackfrost/providers/providers.dart';
+import 'package:stackfrost/services/coins/coin_service.dart';
+import 'package:stackfrost/services/coins/manager.dart';
+import 'package:stackfrost/services/transaction_notification_tracker.dart';
+import 'package:stackfrost/services/wallets_service.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/assets.dart';
+import 'package:stackfrost/utilities/constants.dart';
+import 'package:stackfrost/utilities/default_nodes.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/logger.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/utilities/util.dart';
+import 'package:stackfrost/widgets/conditional_parent.dart';
+import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
+import 'package:stackfrost/widgets/desktop/desktop_app_bar.dart';
+import 'package:stackfrost/widgets/desktop/desktop_scaffold.dart';
+import 'package:stackfrost/widgets/loading_indicator.dart';
+import 'package:stackfrost/widgets/rounded_container.dart';
+import 'package:stackfrost/widgets/rounded_white_container.dart';
 import 'package:tuple/tuple.dart';
 
 class NewWalletRecoveryPhraseWarningView extends StatefulWidget {
@@ -457,6 +458,7 @@ class _NewWalletRecoveryPhraseWarningViewState
                                         await walletsService.addNewWallet(
                                       name: walletName,
                                       coin: coin,
+                                      type: WalletType.normal,
                                       shouldNotifyListeners: false,
                                     );
 

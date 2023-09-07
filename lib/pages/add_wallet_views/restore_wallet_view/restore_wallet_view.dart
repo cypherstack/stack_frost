@@ -17,48 +17,45 @@ import 'package:bip39/bip39.dart' as bip39;
 import 'package:bip39/src/wordlists/english.dart' as bip39wordlist;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_libmonero/monero/monero.dart';
-import 'package:flutter_libmonero/wownero/wownero.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:stackwallet/notifications/show_flush_bar.dart';
-import 'package:stackwallet/pages/add_wallet_views/add_token_view/edit_wallet_tokens_view.dart';
-import 'package:stackwallet/pages/add_wallet_views/restore_wallet_view/confirm_recovery_dialog.dart';
-import 'package:stackwallet/pages/add_wallet_views/restore_wallet_view/sub_widgets/restore_failed_dialog.dart';
-import 'package:stackwallet/pages/add_wallet_views/restore_wallet_view/sub_widgets/restore_succeeded_dialog.dart';
-import 'package:stackwallet/pages/add_wallet_views/restore_wallet_view/sub_widgets/restoring_dialog.dart';
-import 'package:stackwallet/pages/add_wallet_views/select_wallet_for_token_view.dart';
-import 'package:stackwallet/pages/add_wallet_views/verify_recovery_phrase_view/verify_recovery_phrase_view.dart';
-import 'package:stackwallet/pages/home_view/home_view.dart';
-import 'package:stackwallet/pages_desktop_specific/desktop_home_view.dart';
-import 'package:stackwallet/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
-import 'package:stackwallet/providers/global/secure_store_provider.dart';
-import 'package:stackwallet/providers/providers.dart';
-import 'package:stackwallet/services/coins/coin_service.dart';
-import 'package:stackwallet/services/coins/manager.dart';
-import 'package:stackwallet/services/transaction_notification_tracker.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/address_utils.dart';
-import 'package:stackwallet/utilities/assets.dart';
-import 'package:stackwallet/utilities/barcode_scanner_interface.dart';
-import 'package:stackwallet/utilities/clipboard_interface.dart';
-import 'package:stackwallet/utilities/constants.dart';
-import 'package:stackwallet/utilities/custom_text_selection_controls.dart';
-import 'package:stackwallet/utilities/default_nodes.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/enums/form_input_status_enum.dart';
-import 'package:stackwallet/utilities/logger.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/utilities/util.dart';
-import 'package:stackwallet/widgets/custom_buttons/app_bar_icon_button.dart';
-import 'package:stackwallet/widgets/desktop/desktop_app_bar.dart';
-import 'package:stackwallet/widgets/desktop/desktop_scaffold.dart';
-import 'package:stackwallet/widgets/desktop/primary_button.dart';
-import 'package:stackwallet/widgets/icon_widgets/clipboard_icon.dart';
-import 'package:stackwallet/widgets/icon_widgets/qrcode_icon.dart';
-import 'package:stackwallet/widgets/table_view/table_view.dart';
-import 'package:stackwallet/widgets/table_view/table_view_cell.dart';
-import 'package:stackwallet/widgets/table_view/table_view_row.dart';
+import 'package:stackfrost/notifications/show_flush_bar.dart';
+import 'package:stackfrost/pages/add_wallet_views/restore_wallet_view/confirm_recovery_dialog.dart';
+import 'package:stackfrost/pages/add_wallet_views/restore_wallet_view/sub_widgets/restore_failed_dialog.dart';
+import 'package:stackfrost/pages/add_wallet_views/restore_wallet_view/sub_widgets/restore_succeeded_dialog.dart';
+import 'package:stackfrost/pages/add_wallet_views/restore_wallet_view/sub_widgets/restoring_dialog.dart';
+import 'package:stackfrost/pages/add_wallet_views/verify_recovery_phrase_view/verify_recovery_phrase_view.dart';
+import 'package:stackfrost/pages/home_view/home_view.dart';
+import 'package:stackfrost/pages_desktop_specific/desktop_home_view.dart';
+import 'package:stackfrost/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
+import 'package:stackfrost/providers/global/secure_store_provider.dart';
+import 'package:stackfrost/providers/providers.dart';
+import 'package:stackfrost/services/coins/coin_service.dart';
+import 'package:stackfrost/services/coins/manager.dart';
+import 'package:stackfrost/services/transaction_notification_tracker.dart';
+import 'package:stackfrost/services/wallets_service.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/address_utils.dart';
+import 'package:stackfrost/utilities/assets.dart';
+import 'package:stackfrost/utilities/barcode_scanner_interface.dart';
+import 'package:stackfrost/utilities/clipboard_interface.dart';
+import 'package:stackfrost/utilities/constants.dart';
+import 'package:stackfrost/utilities/custom_text_selection_controls.dart';
+import 'package:stackfrost/utilities/default_nodes.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/enums/form_input_status_enum.dart';
+import 'package:stackfrost/utilities/logger.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/utilities/util.dart';
+import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
+import 'package:stackfrost/widgets/desktop/desktop_app_bar.dart';
+import 'package:stackfrost/widgets/desktop/desktop_scaffold.dart';
+import 'package:stackfrost/widgets/desktop/primary_button.dart';
+import 'package:stackfrost/widgets/icon_widgets/clipboard_icon.dart';
+import 'package:stackfrost/widgets/icon_widgets/qrcode_icon.dart';
+import 'package:stackfrost/widgets/table_view/table_view.dart';
+import 'package:stackfrost/widgets/table_view/table_view_cell.dart';
+import 'package:stackfrost/widgets/table_view/table_view_row.dart';
 import 'package:wakelock/wakelock.dart';
 
 class RestoreWalletView extends ConsumerStatefulWidget {
@@ -170,15 +167,6 @@ class _RestoreWalletViewState extends ConsumerState<RestoreWalletView> {
   // TODO: check for wownero wordlist?
   bool _isValidMnemonicWord(String word) {
     // TODO: get the actual language
-    if (widget.coin == Coin.monero) {
-      var moneroWordList = monero.getMoneroWordList("English");
-      return moneroWordList.contains(word);
-    }
-    if (widget.coin == Coin.wownero) {
-      var wowneroWordList = wownero.getWowneroWordList("English",
-          seedWordsLength: widget.seedWordsLength);
-      return wowneroWordList.contains(word);
-    }
     return _wordListHashSet.contains(word);
   }
 
@@ -202,36 +190,8 @@ class _RestoreWalletViewState extends ConsumerState<RestoreWalletView> {
 
       int height = 0;
 
-      if (widget.coin == Coin.monero) {
-        height = monero.getHeigthByDate(date: widget.restoreFromDate);
-      } else if (widget.coin == Coin.wownero) {
-        height = wownero.getHeightByDate(date: widget.restoreFromDate);
-      }
-      // todo: wait until this implemented
-      // else if (widget.coin == Coin.wownero) {
-      //   height = wownero.getHeightByDate(date: widget.restoreFromDate);
-      // }
-
-      // TODO: make more robust estimate of date maybe using https://explorer.epic.tech/api-index
-      if (widget.coin == Coin.epicCash) {
-        int secondsSinceEpoch =
-            widget.restoreFromDate.millisecondsSinceEpoch ~/ 1000;
-        const int epicCashFirstBlock = 1565370278;
-        const double overestimateSecondsPerBlock = 61;
-        int chosenSeconds = secondsSinceEpoch - epicCashFirstBlock;
-        int approximateHeight = chosenSeconds ~/ overestimateSecondsPerBlock;
-        //todo: check if print needed
-        // debugPrint(
-        //     "approximate height: $approximateHeight chosen_seconds: $chosenSeconds");
-        height = approximateHeight;
-        if (height < 0) {
-          height = 0;
-        }
-      }
-
       // TODO: do actual check to make sure it is a valid mnemonic for monero
-      if (bip39.validateMnemonic(mnemonic) == false &&
-          !(widget.coin == Coin.monero || widget.coin == Coin.wownero)) {
+      if (bip39.validateMnemonic(mnemonic) == false) {
         unawaited(showFloatingFlushBar(
           type: FlushBarType.warning,
           message: "Invalid seed phrase!",
@@ -244,6 +204,7 @@ class _RestoreWalletViewState extends ConsumerState<RestoreWalletView> {
         final walletId = await walletsService.addNewWallet(
           name: widget.walletName,
           coin: widget.coin,
+          type: WalletType.normal,
           shouldNotifyListeners: false,
         );
         bool isRestoring = true;
@@ -308,7 +269,7 @@ class _RestoreWalletViewState extends ConsumerState<RestoreWalletView> {
           await manager.recoverFromMnemonic(
             mnemonic: mnemonic,
             mnemonicPassphrase: widget.mnemonicPassphrase,
-            maxUnusedAddressGap: widget.coin == Coin.firo ? 50 : 20,
+            maxUnusedAddressGap: 20,
             maxNumberOfIndexesToCheck: 1000,
             height: height,
           );
@@ -330,13 +291,6 @@ class _RestoreWalletViewState extends ConsumerState<RestoreWalletView> {
             if (isCreateSpecialEthWallet) {
               ref.read(createSpecialEthWalletRoutingFlag.notifier).state =
                   false;
-              ref
-                      .read(newEthWalletTriggerTempUntilHiveCompletelyDeleted.state)
-                      .state =
-                  !ref
-                      .read(newEthWalletTriggerTempUntilHiveCompletelyDeleted
-                          .state)
-                      .state;
             }
 
             if (mounted) {
@@ -347,28 +301,12 @@ class _RestoreWalletViewState extends ConsumerState<RestoreWalletView> {
                   ),
                 );
               } else {
-                if (isCreateSpecialEthWallet) {
-                  Navigator.of(context).popUntil(
-                    ModalRoute.withName(
-                      SelectWalletForTokenView.routeName,
-                    ),
-                  );
-                } else {
-                  unawaited(
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                      HomeView.routeName,
-                      (route) => false,
-                    ),
-                  );
-                  if (manager.coin == Coin.ethereum) {
-                    unawaited(
-                      Navigator.of(context).pushNamed(
-                        EditWalletTokensView.routeName,
-                        arguments: manager.walletId,
-                      ),
-                    );
-                  }
-                }
+                unawaited(
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    HomeView.routeName,
+                    (route) => false,
+                  ),
+                );
               }
 
               await showDialog<dynamic>(

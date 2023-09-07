@@ -21,42 +21,41 @@ import 'package:bs58check/bs58check.dart' as bs58check;
 import 'package:decimal/decimal.dart';
 import 'package:flutter/foundation.dart';
 import 'package:isar/isar.dart';
-import 'package:stackwallet/db/isar/main_db.dart';
-import 'package:stackwallet/electrumx_rpc/cached_electrumx.dart';
-import 'package:stackwallet/electrumx_rpc/electrumx.dart';
-import 'package:stackwallet/exceptions/electrumx/no_such_transaction.dart';
-import 'package:stackwallet/models/balance.dart';
-import 'package:stackwallet/models/isar/models/isar_models.dart' as isar_models;
-import 'package:stackwallet/models/paymint/fee_object_model.dart';
-import 'package:stackwallet/models/signing_data.dart';
-import 'package:stackwallet/services/coins/coin_service.dart';
-import 'package:stackwallet/services/event_bus/events/global/node_connection_status_changed_event.dart';
-import 'package:stackwallet/services/event_bus/events/global/refresh_percent_changed_event.dart';
-import 'package:stackwallet/services/event_bus/events/global/updated_in_background_event.dart';
-import 'package:stackwallet/services/event_bus/events/global/wallet_sync_status_changed_event.dart';
-import 'package:stackwallet/services/event_bus/global_event_bus.dart';
-import 'package:stackwallet/services/mixins/coin_control_interface.dart';
-import 'package:stackwallet/services/mixins/electrum_x_parsing.dart';
-import 'package:stackwallet/services/mixins/paynym_wallet_interface.dart';
-import 'package:stackwallet/services/mixins/wallet_cache.dart';
-import 'package:stackwallet/services/mixins/wallet_db.dart';
-import 'package:stackwallet/services/mixins/xpubable.dart';
-import 'package:stackwallet/services/node_service.dart';
-import 'package:stackwallet/services/transaction_notification_tracker.dart';
-import 'package:stackwallet/utilities/address_utils.dart';
-import 'package:stackwallet/utilities/amount/amount.dart';
-import 'package:stackwallet/utilities/bip32_utils.dart';
-import 'package:stackwallet/utilities/constants.dart';
-import 'package:stackwallet/utilities/default_nodes.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/enums/derive_path_type_enum.dart';
-import 'package:stackwallet/utilities/enums/fee_rate_type_enum.dart';
-import 'package:stackwallet/utilities/flutter_secure_storage_interface.dart';
-import 'package:stackwallet/utilities/format.dart';
-import 'package:stackwallet/utilities/logger.dart';
-import 'package:stackwallet/utilities/paynym_is_api.dart';
-import 'package:stackwallet/utilities/prefs.dart';
-import 'package:stackwallet/widgets/crypto_notifications.dart';
+import 'package:stackfrost/db/isar/main_db.dart';
+import 'package:stackfrost/electrumx_rpc/cached_electrumx.dart';
+import 'package:stackfrost/electrumx_rpc/electrumx.dart';
+import 'package:stackfrost/exceptions/electrumx/no_such_transaction.dart';
+import 'package:stackfrost/models/balance.dart';
+import 'package:stackfrost/models/isar/models/isar_models.dart' as isar_models;
+import 'package:stackfrost/models/paymint/fee_object_model.dart';
+import 'package:stackfrost/models/signing_data.dart';
+import 'package:stackfrost/models/tx_data.dart';
+import 'package:stackfrost/services/coins/coin_service.dart';
+import 'package:stackfrost/services/event_bus/events/global/node_connection_status_changed_event.dart';
+import 'package:stackfrost/services/event_bus/events/global/refresh_percent_changed_event.dart';
+import 'package:stackfrost/services/event_bus/events/global/updated_in_background_event.dart';
+import 'package:stackfrost/services/event_bus/events/global/wallet_sync_status_changed_event.dart';
+import 'package:stackfrost/services/event_bus/global_event_bus.dart';
+import 'package:stackfrost/services/mixins/coin_control_interface.dart';
+import 'package:stackfrost/services/mixins/electrum_x_parsing.dart';
+import 'package:stackfrost/services/mixins/wallet_cache.dart';
+import 'package:stackfrost/services/mixins/wallet_db.dart';
+import 'package:stackfrost/services/mixins/xpubable.dart';
+import 'package:stackfrost/services/node_service.dart';
+import 'package:stackfrost/services/transaction_notification_tracker.dart';
+import 'package:stackfrost/utilities/address_utils.dart';
+import 'package:stackfrost/utilities/amount/amount.dart';
+import 'package:stackfrost/utilities/bip32_utils.dart';
+import 'package:stackfrost/utilities/constants.dart';
+import 'package:stackfrost/utilities/default_nodes.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/enums/derive_path_type_enum.dart';
+import 'package:stackfrost/utilities/enums/fee_rate_type_enum.dart';
+import 'package:stackfrost/utilities/flutter_secure_storage_interface.dart';
+import 'package:stackfrost/utilities/format.dart';
+import 'package:stackfrost/utilities/logger.dart';
+import 'package:stackfrost/utilities/prefs.dart';
+import 'package:stackfrost/widgets/crypto_notifications.dart';
 import 'package:tuple/tuple.dart';
 import 'package:uuid/uuid.dart';
 
@@ -113,12 +112,7 @@ String constructDerivePath({
 }
 
 class BitcoinWallet extends CoinServiceAPI
-    with
-        WalletCache,
-        WalletDB,
-        ElectrumXParsing,
-        PaynymWalletInterface,
-        CoinControlInterface
+    with WalletCache, WalletDB, ElectrumXParsing, CoinControlInterface
     implements XPubAble {
   BitcoinWallet({
     required String walletId,
@@ -149,31 +143,6 @@ class BitcoinWallet extends CoinServiceAPI
         _balance = balance;
         await updateCachedBalance(_balance!);
       },
-    );
-    initPaynymWalletInterface(
-      walletId: walletId,
-      walletName: walletName,
-      network: _network,
-      coin: coin,
-      db: db,
-      electrumXClient: electrumXClient,
-      secureStorage: secureStore,
-      getMnemonicString: () => mnemonicString,
-      getMnemonicPassphrase: () => mnemonicPassphrase,
-      getChainHeight: () => chainHeight,
-      // getCurrentChangeAddress: () => currentChangeAddressP2PKH,
-      getCurrentChangeAddress: () => currentChangeAddress,
-      estimateTxFee: estimateTxFee,
-      prepareSend: prepareSend,
-      getTxCount: getTxCount,
-      fetchBuildTxData: fetchBuildTxData,
-      refresh: refresh,
-      checkChangeAddressForTransactions: _checkChangeAddressForTransactions,
-      // checkChangeAddressForTransactions:
-      //     _checkP2PKHChangeAddressForTransactions,
-      dustLimitP2PKH: DUST_LIMIT_P2PKH.raw.toInt(),
-      minConfirms: MINIMUM_CONFIRMATIONS,
-      dustLimit: DUST_LIMIT.raw.toInt(),
     );
   }
 
@@ -687,39 +656,26 @@ class BitcoinWallet extends CoinServiceAPI
         await db.putAddresses(addressesToStore);
       }
 
-      // get own payment code
-      // isSegwit does not matter here at all
-      final myCode = await getPaymentCode(isSegwit: false);
-
-      // refresh transactions to pick up any received notification transactions
-      await _refreshNotificationAddressTransactions();
-
-      try {
-        final Set<String> codesToCheck = {};
-        final nym = await PaynymIsApi().nym(myCode.toString());
-        if (nym.value != null) {
-          for (final follower in nym.value!.followers) {
-            codesToCheck.add(follower.code);
-          }
-          for (final following in nym.value!.following) {
-            codesToCheck.add(following.code);
-          }
-        }
-
-        // restore paynym transactions
-        await restoreAllHistory(
-          maxUnusedAddressGap: maxUnusedAddressGap,
-          maxNumberOfIndexesToCheck: maxNumberOfIndexesToCheck,
-          paymentCodeStrings: codesToCheck,
-        );
-      } catch (e, s) {
-        Logging.instance.log(
-          "Failed to check paynym.is followers/following for history during "
-          "bitcoin wallet ($walletId $walletName) "
-          "_recoverWalletFromBIP32SeedPhrase: $e/n$s",
-          level: LogLevel.Error,
-        );
-      }
+      // try {
+      //   final Set<String> codesToCheck = {};
+      //   final nym = await PaynymIsApi().nym(myCode.toString());
+      //   if (nym.value != null) {
+      //     for (final follower in nym.value!.followers) {
+      //       codesToCheck.add(follower.code);
+      //     }
+      //     for (final following in nym.value!.following) {
+      //       codesToCheck.add(following.code);
+      //     }
+      //   }
+      //
+      // } catch (e, s) {
+      //   Logging.instance.log(
+      //     "Failed to check paynym.is followers/following for history during "
+      //     "bitcoin wallet ($walletId $walletName) "
+      //     "_recoverWalletFromBIP32SeedPhrase: $e/n$s",
+      //     level: LogLevel.Error,
+      //   );
+      // }
 
       await Future.wait([
         _refreshTransactions(),
@@ -959,18 +915,7 @@ class BitcoinWallet extends CoinServiceAPI
       GlobalEventBus.instance.fire(RefreshPercentChangedEvent(0.0, walletId));
 
       GlobalEventBus.instance.fire(RefreshPercentChangedEvent(0.1, walletId));
-      // isSegwit does not matter here at all
-      final myCode = await getPaymentCode(isSegwit: false);
       final Set<String> codesToCheck = {};
-      final nym = await PaynymIsApi().nym(myCode.toString());
-      if (nym.value != null) {
-        for (final follower in nym.value!.followers) {
-          codesToCheck.add(follower.code);
-        }
-        for (final following in nym.value!.following) {
-          codesToCheck.add(following.code);
-        }
-      }
 
       final currentHeight = await chainHeight;
       const storedHeight = 1; //await storedChainHeight;
@@ -989,7 +934,6 @@ class BitcoinWallet extends CoinServiceAPI
         await _checkCurrentReceivingAddressesForTransactions();
 
         GlobalEventBus.instance.fire(RefreshPercentChangedEvent(0.4, walletId));
-        await checkAllCurrentReceivingPaynymAddressesForTransactions();
 
         final fetchFuture = _refreshTransactions();
         GlobalEventBus.instance
@@ -1007,7 +951,6 @@ class BitcoinWallet extends CoinServiceAPI
         GlobalEventBus.instance
             .fire(RefreshPercentChangedEvent(0.80, walletId));
 
-        await checkForNotificationTransactionsTo(codesToCheck);
         await _updateUTXOs();
         await getAllTxsToWatch();
         GlobalEventBus.instance
@@ -1063,16 +1006,16 @@ class BitcoinWallet extends CoinServiceAPI
   }
 
   @override
-  Future<Map<String, dynamic>> prepareSend({
-    required String address,
-    required Amount amount,
-    Map<String, dynamic>? args,
+  Future<TxData> prepareSend({
+    required TxData txData,
   }) async {
     try {
-      final feeRateType = args?["feeRate"];
-      final customSatsPerVByte = args?["satsPerVByte"] as int?;
-      final feeRateAmount = args?["feeRateAmount"];
-      final utxos = args?["UTXOs"] as Set<isar_models.UTXO>?;
+      final feeRateType = txData.feeRateType;
+      final customSatsPerVByte = txData.satsPerVByte;
+      final feeRateAmount = txData.feeRateAmount;
+      final utxos = txData.utxos;
+      final amount = txData.recipients!.first.amount;
+      final address = txData.recipients!.first.address;
 
       if (customSatsPerVByte != null) {
         // check for send all
@@ -1085,7 +1028,7 @@ class BitcoinWallet extends CoinServiceAPI
 
         final result = await coinSelection(
           satoshiAmountToSend: amount.raw.toInt(),
-          selectedTxFeeRate: -1,
+          selectedTxFeeRatePerKB: -1,
           satsPerVByte: customSatsPerVByte,
           recipientAddress: address,
           isSendAll: isSendAll,
@@ -1105,20 +1048,21 @@ class BitcoinWallet extends CoinServiceAPI
               throw Exception("Transaction failed with error code $result");
           }
         } else {
-          final hex = result["hex"];
+          final txData = result as TxData;
+          final hex = txData.raw;
           if (hex is String) {
-            final fee = result["fee"] as int;
-            final vSize = result["vSize"] as int;
+            final fee = txData.fee!;
+            final vSize = txData.vSize!;
 
             Logging.instance.log("txHex: $hex", level: LogLevel.Info);
             Logging.instance.log("fee: $fee", level: LogLevel.Info);
             Logging.instance.log("vsize: $vSize", level: LogLevel.Info);
             // fee should never be less than vSize sanity check
-            if (fee < vSize) {
+            if (fee.raw.toInt() < vSize) {
               throw Exception(
                   "Error in fee calculation: Transaction fee cannot be less than vSize");
             }
-            return result as Map<String, dynamic>;
+            return txData;
           } else {
             throw Exception("sent hex is not a String!!!");
           }
@@ -1154,33 +1098,33 @@ class BitcoinWallet extends CoinServiceAPI
 
         final bool coinControl = utxos != null;
 
-        final txData = await coinSelection(
+        final result = await coinSelection(
           satoshiAmountToSend: amount.raw.toInt(),
-          selectedTxFeeRate: rate,
+          selectedTxFeeRatePerKB: rate,
           recipientAddress: address,
           isSendAll: isSendAll,
           utxos: utxos?.toList(),
           coinControl: coinControl,
         );
 
-        Logging.instance.log("prepare send: $txData", level: LogLevel.Info);
+        Logging.instance.log("prepare send: $result", level: LogLevel.Info);
         try {
-          if (txData is int) {
-            switch (txData) {
+          if (result is int) {
+            switch (result) {
               case 1:
                 throw Exception("Insufficient balance!");
               case 2:
                 throw Exception(
                     "Insufficient funds to pay for transaction fee!");
               default:
-                throw Exception("Transaction failed with error code $txData");
+                throw Exception("Transaction failed with error code $result");
             }
           } else {
-            final hex = txData["hex"];
-
+            final txData = result as TxData;
+            final hex = txData.raw;
             if (hex is String) {
-              final fee = txData["fee"] as int;
-              final vSize = txData["vSize"] as int;
+              final fee = txData.fee!;
+              final vSize = txData.vSize!;
 
               Logging.instance
                   .log("prepared txHex: $hex", level: LogLevel.Info);
@@ -1189,12 +1133,12 @@ class BitcoinWallet extends CoinServiceAPI
                   .log("prepared vSize: $vSize", level: LogLevel.Info);
 
               // fee should never be less than vSize sanity check
-              if (fee < vSize) {
+              if (fee.raw.toInt() < vSize) {
                 throw Exception(
                     "Error in fee calculation: Transaction fee cannot be less than vSize");
               }
 
-              return txData as Map<String, dynamic>;
+              return txData;
             } else {
               throw Exception("prepared hex is not a String!!!");
             }
@@ -1215,21 +1159,26 @@ class BitcoinWallet extends CoinServiceAPI
   }
 
   @override
-  Future<String> confirmSend({required Map<String, dynamic> txData}) async {
+  Future<TxData> confirmSend({required TxData txData}) async {
     try {
       Logging.instance.log("confirmSend txData: $txData", level: LogLevel.Info);
 
-      final hex = txData["hex"] as String;
+      final hex = txData.raw!;
 
       final txHash = await _electrumXClient.broadcastTransaction(rawTx: hex);
       Logging.instance.log("Sent txHash: $txHash", level: LogLevel.Info);
 
-      final utxos = txData["usedUTXOs"] as List<isar_models.UTXO>;
-
       // mark utxos as used
-      await db.putUTXOs(utxos.map((e) => e.copyWith(used: true)).toList());
+      final usedUTXOs = txData.utxos!.map((e) => e.copyWith(used: true));
+      await db.putUTXOs(usedUTXOs.toList());
 
-      return txHash;
+      txData = txData.copyWith(
+        utxos: usedUTXOs.toSet(),
+        txHash: txHash,
+        txid: txHash,
+      );
+
+      return txData;
     } catch (e, s) {
       Logging.instance.log("Exception rethrown from confirmSend(): $e\n$s",
           level: LogLevel.Error);
@@ -1325,10 +1274,6 @@ class BitcoinWallet extends CoinServiceAPI
 
     await _prefs.init();
 
-    // this will add the notification address to the db if it isn't
-    // already there for older wallets
-    await getMyNotificationAddress();
-
     // await _checkCurrentChangeAddressesForTransactions();
     // await _checkCurrentReceivingAddressesForTransactions();
   }
@@ -1337,17 +1282,17 @@ class BitcoinWallet extends CoinServiceAPI
   // required based on current app architecture where we don't properly store
   // transactions locally in a good way
   @override
-  Future<void> updateSentCachedTxData(Map<String, dynamic> txData) async {
+  Future<void> updateSentCachedTxData(TxData txData) async {
     final transaction = isar_models.Transaction(
       walletId: walletId,
-      txid: txData["txid"] as String,
+      txid: txData.txid!,
       timestamp: DateTime.now().millisecondsSinceEpoch ~/ 1000,
       type: isar_models.TransactionType.outgoing,
       subType: isar_models.TransactionSubType.none,
       // precision may be lost here hence the following amountString
-      amount: (txData["recipientAmt"] as Amount).raw.toInt(),
-      amountString: (txData["recipientAmt"] as Amount).toJsonString(),
-      fee: txData["fee"] as int,
+      amount: txData.amount!.raw.toInt(),
+      amountString: txData.amount!.toJsonString(),
+      fee: txData.fee!.raw.toInt(),
       height: null,
       isCancelled: false,
       isLelantus: false,
@@ -1359,8 +1304,9 @@ class BitcoinWallet extends CoinServiceAPI
       numberOfMessages: null,
     );
 
-    final address = txData["address"] is String
-        ? await db.getAddress(walletId, txData["address"] as String)
+    // TODO: Large scale app refactor required for multiple addresses sent to
+    final address = txData.recipients != null && txData.recipients!.isNotEmpty
+        ? await db.getAddress(walletId, txData.recipients!.first.address)
         : null;
 
     await db.addNewTransactionData(
@@ -1552,10 +1498,6 @@ class BitcoinWallet extends CoinServiceAPI
       _generateAddressForChain(0, 0, DerivePathType.bip49),
       _generateAddressForChain(1, 0, DerivePathType.bip49),
     ]);
-
-    // this will add the notification address to the db if it isn't
-    // already there so it can be watched
-    await getMyNotificationAddress();
 
     await db.putAddresses(initialAddresses);
 
@@ -2097,59 +2039,59 @@ class BitcoinWallet extends CoinServiceAPI
     return false;
   }
 
-  Future<void> _refreshNotificationAddressTransactions() async {
-    final address = await getMyNotificationAddress();
-    final hashes = await _fetchHistory([address.value]);
-
-    List<Map<String, dynamic>> allTransactions = [];
-
-    final currentHeight = await chainHeight;
-
-    for (final txHash in hashes) {
-      final storedTx = await db
-          .getTransactions(walletId)
-          .filter()
-          .txidEqualTo(txHash["tx_hash"] as String)
-          .findFirst();
-
-      // TODO: remove bip47Notification type check sometime after Q2 2023
-      if (storedTx == null ||
-          storedTx.subType ==
-              isar_models.TransactionSubType.bip47Notification ||
-          !storedTx.isConfirmed(currentHeight, MINIMUM_CONFIRMATIONS)) {
-        final tx = await cachedElectrumXClient.getTransaction(
-          txHash: txHash["tx_hash"] as String,
-          verbose: true,
-          coin: coin,
-        );
-
-        tx["address"] = await db
-            .getAddresses(walletId)
-            .filter()
-            .valueEqualTo(txHash["address"] as String)
-            .findFirst();
-        tx["height"] = txHash["height"];
-        allTransactions.add(tx);
-      }
-    }
-
-    final List<Tuple2<isar_models.Transaction, isar_models.Address?>> txnsData =
-        [];
-
-    for (final txObject in allTransactions) {
-      final data = await parseTransaction(
-        txObject,
-        cachedElectrumXClient,
-        [address],
-        coin,
-        MINIMUM_CONFIRMATIONS,
-        walletId,
-      );
-
-      txnsData.add(data);
-    }
-    await db.addNewTransactionData(txnsData, walletId);
-  }
+  // Future<void> _refreshNotificationAddressTransactions() async {
+  //   final address = await getMyNotificationAddress();
+  //   final hashes = await _fetchHistory([address.value]);
+  //
+  //   List<Map<String, dynamic>> allTransactions = [];
+  //
+  //   final currentHeight = await chainHeight;
+  //
+  //   for (final txHash in hashes) {
+  //     final storedTx = await db
+  //         .getTransactions(walletId)
+  //         .filter()
+  //         .txidEqualTo(txHash["tx_hash"] as String)
+  //         .findFirst();
+  //
+  //     // TODO: remove bip47Notification type check sometime after Q2 2023
+  //     if (storedTx == null ||
+  //         storedTx.subType ==
+  //             isar_models.TransactionSubType.bip47Notification ||
+  //         !storedTx.isConfirmed(currentHeight, MINIMUM_CONFIRMATIONS)) {
+  //       final tx = await cachedElectrumXClient.getTransaction(
+  //         txHash: txHash["tx_hash"] as String,
+  //         verbose: true,
+  //         coin: coin,
+  //       );
+  //
+  //       tx["address"] = await db
+  //           .getAddresses(walletId)
+  //           .filter()
+  //           .valueEqualTo(txHash["address"] as String)
+  //           .findFirst();
+  //       tx["height"] = txHash["height"];
+  //       allTransactions.add(tx);
+  //     }
+  //   }
+  //
+  //   final List<Tuple2<isar_models.Transaction, isar_models.Address?>> txnsData =
+  //       [];
+  //
+  //   for (final txObject in allTransactions) {
+  //     final data = await parseTransaction(
+  //       txObject,
+  //       cachedElectrumXClient,
+  //       [address],
+  //       coin,
+  //       MINIMUM_CONFIRMATIONS,
+  //       walletId,
+  //     );
+  //
+  //     txnsData.add(data);
+  //   }
+  //   await db.addNewTransactionData(txnsData, walletId);
+  // }
 
   Future<void> _refreshTransactions() async {
     final List<isar_models.Address> allAddresses =
@@ -2245,12 +2187,12 @@ class BitcoinWallet extends CoinServiceAPI
   }
 
   /// The coinselection algorithm decides whether or not the user is eligible to make the transaction
-  /// with [satoshiAmountToSend] and [selectedTxFeeRate]. If so, it will call buildTrasaction() and return
+  /// with [satoshiAmountToSend] and [selectedTxFeeRatePerKB]. If so, it will call buildTrasaction() and return
   /// a map containing the tx hex along with other important information. If not, then it will return
   /// an integer (1 or 2)
   dynamic coinSelection({
     required int satoshiAmountToSend,
-    required int selectedTxFeeRate,
+    required int selectedTxFeeRatePerKB,
     required String recipientAddress,
     required bool coinControl,
     required bool isSendAll,
@@ -2353,6 +2295,15 @@ class BitcoinWallet extends CoinServiceAPI
     // gather required signing data
     final utxoSigningData = await fetchBuildTxData(utxoObjectsToUse);
 
+    Set<isar_models.UTXO> utxoSetFromSigningData() {
+      final list = utxoSigningData.map((e) => e.utxo);
+      final set = list.toSet();
+      if (set.length != list.length) {
+        throw Exception("UTXOs to set lost one or more utxos!");
+      }
+      return set;
+    }
+
     if (isSendAll) {
       Logging.instance
           .log("Attempting to send all $coin", level: LogLevel.Info);
@@ -2366,14 +2317,14 @@ class BitcoinWallet extends CoinServiceAPI
           ? (satsPerVByte * vSizeForOneOutput)
           : estimateTxFee(
               vSize: vSizeForOneOutput,
-              feeRatePerKB: selectedTxFeeRate,
+              feeRatePerKB: selectedTxFeeRatePerKB,
             );
 
       if (satsPerVByte == null) {
         final int roughEstimate = roughFeeEstimate(
           spendableOutputs.length,
           1,
-          selectedTxFeeRate,
+          selectedTxFeeRatePerKB,
         ).raw.toInt();
         if (feeForOneOutput < roughEstimate) {
           feeForOneOutput = roughEstimate;
@@ -2386,18 +2337,24 @@ class BitcoinWallet extends CoinServiceAPI
         recipients: recipientsArray,
         satoshiAmounts: [amount],
       );
-      Map<String, dynamic> transactionObject = {
-        "hex": txn["hex"],
-        "recipient": recipientsArray[0],
-        "recipientAmt": Amount(
-          rawValue: BigInt.from(amount),
+      return TxData(
+        raw: txn["hex"] as String,
+        recipients: [
+          (
+            address: recipientsArray[0],
+            amount: Amount(
+              rawValue: BigInt.from(amount),
+              fractionDigits: coin.decimals,
+            ),
+          ),
+        ],
+        fee: Amount(
+          rawValue: BigInt.from(feeForOneOutput),
           fractionDigits: coin.decimals,
         ),
-        "fee": feeForOneOutput,
-        "vSize": txn["vSize"],
-        "usedUTXOs": utxoSigningData.map((e) => e.utxo).toList(),
-      };
-      return transactionObject;
+        vSize: txn["vSize"] as int,
+        utxos: utxoSetFromSigningData(),
+      );
     }
 
     final int vSizeForOneOutput;
@@ -2435,14 +2392,14 @@ class BitcoinWallet extends CoinServiceAPI
         ? (satsPerVByte * vSizeForOneOutput)
         : estimateTxFee(
             vSize: vSizeForOneOutput,
-            feeRatePerKB: selectedTxFeeRate,
+            feeRatePerKB: selectedTxFeeRatePerKB,
           );
     // Assume 2 outputs, one for recipient and one for change
     final feeForTwoOutputs = satsPerVByte != null
         ? (satsPerVByte * vSizeForTwoOutPuts)
         : estimateTxFee(
             vSize: vSizeForTwoOutPuts,
-            feeRatePerKB: selectedTxFeeRate,
+            feeRatePerKB: selectedTxFeeRatePerKB,
           );
 
     Logging.instance
@@ -2520,18 +2477,24 @@ class BitcoinWallet extends CoinServiceAPI
             );
           }
 
-          Map<String, dynamic> transactionObject = {
-            "hex": txn["hex"],
-            "recipient": recipientsArray[0],
-            "recipientAmt": Amount(
-              rawValue: BigInt.from(recipientsAmtArray[0]),
+          return TxData(
+            raw: txn["hex"] as String,
+            recipients: [
+              (
+                address: recipientsArray[0],
+                amount: Amount(
+                  rawValue: BigInt.from(recipientsAmtArray[0]),
+                  fractionDigits: coin.decimals,
+                ),
+              ),
+            ],
+            fee: Amount(
+              rawValue: BigInt.from(feeBeingPaid),
               fractionDigits: coin.decimals,
             ),
-            "fee": feeBeingPaid,
-            "vSize": txn["vSize"],
-            "usedUTXOs": utxoSigningData.map((e) => e.utxo).toList(),
-          };
-          return transactionObject;
+            vSize: txn["vSize"] as int,
+            utxos: utxoSetFromSigningData(),
+          );
         } else {
           // Something went wrong here. It either overshot or undershot the estimated fee amount or the changeOutputSize
           // is smaller than or equal to DUST_LIMIT. Revert to single output transaction.
@@ -2550,18 +2513,25 @@ class BitcoinWallet extends CoinServiceAPI
             recipients: recipientsArray,
             satoshiAmounts: recipientsAmtArray,
           );
-          Map<String, dynamic> transactionObject = {
-            "hex": txn["hex"],
-            "recipient": recipientsArray[0],
-            "recipientAmt": Amount(
-              rawValue: BigInt.from(recipientsAmtArray[0]),
+
+          return TxData(
+            raw: txn["hex"] as String,
+            recipients: [
+              (
+                address: recipientsArray[0],
+                amount: Amount(
+                  rawValue: BigInt.from(recipientsAmtArray[0]),
+                  fractionDigits: coin.decimals,
+                ),
+              ),
+            ],
+            fee: Amount(
+              rawValue: BigInt.from(satoshisBeingUsed - satoshiAmountToSend),
               fractionDigits: coin.decimals,
             ),
-            "fee": satoshisBeingUsed - satoshiAmountToSend,
-            "vSize": txn["vSize"],
-            "usedUTXOs": utxoSigningData.map((e) => e.utxo).toList(),
-          };
-          return transactionObject;
+            vSize: txn["vSize"] as int,
+            utxos: utxoSetFromSigningData(),
+          );
         }
       } else {
         // No additional outputs needed since adding one would mean that it'd be smaller than DUST_LIMIT sats
@@ -2582,18 +2552,25 @@ class BitcoinWallet extends CoinServiceAPI
           recipients: recipientsArray,
           satoshiAmounts: recipientsAmtArray,
         );
-        Map<String, dynamic> transactionObject = {
-          "hex": txn["hex"],
-          "recipient": recipientsArray[0],
-          "recipientAmt": Amount(
-            rawValue: BigInt.from(recipientsAmtArray[0]),
+
+        return TxData(
+          raw: txn["hex"] as String,
+          recipients: [
+            (
+              address: recipientsArray[0],
+              amount: Amount(
+                rawValue: BigInt.from(recipientsAmtArray[0]),
+                fractionDigits: coin.decimals,
+              ),
+            ),
+          ],
+          fee: Amount(
+            rawValue: BigInt.from(satoshisBeingUsed - satoshiAmountToSend),
             fractionDigits: coin.decimals,
           ),
-          "fee": satoshisBeingUsed - satoshiAmountToSend,
-          "vSize": txn["vSize"],
-          "usedUTXOs": utxoSigningData.map((e) => e.utxo).toList(),
-        };
-        return transactionObject;
+          vSize: txn["vSize"] as int,
+          utxos: utxoSetFromSigningData(),
+        );
       }
     } else if (satoshisBeingUsed - satoshiAmountToSend == feeForOneOutput) {
       // In this scenario, no additional change output is needed since inputs - outputs equal exactly
@@ -2614,18 +2591,25 @@ class BitcoinWallet extends CoinServiceAPI
         recipients: recipientsArray,
         satoshiAmounts: recipientsAmtArray,
       );
-      Map<String, dynamic> transactionObject = {
-        "hex": txn["hex"],
-        "recipient": recipientsArray[0],
-        "recipientAmt": Amount(
-          rawValue: BigInt.from(recipientsAmtArray[0]),
+
+      return TxData(
+        raw: txn["hex"] as String,
+        recipients: [
+          (
+            address: recipientsArray[0],
+            amount: Amount(
+              rawValue: BigInt.from(recipientsAmtArray[0]),
+              fractionDigits: coin.decimals,
+            ),
+          ),
+        ],
+        fee: Amount(
+          rawValue: BigInt.from(feeForOneOutput),
           fractionDigits: coin.decimals,
         ),
-        "fee": feeForOneOutput,
-        "vSize": txn["vSize"],
-        "usedUTXOs": utxoSigningData.map((e) => e.utxo).toList(),
-      };
-      return transactionObject;
+        vSize: txn["vSize"] as int,
+        utxos: utxoSetFromSigningData(),
+      );
     } else {
       // Remember that returning 2 indicates that the user does not have a sufficient balance to
       // pay for the transaction fee. Ideally, at this stage, we should check if the user has any
@@ -2637,7 +2621,7 @@ class BitcoinWallet extends CoinServiceAPI
       if (spendableOutputs.length > inputsBeingConsumed) {
         return coinSelection(
           satoshiAmountToSend: satoshiAmountToSend,
-          selectedTxFeeRate: selectedTxFeeRate,
+          selectedTxFeeRatePerKB: selectedTxFeeRatePerKB,
           satsPerVByte: satsPerVByte,
           recipientAddress: recipientAddress,
           isSendAll: isSendAll,
@@ -2696,35 +2680,12 @@ class BitcoinWallet extends CoinServiceAPI
         final address = await db.getAddress(walletId, sd.utxo.address!);
         if (address?.derivationPath != null) {
           final bip32.BIP32 node;
-          if (address!.subType == isar_models.AddressSubType.paynymReceive) {
-            final code = await paymentCodeStringByKey(address.otherData!);
-
-            final bip47base = await getBip47BaseNode();
-
-            final privateKey = await getPrivateKeyForPaynymReceivingAddress(
-              paymentCodeString: code!,
-              index: address.derivationIndex,
-            );
-
-            node = bip32.BIP32.fromPrivateKey(
-              privateKey,
-              bip47base.chainCode,
-              bip32.NetworkType(
-                wif: _network.wif,
-                bip32: bip32.Bip32Type(
-                  public: _network.bip32.public,
-                  private: _network.bip32.private,
-                ),
-              ),
-            );
-          } else {
-            node = await Bip32Utils.getBip32Node(
-              (await mnemonicString)!,
-              (await mnemonicPassphrase)!,
-              _network,
-              address.derivationPath!.value,
-            );
-          }
+          node = await Bip32Utils.getBip32Node(
+            (await mnemonicString)!,
+            (await mnemonicPassphrase)!,
+            _network,
+            address!.derivationPath!.value,
+          );
 
           wif = node.toWIF();
           pubKey = Format.uint8listToString(node.publicKey);

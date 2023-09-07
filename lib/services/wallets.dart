@@ -10,20 +10,23 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackwallet/db/hive/db.dart';
-import 'package:stackwallet/models/node_model.dart';
-import 'package:stackwallet/services/coins/coin_service.dart';
-import 'package:stackwallet/services/coins/manager.dart';
-import 'package:stackwallet/services/node_service.dart';
-import 'package:stackwallet/services/transaction_notification_tracker.dart';
-import 'package:stackwallet/services/wallets_service.dart';
-import 'package:stackwallet/utilities/default_nodes.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/enums/sync_type_enum.dart';
-import 'package:stackwallet/utilities/listenable_list.dart';
-import 'package:stackwallet/utilities/listenable_map.dart';
-import 'package:stackwallet/utilities/logger.dart';
-import 'package:stackwallet/utilities/prefs.dart';
+import 'package:stackfrost/db/hive/db.dart';
+import 'package:stackfrost/electrumx_rpc/cached_electrumx.dart';
+import 'package:stackfrost/electrumx_rpc/electrumx.dart';
+import 'package:stackfrost/models/node_model.dart';
+import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
+import 'package:stackfrost/services/coins/coin_service.dart';
+import 'package:stackfrost/services/coins/manager.dart';
+import 'package:stackfrost/services/node_service.dart';
+import 'package:stackfrost/services/transaction_notification_tracker.dart';
+import 'package:stackfrost/services/wallets_service.dart';
+import 'package:stackfrost/utilities/default_nodes.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/enums/sync_type_enum.dart';
+import 'package:stackfrost/utilities/listenable_list.dart';
+import 'package:stackfrost/utilities/listenable_map.dart';
+import 'package:stackfrost/utilities/logger.dart';
+import 'package:stackfrost/utilities/prefs.dart';
 import 'package:tuple/tuple.dart';
 
 final ListenableList<ChangeNotifierProvider<Manager>> _nonFavorites =
@@ -240,31 +243,63 @@ class Wallets extends ChangeNotifier {
             final failovers = nodeService.failoverNodesFor(coin: coin);
 
             // load wallet
-            final wallet = CoinServiceAPI.from(
-              coin,
-              walletId,
-              entry.value.name,
-              nodeService.secureStorageInterface,
-              node,
-              txTracker,
-              prefs,
-              failovers,
-            );
+            final CoinServiceAPI wallet;
+            if (entry.value.type == WalletType.normal) {
+              wallet = CoinServiceAPI.from(
+                coin,
+                walletId,
+                entry.value.name,
+                nodeService.secureStorageInterface,
+                node,
+                txTracker,
+                prefs,
+                failovers,
+              );
+            } else {
+              final electrumxNode = ElectrumXNode(
+                address: node.host,
+                port: node.port,
+                name: node.name,
+                id: node.id,
+                useSSL: node.useSSL,
+              );
+              final client = ElectrumX.from(
+                  node: electrumxNode,
+                  failovers: failovers
+                      .map((e) => ElectrumXNode(
+                            address: e.host,
+                            port: e.port,
+                            name: e.name,
+                            id: e.id,
+                            useSSL: e.useSSL,
+                          ))
+                      .toList(),
+                  prefs: prefs);
+              final cachedClient = CachedElectrumX.from(
+                electrumXClient: client,
+              );
+
+              wallet = FrostWallet(
+                walletId: walletId,
+                walletName: entry.value.name,
+                coin: coin,
+                client: client,
+                cachedClient: cachedClient,
+                tracker: txTracker,
+                secureStore: nodeService.secureStorageInterface,
+              );
+            }
 
             final manager = Manager(wallet);
 
             final shouldSetAutoSync = shouldAutoSyncAll ||
                 walletIdsToEnableAutoSync.contains(manager.walletId);
 
-            if (manager.coin == Coin.monero || manager.coin == Coin.wownero) {
-              // walletsToInitLinearly.add(Tuple2(manager, shouldSetAutoSync));
-            } else {
-              walletInitFutures.add(manager.initializeExisting().then((value) {
-                if (shouldSetAutoSync) {
-                  manager.shouldAutoSync = true;
-                }
-              }));
-            }
+            walletInitFutures.add(manager.initializeExisting().then((value) {
+              if (shouldSetAutoSync) {
+                manager.shouldAutoSync = true;
+              }
+            }));
 
             _managerMap.add(walletId, manager, false);
 
@@ -346,15 +381,11 @@ class Wallets extends ChangeNotifier {
           final shouldSetAutoSync = shouldAutoSyncAll ||
               walletIdsToEnableAutoSync.contains(manager.walletId);
 
-          if (manager.coin == Coin.monero || manager.coin == Coin.wownero) {
-            // walletsToInitLinearly.add(Tuple2(manager, shouldSetAutoSync));
-          } else {
-            walletInitFutures.add(manager.initializeExisting().then((value) {
-              if (shouldSetAutoSync) {
-                manager.shouldAutoSync = true;
-              }
-            }));
-          }
+          walletInitFutures.add(manager.initializeExisting().then((value) {
+            if (shouldSetAutoSync) {
+              manager.shouldAutoSync = true;
+            }
+          }));
 
           _managerMap.add(walletId, manager, false);
 

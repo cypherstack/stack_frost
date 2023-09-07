@@ -11,24 +11,30 @@
 import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
-import 'package:stackwallet/utilities/logger.dart';
-import 'package:stackwallet/utilities/util.dart';
+import 'package:stackfrost/utilities/logger.dart';
+import 'package:stackfrost/utilities/util.dart';
 
 abstract class StackFileSystem {
+  static String? overrideDir;
+
   static Future<Directory> applicationRootDirectory() async {
     Directory appDirectory;
 
     // todo: can merge and do same as regular linux home dir?
     if (Logging.isArmLinux) {
       appDirectory = await getApplicationDocumentsDirectory();
-      appDirectory = Directory("${appDirectory.path}/.stackwallet");
+      appDirectory = Directory("${appDirectory.path}/.stackfrost");
     } else if (Platform.isLinux) {
-      appDirectory = Directory("${Platform.environment['HOME']}/.stackwallet");
+      if (overrideDir != null) {
+        appDirectory = Directory(overrideDir!);
+      } else {
+        appDirectory = Directory("${Platform.environment['HOME']}/.stackfrost");
+      }
     } else if (Platform.isWindows) {
       appDirectory = await getApplicationSupportDirectory();
     } else if (Platform.isMacOS) {
       appDirectory = await getLibraryDirectory();
-      appDirectory = Directory("${appDirectory.path}/stackwallet");
+      appDirectory = Directory("${appDirectory.path}/stackfrost");
     } else if (Platform.isIOS) {
       // todo: check if we need different behaviour here
       if (Util.isDesktop) {

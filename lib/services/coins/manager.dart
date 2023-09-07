@@ -12,21 +12,21 @@ import 'dart:async';
 
 import 'package:event_bus/event_bus.dart';
 import 'package:flutter/material.dart';
-import 'package:stackwallet/db/hive/db.dart';
-import 'package:stackwallet/models/balance.dart';
-import 'package:stackwallet/models/isar/models/isar_models.dart' as isar_models;
-import 'package:stackwallet/models/models.dart';
-import 'package:stackwallet/services/coins/coin_service.dart';
-import 'package:stackwallet/services/event_bus/events/global/node_connection_status_changed_event.dart';
-import 'package:stackwallet/services/event_bus/events/global/updated_in_background_event.dart';
-import 'package:stackwallet/services/event_bus/global_event_bus.dart';
-import 'package:stackwallet/services/mixins/coin_control_interface.dart';
-import 'package:stackwallet/services/mixins/ordinals_interface.dart';
-import 'package:stackwallet/services/mixins/paynym_wallet_interface.dart';
-import 'package:stackwallet/services/mixins/xpubable.dart';
-import 'package:stackwallet/utilities/amount/amount.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/logger.dart';
+import 'package:stackfrost/db/hive/db.dart';
+import 'package:stackfrost/models/balance.dart';
+import 'package:stackfrost/models/isar/models/isar_models.dart' as isar_models;
+import 'package:stackfrost/models/models.dart';
+import 'package:stackfrost/models/tx_data.dart';
+import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
+import 'package:stackfrost/services/coins/coin_service.dart';
+import 'package:stackfrost/services/event_bus/events/global/node_connection_status_changed_event.dart';
+import 'package:stackfrost/services/event_bus/events/global/updated_in_background_event.dart';
+import 'package:stackfrost/services/event_bus/global_event_bus.dart';
+import 'package:stackfrost/services/mixins/coin_control_interface.dart';
+import 'package:stackfrost/services/mixins/xpubable.dart';
+import 'package:stackfrost/utilities/amount/amount.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/logger.dart';
 
 class Manager with ChangeNotifier {
   final CoinServiceAPI _currentWallet;
@@ -102,16 +102,12 @@ class Manager with ChangeNotifier {
     super.dispose();
   }
 
-  Future<Map<String, dynamic>> prepareSend({
-    required String address,
-    required Amount amount,
-    Map<String, dynamic>? args,
+  Future<TxData> prepareSend({
+    required TxData txData,
   }) async {
     try {
       final txInfo = await _currentWallet.prepareSend(
-        address: address,
-        amount: amount,
-        args: args,
+        txData: txData,
       );
       // notifyListeners();
       return txInfo;
@@ -121,12 +117,11 @@ class Manager with ChangeNotifier {
     }
   }
 
-  Future<String> confirmSend({required Map<String, dynamic> txData}) async {
+  Future<TxData> confirmSend({required TxData txData}) async {
     try {
-      final txid = await _currentWallet.confirmSend(txData: txData);
+      txData = await _currentWallet.confirmSend(txData: txData);
 
       try {
-        txData["txid"] = txid;
         await _currentWallet.updateSentCachedTxData(txData);
       } catch (e, s) {
         // do not rethrow as that would get handled as a send failure further up
@@ -136,7 +131,7 @@ class Manager with ChangeNotifier {
       }
 
       notifyListeners();
-      return txid;
+      return txData;
     } catch (e) {
       // rethrow to pass error in alert
       rethrow;
@@ -241,13 +236,9 @@ class Manager with ChangeNotifier {
 
   int get currentHeight => _currentWallet.storedChainHeight;
 
-  bool get hasPaynymSupport => _currentWallet is PaynymWalletInterface;
-
   bool get hasCoinControlSupport => _currentWallet is CoinControlInterface;
 
-  bool get hasOrdinalsSupport => _currentWallet is OrdinalsInterface;
-
-  bool get hasTokenSupport => _currentWallet.coin == Coin.ethereum;
+  bool get isFrostMS => _currentWallet is FrostWallet;
 
   bool get hasWhirlpoolSupport => false;
 

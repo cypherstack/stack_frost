@@ -11,35 +11,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:stackwallet/providers/global/prefs_provider.dart';
-import 'package:stackwallet/providers/global/wallets_provider.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/assets.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/widgets/desktop/desktop_dialog.dart';
-import 'package:stackwallet/widgets/desktop/desktop_dialog_close_button.dart';
-import 'package:stackwallet/widgets/rounded_container.dart';
+import 'package:stackfrost/providers/global/prefs_provider.dart';
+import 'package:stackfrost/providers/global/wallets_provider.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/assets.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/widgets/desktop/desktop_dialog.dart';
+import 'package:stackfrost/widgets/desktop/desktop_dialog_close_button.dart';
+import 'package:stackfrost/widgets/rounded_container.dart';
 
 class MoreFeaturesDialog extends ConsumerStatefulWidget {
   const MoreFeaturesDialog({
     Key? key,
     required this.walletId,
-    required this.onPaynymPressed,
     required this.onCoinControlPressed,
-    required this.onAnonymizeAllPressed,
     required this.onWhirlpoolPressed,
-    required this.onOrdinalsPressed,
-    required this.onMonkeyPressed,
   }) : super(key: key);
 
   final String walletId;
-  final VoidCallback? onPaynymPressed;
   final VoidCallback? onCoinControlPressed;
-  final VoidCallback? onAnonymizeAllPressed;
   final VoidCallback? onWhirlpoolPressed;
-  final VoidCallback? onOrdinalsPressed;
-  final VoidCallback? onMonkeyPressed;
 
   @override
   ConsumerState<MoreFeaturesDialog> createState() => _MoreFeaturesDialogState();
@@ -79,13 +70,6 @@ class _MoreFeaturesDialogState extends ConsumerState<MoreFeaturesDialog> {
               const DesktopDialogCloseButton(),
             ],
           ),
-          if (manager.coin == Coin.firo || manager.coin == Coin.firoTestNet)
-            _MoreFeaturesItem(
-              label: "Anonymize funds",
-              detail: "Anonymize funds",
-              iconAsset: Assets.svg.recycle,
-              onPressed: () => widget.onAnonymizeAllPressed?.call(),
-            ),
           if (manager.hasWhirlpoolSupport)
             _MoreFeaturesItem(
               label: "Whirlpool",
@@ -93,34 +77,13 @@ class _MoreFeaturesDialogState extends ConsumerState<MoreFeaturesDialog> {
               iconAsset: Assets.svg.whirlPool,
               onPressed: () => widget.onWhirlpoolPressed?.call(),
             ),
-          if (manager.hasCoinControlSupport && coinControlPrefEnabled)
-            _MoreFeaturesItem(
-              label: "Coin control",
-              detail: "Control, freeze, and utilize outputs at your discretion",
-              iconAsset: Assets.svg.coinControl.gamePad,
-              onPressed: () => widget.onCoinControlPressed?.call(),
-            ),
-          if (manager.hasPaynymSupport)
-            _MoreFeaturesItem(
-              label: "PayNym",
-              detail: "Increased address privacy using BIP47",
-              iconAsset: Assets.svg.robotHead,
-              onPressed: () => widget.onPaynymPressed?.call(),
-            ),
-          if (manager.hasOrdinalsSupport)
-            _MoreFeaturesItem(
-              label: "Ordinals",
-              detail: "View and control your ordinals in Stack",
-              iconAsset: Assets.svg.ordinal,
-              onPressed: () => widget.onOrdinalsPressed?.call(),
-            ),
-          if (manager.coin == Coin.banano)
-            _MoreFeaturesItem(
-              label: "MonKey",
-              detail: "Generate Banano MonKey",
-              iconAsset: Assets.svg.monkey,
-              onPressed: () => widget.onMonkeyPressed?.call(),
-            ),
+          // if (manager.hasCoinControlSupport && coinControlPrefEnabled)
+          //   _MoreFeaturesItem(
+          //     label: "Coin control",
+          //     detail: "Control, freeze, and utilize outputs at your discretion",
+          //     iconAsset: Assets.svg.coinControl.gamePad,
+          //     onPressed: () => widget.onCoinControlPressed?.call(),
+          //   ),
           const SizedBox(
             height: 28,
           ),

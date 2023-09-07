@@ -10,7 +10,7 @@
 
 import 'package:hive/hive.dart';
 import 'package:stack_wallet_backup/secure_storage.dart';
-import 'package:stackwallet/utilities/logger.dart';
+import 'package:stackfrost/utilities/logger.dart';
 
 const String kBoxNameDesktopData = "desktopData";
 const String _kKeyBlobKey = "swbKeyBlobKeyStringID";

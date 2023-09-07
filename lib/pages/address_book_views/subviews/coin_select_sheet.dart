@@ -13,12 +13,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:stackwallet/providers/global/prefs_provider.dart';
-import 'package:stackwallet/themes/coin_image_provider.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/constants.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
+import 'package:stackfrost/providers/global/prefs_provider.dart';
+import 'package:stackfrost/themes/coin_image_provider.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/constants.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
 
 class CoinSelectSheet extends StatelessWidget {
   const CoinSelectSheet({Key? key}) : super(key: key);
@@ -27,7 +27,6 @@ class CoinSelectSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final maxHeight = MediaQuery.of(context).size.height * 0.60;
     var coins_ = [...Coin.values];
-    coins_.remove(Coin.firoTestNet);
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).extension<StackColors>()!.popupBG,

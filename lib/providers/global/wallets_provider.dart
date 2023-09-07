@@ -10,9 +10,9 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackwallet/providers/global/node_service_provider.dart';
-import 'package:stackwallet/providers/global/wallets_service_provider.dart';
-import 'package:stackwallet/services/wallets.dart';
+import 'package:stackfrost/providers/global/node_service_provider.dart';
+import 'package:stackfrost/providers/global/wallets_service_provider.dart';
+import 'package:stackfrost/services/wallets.dart';
 
 int _count = 0;
 

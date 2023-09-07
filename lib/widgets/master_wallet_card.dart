@@ -11,16 +11,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:stackwallet/providers/providers.dart';
-import 'package:stackwallet/services/coins/ethereum/ethereum_wallet.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/assets.dart';
-import 'package:stackwallet/utilities/constants.dart';
-import 'package:stackwallet/widgets/animated_widgets/rotate_icon.dart';
-import 'package:stackwallet/widgets/expandable.dart';
-import 'package:stackwallet/widgets/rounded_white_container.dart';
-import 'package:stackwallet/widgets/wallet_card.dart';
-import 'package:stackwallet/widgets/wallet_info_row/wallet_info_row.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/assets.dart';
+import 'package:stackfrost/utilities/constants.dart';
+import 'package:stackfrost/widgets/animated_widgets/rotate_icon.dart';
+import 'package:stackfrost/widgets/expandable.dart';
+import 'package:stackfrost/widgets/rounded_white_container.dart';
+import 'package:stackfrost/widgets/wallet_card.dart';
+import 'package:stackfrost/widgets/wallet_info_row/wallet_info_row.dart';
 
 class MasterWalletCard extends ConsumerStatefulWidget {
   const MasterWalletCard({
@@ -43,13 +41,6 @@ class _MasterWalletCardState extends ConsumerState<MasterWalletCard> {
 
   @override
   void initState() {
-    final ethWallet = ref
-        .read(walletsChangeNotifierProvider)
-        .getManager(widget.walletId)
-        .wallet as EthereumWallet;
-
-    tokenContractAddresses = ethWallet.getWalletTokenContractAddresses();
-
     super.initState();
   }
 

@@ -12,15 +12,9 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:cw_core/node.dart';
-import 'package:cw_core/unspent_coins_info.dart';
-import 'package:cw_core/wallet_info.dart';
-import 'package:cw_core/wallet_type.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_libmonero/monero/monero.dart';
-import 'package:flutter_libmonero/wownero/wownero.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -28,49 +22,44 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:isar/isar.dart';
 import 'package:keyboard_dismisser/keyboard_dismisser.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:stackwallet/db/hive/db.dart';
-import 'package:stackwallet/db/isar/main_db.dart';
-import 'package:stackwallet/models/exchange/change_now/exchange_transaction.dart';
-import 'package:stackwallet/models/exchange/change_now/exchange_transaction_status.dart';
-import 'package:stackwallet/models/exchange/response_objects/trade.dart';
-import 'package:stackwallet/models/isar/models/isar_models.dart';
-import 'package:stackwallet/models/models.dart';
-import 'package:stackwallet/models/node_model.dart';
-import 'package:stackwallet/models/notification_model.dart';
-import 'package:stackwallet/models/trade_wallet_lookup.dart';
-import 'package:stackwallet/pages/home_view/home_view.dart';
-import 'package:stackwallet/pages/intro_view.dart';
-import 'package:stackwallet/pages/loading_view.dart';
-import 'package:stackwallet/pages/pinpad_views/create_pin_view.dart';
-import 'package:stackwallet/pages/pinpad_views/lock_screen_view.dart';
-import 'package:stackwallet/pages/settings_views/global_settings_view/stack_backup_views/restore_from_encrypted_string_view.dart';
-import 'package:stackwallet/pages_desktop_specific/password/desktop_login_view.dart';
-import 'package:stackwallet/providers/desktop/storage_crypto_handler_provider.dart';
-import 'package:stackwallet/providers/global/auto_swb_service_provider.dart';
-import 'package:stackwallet/providers/global/base_currencies_provider.dart';
-// import 'package:stackwallet/providers/global/has_authenticated_start_state_provider.dart';
-import 'package:stackwallet/providers/global/trades_service_provider.dart';
-import 'package:stackwallet/providers/providers.dart';
-import 'package:stackwallet/route_generator.dart';
-// import 'package:stackwallet/services/buy/buy_data_loading_service.dart';
-import 'package:stackwallet/services/debug_service.dart';
-import 'package:stackwallet/services/exchange/exchange_data_loading_service.dart';
-import 'package:stackwallet/services/locale_service.dart';
-import 'package:stackwallet/services/node_service.dart';
-import 'package:stackwallet/services/notifications_api.dart';
-import 'package:stackwallet/services/notifications_service.dart';
-import 'package:stackwallet/services/trade_service.dart';
-import 'package:stackwallet/themes/theme_providers.dart';
-import 'package:stackwallet/themes/theme_service.dart';
-import 'package:stackwallet/utilities/constants.dart';
-import 'package:stackwallet/utilities/db_version_migration.dart';
-import 'package:stackwallet/utilities/enums/backup_frequency_type.dart';
-import 'package:stackwallet/utilities/flutter_secure_storage_interface.dart';
-import 'package:stackwallet/utilities/logger.dart';
-import 'package:stackwallet/utilities/prefs.dart';
-import 'package:stackwallet/utilities/stack_file_system.dart';
-import 'package:stackwallet/utilities/util.dart';
-import 'package:stackwallet/widgets/crypto_notifications.dart';
+import 'package:stackfrost/db/hive/db.dart';
+import 'package:stackfrost/db/isar/main_db.dart';
+import 'package:stackfrost/models/exchange/response_objects/trade.dart';
+import 'package:stackfrost/models/isar/models/isar_models.dart';
+import 'package:stackfrost/models/models.dart';
+import 'package:stackfrost/models/node_model.dart';
+import 'package:stackfrost/models/notification_model.dart';
+import 'package:stackfrost/models/trade_wallet_lookup.dart';
+import 'package:stackfrost/pages/home_view/home_view.dart';
+import 'package:stackfrost/pages/loading_view.dart';
+import 'package:stackfrost/pages/pinpad_views/create_pin_view.dart';
+import 'package:stackfrost/pages/pinpad_views/lock_screen_view.dart';
+import 'package:stackfrost/pages/settings_views/global_settings_view/stack_backup_views/restore_from_encrypted_string_view.dart';
+import 'package:stackfrost/pages_desktop_specific/password/create_password_view.dart';
+import 'package:stackfrost/pages_desktop_specific/password/desktop_login_view.dart';
+import 'package:stackfrost/providers/desktop/storage_crypto_handler_provider.dart';
+import 'package:stackfrost/providers/global/auto_swb_service_provider.dart';
+import 'package:stackfrost/providers/global/trades_service_provider.dart';
+import 'package:stackfrost/providers/providers.dart';
+import 'package:stackfrost/route_generator.dart';
+import 'package:stackfrost/services/debug_service.dart';
+import 'package:stackfrost/services/locale_service.dart';
+import 'package:stackfrost/services/node_service.dart';
+import 'package:stackfrost/services/notifications_api.dart';
+import 'package:stackfrost/services/notifications_service.dart';
+import 'package:stackfrost/services/trade_service.dart';
+import 'package:stackfrost/themes/theme_providers.dart';
+import 'package:stackfrost/themes/theme_service.dart';
+import 'package:stackfrost/utilities/assets.dart';
+import 'package:stackfrost/utilities/constants.dart';
+import 'package:stackfrost/utilities/db_version_migration.dart';
+import 'package:stackfrost/utilities/enums/backup_frequency_type.dart';
+import 'package:stackfrost/utilities/flutter_secure_storage_interface.dart';
+import 'package:stackfrost/utilities/logger.dart';
+import 'package:stackfrost/utilities/prefs.dart';
+import 'package:stackfrost/utilities/stack_file_system.dart';
+import 'package:stackfrost/utilities/util.dart';
+import 'package:stackfrost/widgets/crypto_notifications.dart';
 import 'package:window_size/window_size.dart';
 
 final openedFromSWBFileStringStateProvider =
@@ -79,7 +68,11 @@ final openedFromSWBFileStringStateProvider =
 // main() is the entry point to the app. It initializes Hive (local database),
 // runs the MyApp widget and checks for new users, caching the value in the
 // miscellaneous box for later use
-void main() async {
+void main(List<String> args) async {
+  if (args.length == 2 && args.first == "-d") {
+    StackFileSystem.overrideDir = args.last;
+  }
+
   WidgetsFlutterBinding.ensureInitialized();
   GoogleFonts.config.allowRuntimeFetching = false;
   if (Platform.isIOS) {
@@ -121,17 +114,17 @@ void main() async {
     unawaited(DebugService.instance.deleteLogsOlderThan());
   }
 
-  // Registering Transaction Model Adapters
-  Hive.registerAdapter(TransactionDataAdapter());
-  Hive.registerAdapter(TransactionChunkAdapter());
-  Hive.registerAdapter(TransactionAdapter());
-  Hive.registerAdapter(InputAdapter());
-  Hive.registerAdapter(OutputAdapter());
-
-  // Registering Utxo Model Adapters
-  Hive.registerAdapter(UtxoDataAdapter());
-  Hive.registerAdapter(UtxoObjectAdapter());
-  Hive.registerAdapter(StatusAdapter());
+  // // Registering Transaction Model Adapters
+  // Hive.registerAdapter(TransactionDataAdapter());
+  // Hive.registerAdapter(TransactionChunkAdapter());
+  // Hive.registerAdapter(TransactionAdapter());
+  // Hive.registerAdapter(InputAdapter());
+  // Hive.registerAdapter(OutputAdapter());
+  //
+  // // Registering Utxo Model Adapters
+  // Hive.registerAdapter(UtxoDataAdapter());
+  // Hive.registerAdapter(UtxoObjectAdapter());
+  // Hive.registerAdapter(StatusAdapter());
 
   // Registering Lelantus Model Adapters
   Hive.registerAdapter(LelantusCoinAdapter());
@@ -140,8 +133,8 @@ void main() async {
   Hive.registerAdapter(NotificationModelAdapter());
 
   // change now trade adapters
-  Hive.registerAdapter(ExchangeTransactionAdapter());
-  Hive.registerAdapter(ExchangeTransactionStatusAdapter());
+  // Hive.registerAdapter(ExchangeTransactionAdapter());
+  // Hive.registerAdapter(ExchangeTransactionStatusAdapter());
 
   Hive.registerAdapter(TradeAdapter());
 
@@ -151,15 +144,15 @@ void main() async {
   // node model adapter
   Hive.registerAdapter(NodeModelAdapter());
 
-  Hive.registerAdapter(NodeAdapter());
-
-  if (!Hive.isAdapterRegistered(WalletInfoAdapter().typeId)) {
-    Hive.registerAdapter(WalletInfoAdapter());
-  }
-
-  Hive.registerAdapter(WalletTypeAdapter());
-
-  Hive.registerAdapter(UnspentCoinsInfoAdapter());
+  // Hive.registerAdapter(NodeAdapter());
+  //
+  // if (!Hive.isAdapterRegistered(WalletInfoAdapter().typeId)) {
+  //   Hive.registerAdapter(WalletInfoAdapter());
+  // }
+  //
+  // Hive.registerAdapter(WalletTypeAdapter());
+  //
+  // Hive.registerAdapter(UnspentCoinsInfoAdapter());
   await Hive.initFlutter(
       (await StackFileSystem.applicationHiveDirectory()).path);
 
@@ -188,13 +181,6 @@ void main() async {
             level: LogLevel.Error, printFullLength: true);
       }
     }
-  }
-
-  if (!Platform.isWindows) {
-    monero.onStartup();
-  }
-  if (!Platform.isLinux && !Platform.isWindows) {
-    wownero.onStartup();
   }
 
   // SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
@@ -294,12 +280,12 @@ class _MaterialAppWithThemeState extends ConsumerState<MaterialAppWithTheme>
           await ref.read(storageCryptoHandlerProvider).hasPassword();
     }
 
-    ref
-        .read(priceAnd24hChangeNotifierProvider)
-        .tokenContractAddressesToCheck
-        .addAll(
-          await MainDB.instance.getEthContracts().addressProperty().findAll(),
-        );
+    // ref
+    //     .read(priceAnd24hChangeNotifierProvider)
+    //     .tokenContractAddressesToCheck
+    //     .addAll(
+    //       await MainDB.instance.getEthContracts().addressProperty().findAll(),
+    //     );
   }
 
   Future<void> load() async {
@@ -323,7 +309,7 @@ class _MaterialAppWithThemeState extends ConsumerState<MaterialAppWithTheme>
       NotificationApi.prefs = ref.read(prefsChangeNotifierProvider);
       NotificationApi.notificationsService = _notificationsService;
 
-      unawaited(ref.read(baseCurrenciesProvider).update());
+      // unawaited(ref.read(baseCurrenciesProvider).update());
 
       await _nodeService.updateDefaults();
       await _notificationsService.init(
@@ -331,7 +317,7 @@ class _MaterialAppWithThemeState extends ConsumerState<MaterialAppWithTheme>
         tradesService: _tradesService,
         prefs: ref.read(prefsChangeNotifierProvider),
       );
-      ref.read(priceAnd24hChangeNotifierProvider).start(true);
+      // ref.read(priceAnd24hChangeNotifierProvider).start(true);
       await ref
           .read(walletsChangeNotifierProvider)
           .load(ref.read(prefsChangeNotifierProvider));
@@ -339,21 +325,13 @@ class _MaterialAppWithThemeState extends ConsumerState<MaterialAppWithTheme>
       // TODO: this should probably run unawaited. Keep commented out for now as proper community nodes ui hasn't been implemented yet
       //  unawaited(_nodeService.updateCommunityNodes());
 
-      await ExchangeDataLoadingService.instance.initDB();
       // run without awaiting
-      if (ref.read(prefsChangeNotifierProvider).externalCalls &&
-          await ref.read(prefsChangeNotifierProvider).isExternalCallsSet()) {
-        if (Constants.enableExchange) {
-          await ExchangeDataLoadingService.instance.setCurrenciesIfEmpty(
-            ref.read(efCurrencyPairProvider),
-            ref.read(efRateTypeProvider),
-          );
-          unawaited(ExchangeDataLoadingService.instance.loadAll());
-        }
-        // if (Constants.enableBuy) {
-        //   unawaited(BuyDataLoadingService().loadAll(ref));
-        // }
-      }
+      // if (ref.read(prefsChangeNotifierProvider).externalCalls &&
+      //     await ref.read(prefsChangeNotifierProvider).isExternalCallsSet()) {
+      //   // if (Constants.enableBuy) {
+      //   //   unawaited(BuyDataLoadingService().loadAll(ref));
+      //   // }
+      // }
 
       if (ref.read(prefsChangeNotifierProvider).isAutoBackupEnabled) {
         switch (ref.read(prefsChangeNotifierProvider).backupFrequencyType) {
@@ -693,7 +671,12 @@ class _MaterialAppWithThemeState extends ConsumerState<MaterialAppWithTheme>
       home: CryptoNotifications(
         child: Util.isDesktop
             ? FutureBuilder(
-                future: loadShared(),
+                future: Future.wait([
+                  loadShared(),
+                  Future<void>.delayed(
+                    const Duration(seconds: 3),
+                  ),
+                ]),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
                     if (_desktopHasPassword) {
@@ -711,15 +694,22 @@ class _MaterialAppWithThemeState extends ConsumerState<MaterialAppWithTheme>
                         load: load,
                       );
                     } else {
-                      return const IntroView();
+                      return const CreatePasswordView();
                     }
                   } else {
-                    return const LoadingView();
+                    return LoadingView(
+                      overridePngImage: Assets.png.icon,
+                    );
                   }
                 },
               )
             : FutureBuilder(
-                future: load(),
+                future: Future.wait([
+                  load(),
+                  Future<void>.delayed(
+                    const Duration(seconds: 4),
+                  ),
+                ]),
                 builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
                     // FlutterNativeSplash.remove();
@@ -746,14 +736,16 @@ class _MaterialAppWithThemeState extends ConsumerState<MaterialAppWithTheme>
                         biometricsCancelButtonString: "Cancel",
                       );
                     } else {
-                      return const IntroView();
+                      return const CreatePinView();
                     }
                   } else {
                     // CURRENTLY DISABLED as cannot be animated
                     // technically not needed as FlutterNativeSplash will overlay
                     // anything returned here until the future completes but
                     // FutureBuilder requires you to return something
-                    return const LoadingView();
+                    return LoadingView(
+                      overridePngImage: Assets.png.icon,
+                    );
                   }
                 },
               ),

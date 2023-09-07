@@ -9,9 +9,9 @@
  */
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackwallet/models/isar/stack_theme.dart';
-import 'package:stackwallet/themes/theme_providers.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/models/isar/stack_theme.dart';
+import 'package:stackfrost/themes/theme_providers.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
 
 final coinCardProvider = Provider.family<String?, Coin>((ref, coin) {
   final assets = ref.watch(themeAssetsProvider);

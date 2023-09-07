@@ -11,24 +11,26 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackwallet/pages/wallets_view/sub_widgets/all_wallets.dart';
-import 'package:stackwallet/pages/wallets_view/sub_widgets/empty_wallets.dart';
-import 'package:stackwallet/pages/wallets_view/sub_widgets/favorite_wallets.dart';
-import 'package:stackwallet/providers/providers.dart';
-import 'package:stackwallet/themes/theme_providers.dart';
+import 'package:stackfrost/pages/wallets_view/sub_widgets/all_wallets.dart';
+import 'package:stackfrost/pages/wallets_view/sub_widgets/empty_wallets.dart';
+import 'package:stackfrost/pages/wallets_view/sub_widgets/favorite_wallets.dart';
+import 'package:stackfrost/providers/providers.dart';
+import 'package:stackfrost/themes/theme_providers.dart';
 
 class WalletsView extends ConsumerWidget {
   const WalletsView({Key? key}) : super(key: key);
 
   static const routeName = "/wallets";
 
+  static const showFavorites = false;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     debugPrint("BUILD: $runtimeType");
     final hasWallets = ref.watch(walletsChangeNotifierProvider).hasWallets;
 
-    final showFavorites = ref.watch(prefsChangeNotifierProvider
-        .select((value) => value.showFavoriteWallets));
+    // final showFavorites = ref.watch(prefsChangeNotifierProvider
+    //     .select((value) => value.showFavoriteWallets));
 
     return SafeArea(
       child: hasWallets
@@ -37,15 +39,15 @@ class WalletsView extends ConsumerWidget {
                 top:
                     ref.watch(themeProvider).themeId == "fruit_sorbet" ? 6 : 20,
               ),
-              child: Column(
+              child: const Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  if (showFavorites) const FavoriteWallets(),
+                  if (showFavorites) FavoriteWallets(),
                   if (showFavorites)
-                    const SizedBox(
+                    SizedBox(
                       height: 20,
                     ),
-                  const Expanded(
+                  Expanded(
                     child: Padding(
                       padding: EdgeInsets.symmetric(
                         horizontal: 16,

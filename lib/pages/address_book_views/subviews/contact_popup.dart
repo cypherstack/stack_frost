@@ -14,22 +14,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:stackwallet/models/send_view_auto_fill_data.dart';
-import 'package:stackwallet/notifications/show_flush_bar.dart';
-import 'package:stackwallet/pages/address_book_views/subviews/contact_details_view.dart';
-import 'package:stackwallet/pages/exchange_view/exchange_step_views/step_2_view.dart';
-import 'package:stackwallet/pages/send_view/send_view.dart';
-import 'package:stackwallet/providers/global/address_book_service_provider.dart';
-import 'package:stackwallet/providers/providers.dart';
-import 'package:stackwallet/themes/coin_icon_provider.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/themes/theme_providers.dart';
-import 'package:stackwallet/utilities/assets.dart';
-import 'package:stackwallet/utilities/clipboard_interface.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/widgets/rounded_container.dart';
-import 'package:stackwallet/widgets/rounded_white_container.dart';
+import 'package:stackfrost/models/send_view_auto_fill_data.dart';
+import 'package:stackfrost/notifications/show_flush_bar.dart';
+import 'package:stackfrost/pages/address_book_views/subviews/contact_details_view.dart';
+import 'package:stackfrost/pages/send_view/send_view.dart';
+import 'package:stackfrost/providers/global/address_book_service_provider.dart';
+import 'package:stackfrost/providers/providers.dart';
+import 'package:stackfrost/themes/coin_icon_provider.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/themes/theme_providers.dart';
+import 'package:stackfrost/utilities/assets.dart';
+import 'package:stackfrost/utilities/clipboard_interface.dart';
+import 'package:stackfrost/utilities/enums/coin_enum.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/widgets/rounded_container.dart';
+import 'package:stackfrost/widgets/rounded_white_container.dart';
 import 'package:tuple/tuple.dart';
 
 final exchangeFromAddressBookAddressStateProvider =
@@ -60,11 +59,9 @@ class ContactPopUp extends ConsumerWidget {
     assert(active.isEmpty || active.length == 1);
 
     bool hasActiveWallet = active.length == 1;
-    bool isExchangeFlow =
-        ref.watch(exchangeFlowIsActiveStateProvider.state).state;
 
     final addresses = contact.addressesSorted.where((e) {
-      if (hasActiveWallet && !isExchangeFlow) {
+      if (hasActiveWallet) {
         return e.coin == active[0].coin;
       } else {
         return true;
@@ -307,54 +304,13 @@ class ContactPopUp extends ConsumerWidget {
                                           ),
                                         ],
                                       ),
-                                      if (isExchangeFlow)
-                                        const SizedBox(
-                                          width: 6,
-                                        ),
-                                      if (isExchangeFlow)
-                                        Column(
-                                          children: [
-                                            const SizedBox(
-                                              height: 2,
-                                            ),
-                                            GestureDetector(
-                                              onTap: () {
-                                                ref
-                                                    .read(
-                                                        exchangeFromAddressBookAddressStateProvider
-                                                            .state)
-                                                    .state = e.address;
-                                                Navigator.of(context).popUntil(
-                                                    ModalRoute.withName(
-                                                        Step2View.routeName));
-                                              },
-                                              child: RoundedContainer(
-                                                color: Theme.of(context)
-                                                    .extension<StackColors>()!
-                                                    .textFieldDefaultBG,
-                                                padding:
-                                                    const EdgeInsets.all(6),
-                                                child: SvgPicture.asset(
-                                                    Assets.svg.chevronRight,
-                                                    width: 16,
-                                                    height: 16,
-                                                    color: Theme.of(context)
-                                                        .extension<
-                                                            StackColors>()!
-                                                        .accentColorDark),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
                                       if (contact.customId != "default" &&
-                                          hasActiveWallet &&
-                                          !isExchangeFlow)
+                                          hasActiveWallet)
                                         const SizedBox(
                                           width: 4,
                                         ),
                                       if (contact.customId != "default" &&
-                                          hasActiveWallet &&
-                                          !isExchangeFlow)
+                                          hasActiveWallet)
                                         Column(
                                           children: [
                                             const SizedBox(

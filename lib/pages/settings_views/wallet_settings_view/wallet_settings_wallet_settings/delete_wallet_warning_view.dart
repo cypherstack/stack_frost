@@ -10,13 +10,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackwallet/pages/settings_views/wallet_settings_view/wallet_settings_wallet_settings/delete_wallet_recovery_phrase_view.dart';
-import 'package:stackwallet/providers/providers.dart';
-import 'package:stackwallet/themes/stack_colors.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/widgets/background.dart';
-import 'package:stackwallet/widgets/custom_buttons/app_bar_icon_button.dart';
-import 'package:stackwallet/widgets/rounded_container.dart';
+import 'package:stackfrost/pages/settings_views/wallet_settings_view/wallet_settings_wallet_settings/delete_wallet_recovery_phrase_view.dart';
+import 'package:stackfrost/providers/providers.dart';
+import 'package:stackfrost/services/coins/bitcoin/frost_wallet.dart';
+import 'package:stackfrost/themes/stack_colors.dart';
+import 'package:stackfrost/utilities/text_styles.dart';
+import 'package:stackfrost/widgets/background.dart';
+import 'package:stackfrost/widgets/custom_buttons/app_bar_icon_button.dart';
+import 'package:stackfrost/widgets/rounded_container.dart';
 import 'package:tuple/tuple.dart';
 
 class DeleteWalletWarningView extends ConsumerWidget {
@@ -103,11 +104,23 @@ class DeleteWalletWarningView extends ConsumerWidget {
                       .read(walletsChangeNotifierProvider)
                       .getManager(walletId);
                   final mnemonic = await manager.mnemonic;
+
+                  ({String myName, String config, String keys})? data;
+                  if (manager.wallet is FrostWallet) {
+                    final wallet = manager.wallet as FrostWallet;
+                    data = (
+                      myName: wallet.myName,
+                      config: (await wallet.multisigConfig)!,
+                      keys: (await wallet.getSerializedKeys)!,
+                    );
+                  }
+
                   Navigator.of(context).pushNamed(
                     DeleteWalletRecoveryPhraseView.routeName,
-                    arguments: Tuple2(
+                    arguments: Tuple3(
                       manager,
                       mnemonic,
+                      data,
                     ),
                   );
                 },
