@@ -114,104 +114,123 @@ class WalletBackupView extends ConsumerWidget {
         body: Padding(
           padding: const EdgeInsets.all(16),
           child: frost
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    RoundedWhiteContainer(
-                      child: Text(
-                        "Please write down your backup data. Keep it safe and "
-                        "never share it with anyone. "
-                        "Your backup data is the only way you can access your "
-                        "funds if you forget your PIN, lose your phone, etc."
-                        "\n\n"
-                        "Stack Wallet does not keep nor is able to restore "
-                        "your backup data. "
-                        "Only you have access to your wallet.",
-                        style: STextStyles.label(context),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 24,
-                    ),
-                    // DetailItem(
-                    //   title: "My name",
-                    //   detail: frostWalletData!.myName,
-                    //   button: Util.isDesktop
-                    //       ? IconCopyButton(
-                    //           data: frostWalletData!.myName,
-                    //         )
-                    //       : SimpleCopyButton(
-                    //           data: frostWalletData!.myName,
-                    //         ),
-                    // ),
-                    // const SizedBox(
-                    //   height: 16,
-                    // ),
-                    DetailItem(
-                      title: "Multisig config",
-                      detail: frostWalletData!.config,
-                      button: Util.isDesktop
-                          ? IconCopyButton(
-                              data: frostWalletData!.config,
-                            )
-                          : SimpleCopyButton(
-                              data: frostWalletData!.config,
-                            ),
-                    ),
-                    const SizedBox(
-                      height: 16,
-                    ),
-                    DetailItem(
-                      title: "Keys",
-                      detail: frostWalletData!.keys,
-                      button: Util.isDesktop
-                          ? IconCopyButton(
-                              data: frostWalletData!.keys,
-                            )
-                          : SimpleCopyButton(
-                              data: frostWalletData!.keys,
-                            ),
-                    ),
-                    if (prevGen)
-                      const SizedBox(
-                        height: 24,
-                      ),
-                    if (prevGen)
-                      RoundedWhiteContainer(
-                        child: Text(
-                          "Previous generation info",
-                          style: STextStyles.label(context),
+              ? LayoutBuilder(
+                  builder: (builderContext, constraints) {
+                    return SingleChildScrollView(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: constraints.maxHeight - 24,
+                        ),
+                        child: IntrinsicHeight(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              RoundedWhiteContainer(
+                                child: Text(
+                                  "Please write down your backup data. Keep it safe and "
+                                  "never share it with anyone. "
+                                  "Your backup data is the only way you can access your "
+                                  "funds if you forget your PIN, lose your phone, etc."
+                                  "\n\n"
+                                  "Stack Wallet does not keep nor is able to restore "
+                                  "your backup data. "
+                                  "Only you have access to your wallet.",
+                                  style: STextStyles.label(context),
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 24,
+                              ),
+                              // DetailItem(
+                              //   title: "My name",
+                              //   detail: frostWalletData!.myName,
+                              //   button: Util.isDesktop
+                              //       ? IconCopyButton(
+                              //           data: frostWalletData!.myName,
+                              //         )
+                              //       : SimpleCopyButton(
+                              //           data: frostWalletData!.myName,
+                              //         ),
+                              // ),
+                              // const SizedBox(
+                              //   height: 16,
+                              // ),
+                              DetailItem(
+                                title: "Multisig config",
+                                detail: frostWalletData!.config,
+                                button: Util.isDesktop
+                                    ? IconCopyButton(
+                                        data: frostWalletData!.config,
+                                      )
+                                    : SimpleCopyButton(
+                                        data: frostWalletData!.config,
+                                      ),
+                              ),
+                              const SizedBox(
+                                height: 16,
+                              ),
+                              DetailItem(
+                                title: "Keys",
+                                detail: frostWalletData!.keys,
+                                button: Util.isDesktop
+                                    ? IconCopyButton(
+                                        data: frostWalletData!.keys,
+                                      )
+                                    : SimpleCopyButton(
+                                        data: frostWalletData!.keys,
+                                      ),
+                              ),
+                              if (prevGen)
+                                const SizedBox(
+                                  height: 24,
+                                ),
+                              if (prevGen)
+                                RoundedWhiteContainer(
+                                  child: Text(
+                                    "Previous generation info",
+                                    style: STextStyles.label(context),
+                                  ),
+                                ),
+                              if (prevGen)
+                                const SizedBox(
+                                  height: 12,
+                                ),
+                              if (prevGen)
+                                DetailItem(
+                                  title: "Previous multisig config",
+                                  detail: frostWalletData!.prevGen!.config,
+                                  button: Util.isDesktop
+                                      ? IconCopyButton(
+                                          data:
+                                              frostWalletData!.prevGen!.config,
+                                        )
+                                      : SimpleCopyButton(
+                                          data:
+                                              frostWalletData!.prevGen!.config,
+                                        ),
+                                ),
+                              if (prevGen)
+                                const SizedBox(
+                                  height: 16,
+                                ),
+                              if (prevGen)
+                                DetailItem(
+                                  title: "Previous keys",
+                                  detail: frostWalletData!.prevGen!.keys,
+                                  button: Util.isDesktop
+                                      ? IconCopyButton(
+                                          data: frostWalletData!.prevGen!.keys,
+                                        )
+                                      : SimpleCopyButton(
+                                          data: frostWalletData!.prevGen!.keys,
+                                        ),
+                                ),
+                            ],
+                          ),
                         ),
                       ),
-                    if (prevGen)
-                      DetailItem(
-                        title: "Previous multisig config",
-                        detail: frostWalletData!.prevGen!.config,
-                        button: Util.isDesktop
-                            ? IconCopyButton(
-                                data: frostWalletData!.prevGen!.config,
-                              )
-                            : SimpleCopyButton(
-                                data: frostWalletData!.prevGen!.config,
-                              ),
-                      ),
-                    if (prevGen)
-                      const SizedBox(
-                        height: 16,
-                      ),
-                    if (prevGen)
-                      DetailItem(
-                        title: "Previous keys",
-                        detail: frostWalletData!.prevGen!.keys,
-                        button: Util.isDesktop
-                            ? IconCopyButton(
-                                data: frostWalletData!.prevGen!.keys,
-                              )
-                            : SimpleCopyButton(
-                                data: frostWalletData!.prevGen!.keys,
-                              ),
-                      ),
-                  ],
+                    );
+                  },
                 )
               : Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
